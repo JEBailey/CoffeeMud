@@ -1,5 +1,4 @@
 package com.planet_ink.coffee_mud.Items.interfaces;
-import com.planet_ink.coffee_mud.core.interfaces.*;
 
 /*
 Copyright 2005-2014 Bo Zimmerman

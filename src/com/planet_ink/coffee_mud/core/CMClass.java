@@ -1,28 +1,57 @@
 package com.planet_ink.coffee_mud.core;
-import com.planet_ink.coffee_mud.WebMacros.interfaces.*;
-import com.planet_ink.coffee_mud.core.interfaces.*;
-import com.planet_ink.coffee_mud.core.collections.*;
-import com.planet_ink.coffee_mud.Libraries.interfaces.*;
-import com.planet_ink.coffee_mud.Abilities.interfaces.*;
-import com.planet_ink.coffee_mud.Areas.interfaces.*;
-import com.planet_ink.coffee_mud.Behaviors.interfaces.*;
-import com.planet_ink.coffee_mud.CharClasses.interfaces.*;
-import com.planet_ink.coffee_mud.Commands.interfaces.*;
-import com.planet_ink.coffee_mud.Common.interfaces.*;
-import com.planet_ink.coffee_mud.Exits.interfaces.*;
-import com.planet_ink.coffee_mud.Items.interfaces.*;
-import com.planet_ink.coffee_mud.Locales.interfaces.*;
-import com.planet_ink.coffee_mud.MOBS.interfaces.*;
-import com.planet_ink.coffee_mud.Races.interfaces.*;
-
-import java.util.*;
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
-import org.mozilla.javascript.*;
-import org.mozilla.javascript.optimizer.*;
+import org.mozilla.javascript.CompilerEnvirons;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.optimizer.ClassCompiler;
+
+import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
+import com.planet_ink.coffee_mud.Areas.interfaces.Area;
+import com.planet_ink.coffee_mud.Behaviors.interfaces.Behavior;
+import com.planet_ink.coffee_mud.CharClasses.interfaces.CharClass;
+import com.planet_ink.coffee_mud.Commands.interfaces.Command;
+import com.planet_ink.coffee_mud.Common.interfaces.CMCommon;
+import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
+import com.planet_ink.coffee_mud.Common.interfaces.CharStats;
+import com.planet_ink.coffee_mud.Common.interfaces.Clan;
+import com.planet_ink.coffee_mud.Common.interfaces.PhyStats;
+import com.planet_ink.coffee_mud.Exits.interfaces.Exit;
+import com.planet_ink.coffee_mud.Items.interfaces.ArchonOnly;
+import com.planet_ink.coffee_mud.Items.interfaces.Armor;
+import com.planet_ink.coffee_mud.Items.interfaces.ClanItem;
+import com.planet_ink.coffee_mud.Items.interfaces.Electronics;
+import com.planet_ink.coffee_mud.Items.interfaces.Item;
+import com.planet_ink.coffee_mud.Items.interfaces.MiscMagic;
+import com.planet_ink.coffee_mud.Items.interfaces.ShipComponent;
+import com.planet_ink.coffee_mud.Items.interfaces.Software;
+import com.planet_ink.coffee_mud.Items.interfaces.Weapon;
+import com.planet_ink.coffee_mud.Libraries.interfaces.CMLibrary;
+import com.planet_ink.coffee_mud.Libraries.interfaces.DatabaseEngine;
+import com.planet_ink.coffee_mud.Locales.interfaces.Room;
+import com.planet_ink.coffee_mud.MOBS.interfaces.MOB;
+import com.planet_ink.coffee_mud.Races.interfaces.Race;
+import com.planet_ink.coffee_mud.WebMacros.interfaces.WebMacro;
+import com.planet_ink.coffee_mud.core.collections.FilteredEnumeration;
+import com.planet_ink.coffee_mud.core.collections.Filterer;
+import com.planet_ink.coffee_mud.core.collections.XVector;
+import com.planet_ink.coffee_mud.core.interfaces.CMObject;
+import com.planet_ink.coffee_mud.core.interfaces.Environmental;
+import com.planet_ink.coffee_mud.core.interfaces.MudHost;
 
 
 /*

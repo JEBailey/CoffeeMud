@@ -7,10 +7,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.planet_ink.miniweb.http.HTTPException;
-import com.planet_ink.miniweb.http.HTTPHeader;
-import com.planet_ink.miniweb.http.HTTPStatus;
-import com.planet_ink.miniweb.http.MIMEType;
 import com.planet_ink.miniweb.interfaces.DataBuffers;
 import com.planet_ink.miniweb.interfaces.HTTPIOHandler;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;

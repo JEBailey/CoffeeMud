@@ -1,5 +1,5 @@
 package com.planet_ink.coffee_mud.core.collections;
-import java.util.*;
+import java.util.Iterator;
 /*
 Copyright 2000-2014 Bo Zimmerman
 
@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-import com.planet_ink.coffee_mud.Libraries.interfaces.MaskingLibrary;
 public final class PairSLinkedList<T,K> extends SLinkedList<Pair<T,K>> implements SPairList<T,K>
 {
 	private static final long serialVersionUID = -9175373328892311411L;

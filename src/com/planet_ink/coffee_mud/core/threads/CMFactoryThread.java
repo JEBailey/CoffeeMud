@@ -1,6 +1,5 @@
 package com.planet_ink.coffee_mud.core.threads;
 
-import com.planet_ink.coffee_mud.core.Log;
 
 /*
 Portions Copyright 2002 Jeff Kamenek

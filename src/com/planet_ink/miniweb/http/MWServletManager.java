@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.planet_ink.miniweb.interfaces.SimpleServlet;
 import com.planet_ink.miniweb.interfaces.SimpleServletManager;
-import com.planet_ink.miniweb.util.MiniWebConfig;
 import com.planet_ink.miniweb.util.MWRequestStats;
+import com.planet_ink.miniweb.util.MiniWebConfig;
 
 /*
 Copyright 2012-2014 Bo Zimmerman

@@ -3,9 +3,9 @@ package com.planet_ink.coffee_mud.Libraries.layouts;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import com.planet_ink.coffee_mud.core.Directions;
 import com.planet_ink.coffee_mud.Libraries.interfaces.AreaGenerationLibrary.LayoutNode;
 import com.planet_ink.coffee_mud.Libraries.interfaces.AreaGenerationLibrary.LayoutTypes;
+import com.planet_ink.coffee_mud.core.Directions;
 
 /*
 Copyright 2007-2014 Bo Zimmerman

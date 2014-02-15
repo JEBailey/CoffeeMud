@@ -1,10 +1,9 @@
 package com.planet_ink.coffee_mud.Libraries.interfaces;
 
-import java.util.*;
-import com.planet_ink.coffee_mud.Common.interfaces.*;
-import com.planet_ink.coffee_mud.core.collections.*;
-import com.planet_ink.coffee_mud.core.interfaces.*;
-import com.planet_ink.coffee_mud.MOBS.interfaces.*;
+import java.util.Iterator;
+
+import com.planet_ink.coffee_mud.Common.interfaces.Session;
+import com.planet_ink.coffee_mud.MOBS.interfaces.MOB;
 /* 
 Copyright 2000-2014 Bo Zimmerman
 

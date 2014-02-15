@@ -1,5 +1,8 @@
 package com.planet_ink.coffee_mud.core.collections;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 /*
 Copyright 2000-2014 Bo Zimmerman
 
@@ -15,8 +18,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-import com.planet_ink.coffee_mud.Libraries.interfaces.MaskingLibrary;
 public class QuintVector<T,K,L,M,N> extends Vector<Quint<T,K,L,M,N>> implements List<Quint<T,K,L,M,N>>
 {
 	private static final long serialVersionUID = -9175373358892311411L;

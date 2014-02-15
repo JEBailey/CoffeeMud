@@ -1,7 +1,15 @@
 package com.planet_ink.coffee_mud.core;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
-import java.io.*;
+import java.util.Random;
+import java.util.StringTokenizer;
 
 /*
    Copyright 2000-2014 Bo Zimmerman

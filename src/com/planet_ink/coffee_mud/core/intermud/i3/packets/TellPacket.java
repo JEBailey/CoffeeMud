@@ -1,20 +1,8 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.packets;
-import com.planet_ink.coffee_mud.core.intermud.i3.server.*;
-import com.planet_ink.coffee_mud.core.intermud.i3.net.*;
-import com.planet_ink.coffee_mud.core.interfaces.*;
-import com.planet_ink.coffee_mud.core.*;
-import com.planet_ink.coffee_mud.core.collections.*;
-import com.planet_ink.coffee_mud.Abilities.interfaces.*;
-import com.planet_ink.coffee_mud.Areas.interfaces.*;
-import com.planet_ink.coffee_mud.Behaviors.interfaces.*;
-import com.planet_ink.coffee_mud.CharClasses.interfaces.*;
-import com.planet_ink.coffee_mud.Commands.interfaces.*;
-import com.planet_ink.coffee_mud.Common.interfaces.*;
-import com.planet_ink.coffee_mud.Exits.interfaces.*;
-import com.planet_ink.coffee_mud.Items.interfaces.*;
-import com.planet_ink.coffee_mud.Locales.interfaces.*;
-import com.planet_ink.coffee_mud.MOBS.interfaces.*;
-import com.planet_ink.coffee_mud.Races.interfaces.*;
+import java.util.Vector;
+
+import com.planet_ink.coffee_mud.core.intermud.i3.net.Interactive;
+import com.planet_ink.coffee_mud.core.intermud.i3.server.I3Server;
 /**
  * com.planet_ink.coffee_mud.core.intermud.i3.packets.TellPacket
  * Copyright (c) 1996 George Reese
@@ -32,9 +20,6 @@ import com.planet_ink.coffee_mud.Races.interfaces.*;
  *
  * The I3 tell packet
  */
-
-
-import java.util.Vector;
 
 /**
  * This extension of the Packet class handles incoming and

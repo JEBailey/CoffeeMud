@@ -1,6 +1,11 @@
 package com.planet_ink.coffee_mud.core.collections;
-import java.io.Serializable;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
 /* 
 Copyright 2000-2014 Bo Zimmerman

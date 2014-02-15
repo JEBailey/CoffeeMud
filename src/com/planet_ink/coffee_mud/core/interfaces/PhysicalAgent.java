@@ -1,10 +1,5 @@
 package com.planet_ink.coffee_mud.core.interfaces;
 
-import java.util.Enumeration;
-
-import com.planet_ink.coffee_mud.Behaviors.interfaces.Behavior;
-import com.planet_ink.coffee_mud.Common.interfaces.ScriptingEngine;
-import com.planet_ink.coffee_mud.MOBS.interfaces.MOB;
 
 /*
 Copyright 2000-2014 Bo Zimmerman

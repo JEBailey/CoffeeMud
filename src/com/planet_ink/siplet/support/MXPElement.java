@@ -1,5 +1,7 @@
 package com.planet_ink.siplet.support;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 /*
 Copyright 2008-2014 Bo Zimmerman
 

@@ -1,7 +1,16 @@
 package com.planet_ink.fakedb;
-import java.io.*;
-import java.util.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 /* 
    Copyright 2003-2014 Bo Zimmerman

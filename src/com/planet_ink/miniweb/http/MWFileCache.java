@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.planet_ink.miniweb.http.HTTPException;
-import com.planet_ink.miniweb.http.HTTPStatus;
 import com.planet_ink.miniweb.interfaces.DataBuffers;
 import com.planet_ink.miniweb.interfaces.FileCacheManager;
 import com.planet_ink.miniweb.interfaces.FileManager;

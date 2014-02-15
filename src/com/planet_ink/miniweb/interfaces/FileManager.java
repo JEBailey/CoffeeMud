@@ -1,9 +1,6 @@
 package com.planet_ink.miniweb.interfaces;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
 /*
 Copyright 2012-2014 Bo Zimmerman
 
@@ -20,6 +17,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
  * Manages File objects

@@ -1,12 +1,8 @@
 package com.planet_ink.coffee_mud.core.collections;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 /*
 Copyright 2012-2014 Bo Zimmerman

@@ -1,7 +1,6 @@
 package com.planet_ink.siplet.support;
-import java.applet.*;
-import java.net.*;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import com.planet_ink.siplet.applet.Siplet;
 

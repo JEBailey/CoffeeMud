@@ -1,5 +1,10 @@
 package com.planet_ink.coffee_mud.core.collections;
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 /*
 Copyright 2000-2014 Bo Zimmerman
 

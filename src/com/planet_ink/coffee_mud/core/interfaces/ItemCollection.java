@@ -3,7 +3,6 @@ package com.planet_ink.coffee_mud.core.interfaces;
 import java.util.Enumeration;
 import java.util.List;
 
-import com.planet_ink.coffee_mud.Behaviors.interfaces.Behavior;
 import com.planet_ink.coffee_mud.Items.interfaces.Item;
 /*
 Copyright 2000-2014 Bo Zimmerman
@@ -20,7 +19,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import com.planet_ink.coffee_mud.core.CMLib;
 
 /**
  * An abstract interface for something capable of grouping items together

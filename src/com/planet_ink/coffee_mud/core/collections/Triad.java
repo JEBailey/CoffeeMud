@@ -1,5 +1,4 @@
 package com.planet_ink.coffee_mud.core.collections;
-import java.util.*;
 /*
 Copyright 2000-2014 Bo Zimmerman
 

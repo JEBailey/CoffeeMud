@@ -1,8 +1,5 @@
 package com.planet_ink.coffee_mud.core.interfaces;
 
-import java.util.Enumeration;
-import java.util.List;
-
 import com.planet_ink.coffee_mud.Items.interfaces.Item;
 /*
 Copyright 2000-2014 Bo Zimmerman

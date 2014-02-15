@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 
 import com.planet_ink.miniweb.interfaces.HTTPIOHandler;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
-import com.planet_ink.miniweb.util.MiniWebConfig;
 import com.planet_ink.miniweb.util.MWThread;
+import com.planet_ink.miniweb.util.MiniWebConfig;
 
 /*
 Copyright 2012-2014 Bo Zimmerman

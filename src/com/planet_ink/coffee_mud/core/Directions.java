@@ -2,9 +2,6 @@ package com.planet_ink.coffee_mud.core;
 
 import java.util.Arrays;
 
-import com.planet_ink.coffee_mud.Items.interfaces.SpaceShip;
-import com.planet_ink.coffee_mud.Locales.interfaces.Room;
-
 /* 
    Copyright 2000-2014 Bo Zimmerman
 

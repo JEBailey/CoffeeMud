@@ -1,5 +1,6 @@
 package com.planet_ink.miniweb.http;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -10,17 +11,16 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.*;
 
+import com.planet_ink.coffee_mud.core.Log;
+import com.planet_ink.coffee_mud.core.Log.Type;
+import com.planet_ink.coffee_mud.core.collections.Pair;
 import com.planet_ink.miniweb.interfaces.DataBuffers;
 import com.planet_ink.miniweb.interfaces.HTTPIOHandler;
 import com.planet_ink.miniweb.server.MiniWebServer;
 import com.planet_ink.miniweb.util.MWDataBuffers;
-import com.planet_ink.miniweb.util.WebAddress;
 import com.planet_ink.miniweb.util.MiniWebConfig;
-import com.planet_ink.coffee_mud.core.Log;
-import com.planet_ink.coffee_mud.core.Log.Type;
-import com.planet_ink.coffee_mud.core.collections.Pair;
+import com.planet_ink.miniweb.util.WebAddress;
 
 /*
 Copyright 2012-2014 Bo Zimmerman

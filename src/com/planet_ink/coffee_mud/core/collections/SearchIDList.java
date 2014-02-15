@@ -1,7 +1,6 @@
 package com.planet_ink.coffee_mud.core.collections;
 
 import java.util.List;
-import com.planet_ink.coffee_mud.core.interfaces.CMObject;
 
 /*
 Copyright 2012-2014 Bo Zimmerman
