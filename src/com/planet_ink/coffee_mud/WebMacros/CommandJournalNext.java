@@ -10,58 +10,60 @@ import com.planet_ink.miniweb.interfaces.HTTPRequest;
 import com.planet_ink.miniweb.util.MWThread;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class CommandJournalNext extends StdWebMacro
-{
-	public String name() { return "CommandJournalNext"; }
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class CommandJournalNext extends StdWebMacro {
+	public String name() {
+		return "CommandJournalNext";
+	}
 
-	public String runMacro(HTTPRequest httpReq, String parm)
-	{
-		java.util.Map<String,String> parms=parseParms(parm);
-		String last=httpReq.getUrlParameter("COMMANDJOURNAL");
-		if(parms.containsKey("RESET"))
-		{
-			if(last!=null) httpReq.removeUrlParameter("COMMANDJOURNAL");
+	public String runMacro(HTTPRequest httpReq, String parm) {
+		java.util.Map<String, String> parms = parseParms(parm);
+		String last = httpReq.getUrlParameter("COMMANDJOURNAL");
+		if (parms.containsKey("RESET")) {
+			if (last != null)
+				httpReq.removeUrlParameter("COMMANDJOURNAL");
 			return "";
 		}
 		MOB mob = Authenticate.getAuthenticatedMob(httpReq);
-		String lastID="";
-		boolean allJournals=false;
-		if((Thread.currentThread() instanceof MWThread)
-		&&CMath.s_bool(((MWThread)Thread.currentThread()).getConfig().getMiscProp("ADMIN"))
-		&&parms.containsKey("ALLCOMMANDJOURNALS"))
-			allJournals=true;
-		for(Enumeration<JournalsLibrary.CommandJournal> i=CMLib.journals().commandJournals();i.hasMoreElements();)
-		{
-			JournalsLibrary.CommandJournal J=i.nextElement();
-			String name=J.NAME();
-			if((last==null)
-			||((last.length()>0)&&(last.equals(lastID))&&(!name.equals(lastID))))
-			{
-				if(allJournals||((mob!=null)&&(J.mask().length()>0)&&(!CMLib.masking().maskCheck(J.mask(),mob,true))))
-				{
-					httpReq.addFakeUrlParameter("COMMANDJOURNAL",name);
+		String lastID = "";
+		boolean allJournals = false;
+		if ((Thread.currentThread() instanceof MWThread)
+				&& CMath.s_bool(((MWThread) Thread.currentThread()).getConfig()
+						.getMiscProp("ADMIN"))
+				&& parms.containsKey("ALLCOMMANDJOURNALS"))
+			allJournals = true;
+		for (Enumeration<JournalsLibrary.CommandJournal> i = CMLib.journals()
+				.commandJournals(); i.hasMoreElements();) {
+			JournalsLibrary.CommandJournal J = i.nextElement();
+			String name = J.NAME();
+			if ((last == null)
+					|| ((last.length() > 0) && (last.equals(lastID)) && (!name
+							.equals(lastID)))) {
+				if (allJournals
+						|| ((mob != null) && (J.mask().length() > 0) && (!CMLib
+								.masking().maskCheck(J.mask(), mob, true)))) {
+					httpReq.addFakeUrlParameter("COMMANDJOURNAL", name);
 					return "";
 				}
-				last=name;
+				last = name;
 			}
-			lastID=name;
+			lastID = name;
 		}
-		httpReq.addFakeUrlParameter("COMMANDJOURNAL","");
-		if(parms.containsKey("EMPTYOK"))
+		httpReq.addFakeUrlParameter("COMMANDJOURNAL", "");
+		if (parms.containsKey("EMPTYOK"))
 			return "<!--EMPTY-->";
 		return " @break@";
 	}

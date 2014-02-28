@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Behaviors;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Common.interfaces.CharStats;
@@ -15,79 +16,82 @@ import com.planet_ink.coffee_mud.core.interfaces.PhysicalAgent;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Lee H. Fox
+ Copyright 2000-2014 Lee H. Fox
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Drowness extends StdBehavior
-{
-	public String ID(){return "Drowness";}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Drowness extends StdBehavior {
+	public String ID() {
+		return "Drowness";
+	}
 
-	public String accountForYourself()
-	{ 
+	public String accountForYourself() {
 		return "drowly";
 	}
 
-	boolean confirmedSetup=false;
-	public int darkDown=4;
-	public int fightDown=2;
-	public int statCheck=3;
-	protected int spellDown=3;
+	boolean confirmedSetup = false;
+	public int darkDown = 4;
+	public int fightDown = 2;
+	public int statCheck = 3;
+	protected int spellDown = 3;
 	protected int magicResistance = 50;
 
 	public static final int CAST_DARKNESS = 1;
 	public static final int FIGHTER_SKILL = 128;
 	public static final int CHECK_STATUS = 129;
 
-	public void startBehavior(PhysicalAgent forMe)
-	{
+	public void startBehavior(PhysicalAgent forMe) {
 		super.startBehavior(forMe);
-		if(!(forMe instanceof MOB)) return;
-		MOB mob=(MOB)forMe;
+		if (!(forMe instanceof MOB))
+			return;
+		MOB mob = (MOB) forMe;
 
-		mob.baseCharStats().setStat(CharStats.STAT_STRENGTH,12 + CMLib.dice().roll(1,6,0));
-		mob.baseCharStats().setStat(CharStats.STAT_INTELLIGENCE,14 + CMLib.dice().roll(1,6,0));
-		mob.baseCharStats().setStat(CharStats.STAT_WISDOM,13 + CMLib.dice().roll(1,6,0));
-		mob.baseCharStats().setStat(CharStats.STAT_DEXTERITY,15 + CMLib.dice().roll(1,6,0));
-		mob.baseCharStats().setStat(CharStats.STAT_CONSTITUTION,12 + CMLib.dice().roll(1,6,0));
-		mob.baseCharStats().setStat(CharStats.STAT_CHARISMA,13 + CMLib.dice().roll(1,6,0));
-		if(mob.baseCharStats().getStat(CharStats.STAT_GENDER)=='M')
-		{
-			mob.baseCharStats().setCurrentClass(CMClass.getCharClass("Fighter"));
+		mob.baseCharStats().setStat(CharStats.STAT_STRENGTH,
+				12 + CMLib.dice().roll(1, 6, 0));
+		mob.baseCharStats().setStat(CharStats.STAT_INTELLIGENCE,
+				14 + CMLib.dice().roll(1, 6, 0));
+		mob.baseCharStats().setStat(CharStats.STAT_WISDOM,
+				13 + CMLib.dice().roll(1, 6, 0));
+		mob.baseCharStats().setStat(CharStats.STAT_DEXTERITY,
+				15 + CMLib.dice().roll(1, 6, 0));
+		mob.baseCharStats().setStat(CharStats.STAT_CONSTITUTION,
+				12 + CMLib.dice().roll(1, 6, 0));
+		mob.baseCharStats().setStat(CharStats.STAT_CHARISMA,
+				13 + CMLib.dice().roll(1, 6, 0));
+		if (mob.baseCharStats().getStat(CharStats.STAT_GENDER) == 'M') {
+			mob.baseCharStats()
+					.setCurrentClass(CMClass.getCharClass("Fighter"));
 			mob.recoverCharStats();
 			addMaleNaturalAbilities(mob);
-		}
-		else
-		{
+		} else {
 			mob.baseCharStats().setCurrentClass(CMClass.getCharClass("Cleric"));
 			mob.recoverCharStats();
 			addFemaleNaturalAbilities(mob);
 		}
 		mob.baseCharStats().setMyRace(CMClass.getRace("Elf"));
-		mob.baseCharStats().getMyRace().startRacing(mob,false);
+		mob.baseCharStats().getMyRace().startRacing(mob, false);
 
 		mob.recoverMaxState();
 		mob.recoverPhyStats();
 		mob.recoverCharStats();
 	}
 
-	public void addFemaleNaturalAbilities(MOB mob)
-	{
+	public void addFemaleNaturalAbilities(MOB mob) {
 		Weapon mainWeapon = CMClass.getWeapon("Mace");
 		mainWeapon.wearAt(Wearable.WORN_WIELD);
 		mob.addItem(mainWeapon);
 
-		Ability dark=CMClass.getAbility("Spell_Darkness");
+		Ability dark = CMClass.getAbility("Spell_Darkness");
 		dark.setProficiency(100);
 		dark.setSavable(false);
 		mob.addAbility(dark);
@@ -164,8 +168,7 @@ public class Drowness extends StdBehavior
 
 	}
 
-	public void addMaleNaturalAbilities(MOB mob)
-	{
+	public void addMaleNaturalAbilities(MOB mob) {
 		Armor chainMail = CMClass.getArmor("DrowChainMailArmor");
 		chainMail.wearAt(Wearable.WORN_TORSO);
 		mob.addItem(chainMail);
@@ -173,10 +176,9 @@ public class Drowness extends StdBehavior
 		Weapon mainWeapon = null;
 		Weapon secondWeapon = null;
 
-		int weaponry = CMLib.dice().roll(1,4,0);
-		if(mob.fetchWieldedItem()==null)
-		switch(weaponry)
-		{
+		int weaponry = CMLib.dice().roll(1, 4, 0);
+		if (mob.fetchWieldedItem() == null)
+			switch (weaponry) {
 			case 1:
 				mainWeapon = CMClass.getWeapon("DrowSword");
 				secondWeapon = CMClass.getWeapon("DrowSword");
@@ -188,11 +190,11 @@ public class Drowness extends StdBehavior
 				break;
 			case 2:
 				mainWeapon = CMClass.getWeapon("DrowSword");
-//				Shield secondWeapon = new Shield();
+				// Shield secondWeapon = new Shield();
 				mainWeapon.wearAt(Wearable.WORN_WIELD);
-//				secondWeapon.wear(Item.SHIELD);
+				// secondWeapon.wear(Item.SHIELD);
 				mob.addItem(mainWeapon);
-//  			mob.addItem(secondWeapon);
+				// mob.addItem(secondWeapon);
 				mob.basePhyStats().setSpeed(1.0);
 				break;
 			case 3:
@@ -222,9 +224,9 @@ public class Drowness extends StdBehavior
 				mob.addItem(secondWeapon);
 				mob.basePhyStats().setSpeed(2.0);
 				break;
-		}
+			}
 
-		Ability dark=CMClass.getAbility("Spell_Darkness");
+		Ability dark = CMClass.getAbility("Spell_Darkness");
 		dark.setProficiency(100);
 		dark.setSavable(false);
 		mob.addAbility(dark);
@@ -301,47 +303,44 @@ public class Drowness extends StdBehavior
 
 	}
 
-
-	public boolean checkStatus(MOB mob)
-	{
-		if(CMLib.flags().isSitting(mob))
-			mob.phyStats().setDisposition(mob.phyStats().disposition() - PhyStats.IS_SITTING);
-		mob.location().show(mob, null, CMMsg.MSG_QUIETMOVEMENT, "<S-NAME> stand(s) up, ready for more combat.");
+	public boolean checkStatus(MOB mob) {
+		if (CMLib.flags().isSitting(mob))
+			mob.phyStats().setDisposition(
+					mob.phyStats().disposition() - PhyStats.IS_SITTING);
+		mob.location().show(mob, null, CMMsg.MSG_QUIETMOVEMENT,
+				"<S-NAME> stand(s) up, ready for more combat.");
 
 		return true;
 	}
 
-	public boolean useSkill(MOB mob)
-	{
+	public boolean useSkill(MOB mob) {
 		Ability prayer = null;
-		if(CMLib.dice().rollPercentage() < 70)
-		{
+		if (CMLib.dice().rollPercentage() < 70) {
 			prayer = mob.fetchRandomAbility();
-			while((prayer==null)||(mob.basePhyStats().level() < CMLib.ableMapper().lowestQualifyingLevel(prayer.ID())))
+			while ((prayer == null)
+					|| (mob.basePhyStats().level() < CMLib.ableMapper()
+							.lowestQualifyingLevel(prayer.ID())))
 				prayer = mob.fetchRandomAbility();
-		}
-		else
-		{
+		} else {
 			prayer = CMClass.getAbility("Prayer_CureSerious");
 		}
-		if(prayer!=null)
-			return prayer.invoke(mob,null,false,0);
+		if (prayer != null)
+			return prayer.invoke(mob, null, false, 0);
 		return false;
 	}
 
-	public boolean okMessage(Environmental oking, CMMsg msg)
-	{
-		if(oking==null) return super.okMessage(oking,msg);
-		if(!(oking instanceof MOB)) return super.okMessage(oking,msg);
+	public boolean okMessage(Environmental oking, CMMsg msg) {
+		if (oking == null)
+			return super.okMessage(oking, msg);
+		if (!(oking instanceof MOB))
+			return super.okMessage(oking, msg);
 
 		boolean retval = super.okMessage(oking, msg);
-		MOB mob=(MOB)oking;
-		if((msg.amITarget(mob))
-		&&(CMath.bset(msg.targetMajor(),CMMsg.MASK_MALICIOUS))
-		&&(msg.targetMinor()==CMMsg.TYP_CAST_SPELL))
-		{
-			if(CMLib.dice().rollPercentage() <= magicResistance)
-			{
+		MOB mob = (MOB) oking;
+		if ((msg.amITarget(mob))
+				&& (CMath.bset(msg.targetMajor(), CMMsg.MASK_MALICIOUS))
+				&& (msg.targetMinor() == CMMsg.TYP_CAST_SPELL)) {
+			if (CMLib.dice().rollPercentage() <= magicResistance) {
 				msg.source().tell("The drow resisted your spell!");
 				return false;
 			}
@@ -349,93 +348,81 @@ public class Drowness extends StdBehavior
 		return retval;
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(ticking!=null)
-		if(ticking instanceof MOB)
-		{
-			MOB mob=(MOB)ticking;
-			if((!mob.amDead())&&(tickID==Tickable.TICKID_MOB))
-			{
-				if(mob.baseCharStats().getStat(CharStats.STAT_GENDER)=='F')
-				{
-					if (mob.isInCombat())
-					{
-						if((--spellDown)<=0)
-						{
-							spellDown=3;
-							castFemaleSpell(mob);
+	public boolean tick(Tickable ticking, int tickID) {
+		if (ticking != null)
+			if (ticking instanceof MOB) {
+				MOB mob = (MOB) ticking;
+				if ((!mob.amDead()) && (tickID == Tickable.TICKID_MOB)) {
+					if (mob.baseCharStats().getStat(CharStats.STAT_GENDER) == 'F') {
+						if (mob.isInCombat()) {
+							if ((--spellDown) <= 0) {
+								spellDown = 3;
+								castFemaleSpell(mob);
+							}
+							if ((--darkDown) <= 0) {
+								darkDown = 4;
+								castDarkness(mob);
+							}
 						}
-						if((--darkDown)<=0)
-						{
-							darkDown=4;
-							castDarkness(mob);
-						}
-					}
-				}else
-				{
-					if (mob.isInCombat())
-					{
-						if((--fightDown)<=0)
-						{
-							fightDown=2;
-							useSkill(mob);
-						}
-						if((--statCheck)<=0)
-						{
-							statCheck=3;
-							checkStatus(mob);
-						}
-						if((--darkDown)<=0)
-						{
-							darkDown=4;
-							castDarkness(mob);
+					} else {
+						if (mob.isInCombat()) {
+							if ((--fightDown) <= 0) {
+								fightDown = 2;
+								useSkill(mob);
+							}
+							if ((--statCheck) <= 0) {
+								statCheck = 3;
+								checkStatus(mob);
+							}
+							if ((--darkDown) <= 0) {
+								darkDown = 4;
+								castDarkness(mob);
+							}
 						}
 					}
-				}
 
+				}
 			}
-		}
-		super.tick(ticking,tickID);
+		super.tick(ticking, tickID);
 		return true;
 	}
 
-	public boolean castFemaleSpell(MOB mob)
-	{
+	public boolean castFemaleSpell(MOB mob) {
 		Ability prayer = null;
-		if(CMLib.dice().rollPercentage() < 70)
-		{
-			prayer = mob.fetchAbility(CMLib.dice().roll(1,mob.numAbilities(),-1));
-			while((prayer==null)||(mob.basePhyStats().level() < CMLib.ableMapper().lowestQualifyingLevel(prayer.ID())))
-				prayer = mob.fetchAbility(CMLib.dice().roll(1,mob.numAbilities(),-1));
-		}
-		else
-		{
+		if (CMLib.dice().rollPercentage() < 70) {
+			prayer = mob.fetchAbility(CMLib.dice().roll(1, mob.numAbilities(),
+					-1));
+			while ((prayer == null)
+					|| (mob.basePhyStats().level() < CMLib.ableMapper()
+							.lowestQualifyingLevel(prayer.ID())))
+				prayer = mob.fetchAbility(CMLib.dice().roll(1,
+						mob.numAbilities(), -1));
+		} else {
 			prayer = CMClass.getAbility("Prayer_CureSerious");
-			if(prayer!=null)
+			if (prayer != null)
 				prayer.setProficiency(CMLib.dice().roll(5, 10, 50));
 		}
-		if(prayer!=null)
-			return prayer.invoke(mob,null,false,0);
+		if (prayer != null)
+			return prayer.invoke(mob, null, false, 0);
 		return false;
 	}
 
-	protected boolean castDarkness(MOB mob)
-	{
-		if(mob.location()==null)
+	protected boolean castDarkness(MOB mob) {
+		if (mob.location() == null)
 			return true;
-		if(CMLib.flags().isInDark(mob.location()))
+		if (CMLib.flags().isInDark(mob.location()))
 			return true;
 
-		Ability dark=CMClass.getAbility("Spell_Darkness");
+		Ability dark = CMClass.getAbility("Spell_Darkness");
 		dark.setProficiency(100);
 		dark.setSavable(false);
-		if(mob.fetchAbility(dark.ID())==null)
+		if (mob.fetchAbility(dark.ID()) == null)
 			mob.addAbility(dark);
 		else
 			dark = mob.fetchAbility(dark.ID());
 
-		if(dark!=null) dark.invoke(mob,null,false,0);
+		if (dark != null)
+			dark.invoke(mob, null, false, 0);
 		return true;
 	}
 }

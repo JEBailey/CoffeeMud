@@ -1,28 +1,29 @@
 package com.planet_ink.coffee_mud.Items.Weapons;
+
 import com.planet_ink.coffee_mud.Items.interfaces.RawMaterial;
 import com.planet_ink.coffee_mud.Items.interfaces.Weapon;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Cestus extends StdWeapon
-{
-	public String ID(){	return "Cestus";}
-	public Cestus()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Cestus extends StdWeapon {
+	public String ID() {
+		return "Cestus";
+	}
+
+	public Cestus() {
 		super();
 
 		setName("a mean looking cestus");
@@ -33,14 +34,12 @@ public class Cestus extends StdWeapon
 		basePhyStats.setWeight(2);
 		basePhyStats().setAttackAdjustment(0);
 		basePhyStats().setDamage(4);
-		material=RawMaterial.RESOURCE_LEATHER;
-		baseGoldValue=5;
+		material = RawMaterial.RESOURCE_LEATHER;
+		baseGoldValue = 5;
 		recoverPhyStats();
-		weaponType=Weapon.TYPE_PIERCING;
-		weaponClassification=Weapon.CLASS_EDGED;
+		weaponType = Weapon.TYPE_PIERCING;
+		weaponClassification = Weapon.CLASS_EDGED;
 
 	}
-
-
 
 }

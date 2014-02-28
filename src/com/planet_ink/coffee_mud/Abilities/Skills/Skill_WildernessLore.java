@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Skills;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -13,51 +14,74 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Places;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Skill_WildernessLore extends StdSkill
-{
-	public String ID() { return "Skill_WildernessLore"; }
-	public String name(){ return "Wilderness Lore";}
-	protected int canAffectCode(){return 0;}
-	protected int canTargetCode(){return 0;}
-	public int abstractQuality(){return Ability.QUALITY_INDIFFERENT;}
-	private static final String[] triggerStrings = {"WILDERNESSLORE","WLORE"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int classificationCode(){return Ability.ACODE_SKILL|Ability.DOMAIN_NATURELORE;}
-	public int usageType(){return USAGE_MANA;}
+public class Skill_WildernessLore extends StdSkill {
+	public String ID() {
+		return "Skill_WildernessLore";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+	public String name() {
+		return "Wilderness Lore";
+	}
+
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	private static final String[] triggerStrings = { "WILDERNESSLORE", "WLORE" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SKILL | Ability.DOMAIN_NATURELORE;
+	}
+
+	public int usageType() {
+		return USAGE_MANA;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(!success)
-		{
-			mob.location().show(mob,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> take(s) a quick look at the terrain and feel(s) quite confused.");
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (!success) {
+			mob.location()
+					.show(mob, null, CMMsg.MSG_OK_VISUAL,
+							"<S-NAME> take(s) a quick look at the terrain and feel(s) quite confused.");
 			return false;
 		}
-		final Room room=mob.location();
-		CMMsg msg=CMClass.getMsg(mob,null,this,CMMsg.MSG_HANDS,"<S-NAME> take(s) a quick look at the terrain.");
-		if(room.okMessage(mob,msg))
-		{
-			room.send(mob,msg);
-			switch(room.domainType())
-			{
+		final Room room = mob.location();
+		CMMsg msg = CMClass.getMsg(mob, null, this, CMMsg.MSG_HANDS,
+				"<S-NAME> take(s) a quick look at the terrain.");
+		if (room.okMessage(mob, msg)) {
+			room.send(mob, msg);
+			switch (room.domainType()) {
 			case Room.DOMAIN_INDOORS_METAL:
 				mob.tell("You are in a metal structure.");
 				break;
@@ -122,28 +146,29 @@ public class Skill_WildernessLore extends StdSkill
 				mob.tell("You are inside, on the surface of the water.");
 				break;
 			}
-			final int derivedClimate=room.getClimateType();
-			if(derivedClimate!=Places.CLIMASK_NORMAL)
-			{
-				StringBuffer str=new StringBuffer("It is unusually ");
-				List<String> conditions=new Vector<String>();
-				if(CMath.bset(derivedClimate, Places.CLIMASK_WET))
+			final int derivedClimate = room.getClimateType();
+			if (derivedClimate != Places.CLIMASK_NORMAL) {
+				StringBuffer str = new StringBuffer("It is unusually ");
+				List<String> conditions = new Vector<String>();
+				if (CMath.bset(derivedClimate, Places.CLIMASK_WET))
 					conditions.add("wet");
-				if(CMath.bset(derivedClimate, Places.CLIMASK_HOT))
+				if (CMath.bset(derivedClimate, Places.CLIMASK_HOT))
 					conditions.add("hot");
-				if(CMath.bset(derivedClimate, Places.CLIMASK_DRY))
+				if (CMath.bset(derivedClimate, Places.CLIMASK_DRY))
 					conditions.add("dry");
-				if(CMath.bset(derivedClimate, Places.CLIMASK_COLD))
+				if (CMath.bset(derivedClimate, Places.CLIMASK_COLD))
 					conditions.add("cold");
-				if(CMath.bset(derivedClimate, Places.CLIMASK_WINDY))
+				if (CMath.bset(derivedClimate, Places.CLIMASK_WINDY))
 					conditions.add("windy");
-				str.append(CMLib.english().toEnglishStringList(conditions.toArray(new String[0])));
+				str.append(CMLib.english().toEnglishStringList(
+						conditions.toArray(new String[0])));
 				str.append(" here.");
 				mob.tell(str.toString());
 			}
-		}
-		else
-			mob.location().show(mob,null,this,CMMsg.MSG_HANDS,"<S-NAME> take(s) a quick look around, but get(s) confused.");
+		} else
+			mob.location()
+					.show(mob, null, this, CMMsg.MSG_HANDS,
+							"<S-NAME> take(s) a quick look around, but get(s) confused.");
 		return success;
 	}
 

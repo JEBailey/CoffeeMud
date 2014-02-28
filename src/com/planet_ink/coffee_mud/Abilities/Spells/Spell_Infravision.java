@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -9,85 +10,102 @@ import com.planet_ink.coffee_mud.core.CMClass;
 import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_Infravision extends Spell
-{
-	public String ID() { return "Spell_Infravision"; }
-	public String name(){return "Infravision";}
-	public String displayText(){return "(Infravision)";}
-	public int abstractQuality(){ return Ability.QUALITY_OK_SELF;}
-	protected int canAffectCode(){return CAN_MOBS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_DIVINATION;}
+public class Spell_Infravision extends Spell {
+	public String ID() {
+		return "Spell_Infravision";
+	}
 
-	public boolean successfulObservation=false;
+	public String name() {
+		return "Infravision";
+	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public String displayText() {
+		return "(Infravision)";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_SELF;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_DIVINATION;
+	}
+
+	public boolean successfulObservation = false;
+
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
-		if(canBeUninvoked())
-			if((mob.location()!=null)&&(!mob.amDead()))
-				mob.location().show(mob,null,CMMsg.MSG_OK_VISUAL,"<S-YOUPOSS> eyes cease to sparkle.");
+		if (canBeUninvoked())
+			if ((mob.location() != null) && (!mob.amDead()))
+				mob.location().show(mob, null, CMMsg.MSG_OK_VISUAL,
+						"<S-YOUPOSS> eyes cease to sparkle.");
 	}
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		if(successfulObservation)
-			affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_SEE_INFRARED);
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+		if (successfulObservation)
+			affectableStats.setSensesMask(affectableStats.sensesMask()
+					| PhyStats.CAN_SEE_INFRARED);
 	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(mob.isInCombat()&&(!CMLib.flags().canBeSeenBy(mob.getVictim(),mob)))
-				return super.castingQuality(mob, target,Ability.QUALITY_BENEFICIAL_SELF);
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (mob.isInCombat()
+					&& (!CMLib.flags().canBeSeenBy(mob.getVictim(), mob)))
+				return super.castingQuality(mob, target,
+						Ability.QUALITY_BENEFICIAL_SELF);
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if((auto)&&(givenTarget!=null)&&(givenTarget instanceof MOB))
-			target=(MOB)givenTarget;
-		if(target.fetchEffect(this.ID())!=null)
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> already using infravision.");
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if ((auto) && (givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
+		if (target.fetchEffect(this.ID()) != null) {
+			mob.tell(target, null, null,
+					"<S-NAME> <S-IS-ARE> already using infravision.");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"<T-NAME> attain(s) glowing eyes!":"^S<S-NAME> invoke(s) glowing red eyes!^?");
-		if(mob.location().okMessage(mob,msg))
-		{
-			successfulObservation=success;
-			mob.location().send(mob,msg);
-			beneficialAffect(mob,target,asLevel,0);
+		CMMsg msg = CMClass.getMsg(mob, target, this,
+				verbalCastCode(mob, target, auto),
+				auto ? "<T-NAME> attain(s) glowing eyes!"
+						: "^S<S-NAME> invoke(s) glowing red eyes!^?");
+		if (mob.location().okMessage(mob, msg)) {
+			successfulObservation = success;
+			mob.location().send(mob, msg);
+			beneficialAffect(mob, target, asLevel, 0);
 		}
 
 		return success;

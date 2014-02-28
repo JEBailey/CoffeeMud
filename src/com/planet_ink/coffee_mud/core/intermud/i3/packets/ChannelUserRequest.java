@@ -1,53 +1,53 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.packets;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.core.intermud.i3.server.I3Server;
 
 /**
- * Copyright (c) 2008-2014 Bo Zimmerman
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  	  http://www.apache.org/licenses/LICENSE-2.0
- *
+ * Copyright (c) 2008-2014 Bo Zimmerman Licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ * 
  */
 @SuppressWarnings("rawtypes")
 public class ChannelUserRequest extends Packet {
 	public String userToRequest = null;
 
-	public ChannelUserRequest()
-	{
+	public ChannelUserRequest() {
 		super();
 		type = Packet.CHAN_USER_REQ;
 	}
+
 	public ChannelUserRequest(Vector v) throws InvalidPacketException {
 		super(v);
 		try {
 			type = Packet.CHAN_USER_REQ;
-			userToRequest = (String)v.elementAt(6);
-		}
-		catch( ClassCastException e ) {
+			userToRequest = (String) v.elementAt(6);
+		} catch (ClassCastException e) {
 			throw new InvalidPacketException();
 		}
 	}
 
 	public void send() throws InvalidPacketException {
-		if( sender_name == null || target_mud == null || sender_mud == null  || userToRequest == null) {
+		if (sender_name == null || target_mud == null || sender_mud == null
+				|| userToRequest == null) {
 			throw new InvalidPacketException();
 		}
 		super.send();
 	}
 
 	public String toString() {
-		String str="({\"chan-user-req\",5,\"" + I3Server.getMudName() +
-			   "\",0,\"" + target_mud + "\",0,\"" + userToRequest + "\",})";
+		String str = "({\"chan-user-req\",5,\"" + I3Server.getMudName()
+				+ "\",0,\"" + target_mud + "\",0,\"" + userToRequest + "\",})";
 		return str;
 	}
 }

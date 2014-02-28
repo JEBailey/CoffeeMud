@@ -1,44 +1,42 @@
 package com.planet_ink.coffee_mud.core.collections;
+
 import java.util.Arrays;
 import java.util.Iterator;
+
 /*
-Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class MultiIterable<K> implements Iterable<K>, SizedIterable<K>
-{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class MultiIterable<K> implements Iterable<K>, SizedIterable<K> {
 	@SuppressWarnings("unchecked")
-	private Iterable<K>[] iters=new Iterable[0];
-	private int size=0;
-	
-	public MultiIterable(Iterable<K>[] esets, int newSize) 
-	{
-		if((esets==null)||(esets.length==0)) 
+	private Iterable<K>[] iters = new Iterable[0];
+	private int size = 0;
+
+	public MultiIterable(Iterable<K>[] esets, int newSize) {
+		if ((esets == null) || (esets.length == 0))
 			return;
-		iters=esets.clone();
-		size=newSize;
+		iters = esets.clone();
+		size = newSize;
 	}
 
-	public MultiIterable()
-	{
+	public MultiIterable() {
 	}
-	
-	public synchronized void add(Iterable<K> eset, int sizeAdd)
-	{
-		iters=Arrays.copyOf(iters, iters.length+1);
-		iters[iters.length-1]=eset;
-		size+=sizeAdd;
+
+	public synchronized void add(Iterable<K> eset, int sizeAdd) {
+		iters = Arrays.copyOf(iters, iters.length + 1);
+		iters[iters.length - 1] = eset;
+		size += sizeAdd;
 	}
 
 	@Override
@@ -50,5 +48,5 @@ public class MultiIterable<K> implements Iterable<K>, SizedIterable<K>
 	public int size() {
 		return size;
 	}
-	
+
 }

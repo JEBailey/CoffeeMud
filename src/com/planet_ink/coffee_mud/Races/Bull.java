@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Races;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -10,48 +11,72 @@ import com.planet_ink.coffee_mud.Races.interfaces.Race;
 import com.planet_ink.coffee_mud.core.CMClass;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Bull extends Buffalo
-{
-	public String ID(){	return "Bull"; }
-	public String name(){ return "Bull"; }
-	public int shortestMale(){return 48;}
-	public int shortestFemale(){return 48;}
-	public int heightVariance(){return 6;}
-	public int lightestWeight(){return 350;}
-	public int weightVariance(){return 100;}
-	protected static Vector<RawMaterial> resources=new Vector<RawMaterial>();
-	public String racialCategory(){return "Bovine";}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Bull extends Buffalo {
+	public String ID() {
+		return "Bull";
+	}
 
-	//  							  an ey ea he ne ar ha to le fo no gi mo wa ta wi
-	private static final int[] parts={0 ,2 ,2 ,1 ,1 ,0 ,0 ,1 ,4 ,4 ,1 ,0 ,1 ,1 ,1 ,0 };
-	public int[] bodyMask(){return parts;}
+	public String name() {
+		return "Bull";
+	}
 
-	public boolean canBreedWith(Race R) 
-	{ 
-		if((!super.sameAs(R))&&(R!=null))
+	public int shortestMale() {
+		return 48;
+	}
+
+	public int shortestFemale() {
+		return 48;
+	}
+
+	public int heightVariance() {
+		return 6;
+	}
+
+	public int lightestWeight() {
+		return 350;
+	}
+
+	public int weightVariance() {
+		return 100;
+	}
+
+	protected static Vector<RawMaterial> resources = new Vector<RawMaterial>();
+
+	public String racialCategory() {
+		return "Bovine";
+	}
+
+	// an ey ea he ne ar ha to le fo no gi mo wa ta wi
+	private static final int[] parts = { 0, 2, 2, 1, 1, 0, 0, 1, 4, 4, 1, 0, 1,
+			1, 1, 0 };
+
+	public int[] bodyMask() {
+		return parts;
+	}
+
+	public boolean canBreedWith(Race R) {
+		if ((!super.sameAs(R)) && (R != null))
 			return R.ID().equals("Cow");
 		return true;
-	} 
-	
-	public Weapon myNaturalWeapon()
-	{
-		if(naturalWeapon==null)
-		{
-			naturalWeapon=CMClass.getWeapon("StdWeapon");
+	}
+
+	public Weapon myNaturalWeapon() {
+		if (naturalWeapon == null) {
+			naturalWeapon = CMClass.getWeapon("StdWeapon");
 			naturalWeapon.setName("a pair of deadly horns");
 			naturalWeapon.setMaterial(RawMaterial.RESOURCE_BONE);
 			naturalWeapon.setUsesRemaining(1000);
@@ -59,79 +84,90 @@ public class Bull extends Buffalo
 		}
 		return naturalWeapon;
 	}
-	public void affectCharStats(MOB affectedMOB, CharStats affectableStats)
-	{
+
+	public void affectCharStats(MOB affectedMOB, CharStats affectableStats) {
 		super.affectCharStats(affectedMOB, affectableStats);
-		affectableStats.setRacialStat(CharStats.STAT_STRENGTH,19);
-		affectableStats.setRacialStat(CharStats.STAT_DEXTERITY,5);
-		affectableStats.setRacialStat(CharStats.STAT_INTELLIGENCE,1);
+		affectableStats.setRacialStat(CharStats.STAT_STRENGTH, 19);
+		affectableStats.setRacialStat(CharStats.STAT_DEXTERITY, 5);
+		affectableStats.setRacialStat(CharStats.STAT_INTELLIGENCE, 1);
 	}
-	
-	public Race mixRace(Race race, String newRaceID, String newRaceName)
-	{
-		if(ID().equalsIgnoreCase("Bull"))
-		{
-			if((race!=null)&&(race.ID().equalsIgnoreCase("Buffalo")))
+
+	public Race mixRace(Race race, String newRaceID, String newRaceName) {
+		if (ID().equalsIgnoreCase("Bull")) {
+			if ((race != null) && (race.ID().equalsIgnoreCase("Buffalo")))
 				return CMClass.getRace("Buffalo");
-			if((race!=null)&&(race.ID().equalsIgnoreCase("Cow")))
+			if ((race != null) && (race.ID().equalsIgnoreCase("Cow")))
 				return CMClass.getRace("Cow");
 		}
 		return super.mixRace(race, newRaceID, newRaceName);
 	}
-	public String makeMobName(char gender, int age)
-	{
-		switch(age)
-		{
-			case Race.AGE_INFANT:
-			case Race.AGE_TODDLER:
-			case Race.AGE_CHILD:
-				return "calf";
-			case Race.AGE_YOUNGADULT:
-				switch(gender)
-				{
-				case 'M': case 'm': return "young bull";
-				case 'F': case 'f': return "young cow";
-				default: return name().toLowerCase();
-				}
-			case Race.AGE_MATURE:
-			case Race.AGE_MIDDLEAGED:
+
+	public String makeMobName(char gender, int age) {
+		switch (age) {
+		case Race.AGE_INFANT:
+		case Race.AGE_TODDLER:
+		case Race.AGE_CHILD:
+			return "calf";
+		case Race.AGE_YOUNGADULT:
+			switch (gender) {
+			case 'M':
+			case 'm':
+				return "young bull";
+			case 'F':
+			case 'f':
+				return "young cow";
 			default:
-				switch(gender)
-				{
-				case 'M': case 'm': return "bull";
-				case 'F': case 'f': return "cow";
-				default: return name().toLowerCase();
-				}
-			case Race.AGE_OLD:
-			case Race.AGE_VENERABLE:
-			case Race.AGE_ANCIENT:
-				switch(gender)
-				{
-				case 'M': case 'm': return "old bull";
-				case 'F': case 'f': return "old cow";
-				default: return "old "+name().toLowerCase();
-				}
+				return name().toLowerCase();
+			}
+		case Race.AGE_MATURE:
+		case Race.AGE_MIDDLEAGED:
+		default:
+			switch (gender) {
+			case 'M':
+			case 'm':
+				return "bull";
+			case 'F':
+			case 'f':
+				return "cow";
+			default:
+				return name().toLowerCase();
+			}
+		case Race.AGE_OLD:
+		case Race.AGE_VENERABLE:
+		case Race.AGE_ANCIENT:
+			switch (gender) {
+			case 'M':
+			case 'm':
+				return "old bull";
+			case 'F':
+			case 'f':
+				return "old cow";
+			default:
+				return "old " + name().toLowerCase();
+			}
 		}
 	}
-	
-	public List<RawMaterial> myResources()
-	{
-		synchronized(resources)
-		{
-			if(resources.size()==0)
-			{
-				resources.addElement(makeResource
-				("a pair of "+name().toLowerCase()+" horns",RawMaterial.RESOURCE_BONE));
-				for(int i=0;i<10;i++)
-					resources.addElement(makeResource
-					("a strip of "+name().toLowerCase()+" leather",RawMaterial.RESOURCE_LEATHER));
-				for(int i=0;i<7;i++)
-					resources.addElement(makeResource
-					("a pound of "+name().toLowerCase()+" meat",RawMaterial.RESOURCE_BEEF));
-				resources.addElement(makeResource
-				("some "+name().toLowerCase()+" blood",RawMaterial.RESOURCE_BLOOD));
-				resources.addElement(makeResource
-				("a pile of "+name().toLowerCase()+" bones",RawMaterial.RESOURCE_BONE));
+
+	public List<RawMaterial> myResources() {
+		synchronized (resources) {
+			if (resources.size() == 0) {
+				resources.addElement(makeResource("a pair of "
+						+ name().toLowerCase() + " horns",
+						RawMaterial.RESOURCE_BONE));
+				for (int i = 0; i < 10; i++)
+					resources.addElement(makeResource("a strip of "
+							+ name().toLowerCase() + " leather",
+							RawMaterial.RESOURCE_LEATHER));
+				for (int i = 0; i < 7; i++)
+					resources.addElement(makeResource("a pound of "
+							+ name().toLowerCase() + " meat",
+							RawMaterial.RESOURCE_BEEF));
+				resources.addElement(makeResource("some "
+						+ name().toLowerCase() + " blood",
+						RawMaterial.RESOURCE_BLOOD));
+				resources.addElement(makeResource("a pile of "
+						+ name().toLowerCase() + " bones",
+						RawMaterial.RESOURCE_BONE));
 			}
 		}
 		return resources;

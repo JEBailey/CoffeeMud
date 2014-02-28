@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.Basic;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -24,344 +25,350 @@ import com.planet_ink.coffee_mud.core.interfaces.LandTitle;
 import com.planet_ink.coffee_mud.core.interfaces.ShopKeeper;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class StdTitle extends StdItem implements LandTitle
-{
-	public String ID(){    return "StdTitle";}
-	public String displayText() {return "an official looking document sits here";}
-	public int baseGoldValue() {return getPrice();}
-	public int value()
-	{
-		if(name().indexOf("(Copy)")>=0)
-			baseGoldValue=10;
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class StdTitle extends StdItem implements LandTitle {
+	public String ID() {
+		return "StdTitle";
+	}
+
+	public String displayText() {
+		return "an official looking document sits here";
+	}
+
+	public int baseGoldValue() {
+		return getPrice();
+	}
+
+	public int value() {
+		if (name().indexOf("(Copy)") >= 0)
+			baseGoldValue = 10;
 		else
-			baseGoldValue=getPrice();
+			baseGoldValue = getPrice();
 		return baseGoldValue;
 	}
-	public void setBaseGoldValue(int newValue) {setPrice(newValue);}
 
-	public StdTitle()
-	{
+	public void setBaseGoldValue(int newValue) {
+		setPrice(newValue);
+	}
+
+	public StdTitle() {
 		super();
 		setName("a standard title");
 		setDescription("Give or Sell this title to transfer ownership. **DON`T LOSE THIS!**");
-		baseGoldValue=10000;
+		baseGoldValue = 10000;
 		basePhyStats().setSensesMask(PhyStats.SENSE_ITEMREADABLE);
 		setMaterial(RawMaterial.RESOURCE_PAPER);
 		recoverPhyStats();
 	}
 
-	public boolean allowsExpansionConstruction()
-	{ 
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return false;
+	public boolean allowsExpansionConstruction() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return false;
 		return A.allowsExpansionConstruction();
 	}
 
-	public int getPrice()
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return 0;
-		return A.getPrice()+A.backTaxes();
+	public int getPrice() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return 0;
+		return A.getPrice() + A.backTaxes();
 	}
 
-	public void setPrice(int price)
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return;
+	public void setPrice(int price) {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return;
 		A.setPrice(price);
 		A.updateTitle();
 	}
 
-	public void setBackTaxes(int amount)
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return;
+	public void setBackTaxes(int amount) {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return;
 		A.setBackTaxes(amount);
 		A.updateTitle();
 	}
-	public int backTaxes()
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return 0;
+
+	public int backTaxes() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return 0;
 		return A.backTaxes();
 	}
-	public boolean rentalProperty()
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return false;
+
+	public boolean rentalProperty() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return false;
 		return A.rentalProperty();
 	}
 
-	public String getUniqueLotID()
-	{ 
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return "";
+	public String getUniqueLotID() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return "";
 		return A.getUniqueLotID();
 	}
-	public void setRentalProperty(boolean truefalse)
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return;
+
+	public void setRentalProperty(boolean truefalse) {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return;
 		A.setRentalProperty(truefalse);
 		A.updateTitle();
 	}
 
-	public CMObject getOwnerObject()
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return null;
-		String owner=A.getOwnerName();
-		if(owner.length()==0) return null;
-		Clan C=CMLib.clans().getClan(owner);
-		if(C!=null) return C;
+	public CMObject getOwnerObject() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return null;
+		String owner = A.getOwnerName();
+		if (owner.length() == 0)
+			return null;
+		Clan C = CMLib.clans().getClan(owner);
+		if (C != null)
+			return C;
 		return CMLib.players().getLoadPlayer(owner);
 	}
-	
-	public String getOwnerName()
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return "";
+
+	public String getOwnerName() {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return "";
 		return A.getOwnerName();
 	}
-	public void setOwnerName(String owner)
-	{
-		LandTitle A=fetchALandTitle();
-		if(A==null)    return;
+
+	public void setOwnerName(String owner) {
+		LandTitle A = fetchALandTitle();
+		if (A == null)
+			return;
 		A.setOwnerName(owner);
 		A.updateTitle();
 	}
 
-	public LandTitle fetchALandTitle()
-	{
-		List<Room> V=getAllTitledRooms();
-		if((V!=null)&&(V.size()>0))
+	public LandTitle fetchALandTitle() {
+		List<Room> V = getAllTitledRooms();
+		if ((V != null) && (V.size() > 0))
 			return CMLib.law().getLandTitle(V.get(0));
 		return null;
 	}
 
-	public String landPropertyID()
-	{
+	public String landPropertyID() {
 		return text();
 	}
 
-	public void updateTitleName()
-	{
-		if(!name.startsWith("the title to"))
-		{
-			List<Room> V=getAllTitledRooms();
-			if((V.size()<2)
-			||(CMLib.map().getArea(landPropertyID())!=null))
-				setName("the title to "+landPropertyID());
+	public void updateTitleName() {
+		if (!name.startsWith("the title to")) {
+			List<Room> V = getAllTitledRooms();
+			if ((V.size() < 2)
+					|| (CMLib.map().getArea(landPropertyID()) != null))
+				setName("the title to " + landPropertyID());
 			else
-				setName("the title to rooms around "+CMLib.map().getExtendedRoomID(V.get(0)));
+				setName("the title to rooms around "
+						+ CMLib.map().getExtendedRoomID(V.get(0)));
 		}
 	}
 
-	public void setLandPropertyID(String landID)
-	{
+	public void setLandPropertyID(String landID) {
 		setMiscText(landID);
 		updateTitleName();
 	}
 
-	public void updateLot(List optPlayerList)
-	{
-		List<Room> V=getAllTitledRooms();
-		for(int v=0;v<V.size();v++)
-		{
-			Room R=V.get(v);
-			LandTitle T=CMLib.law().getLandTitle(R);
-			if(T!=null) T.updateLot(optPlayerList);
+	public void updateLot(List optPlayerList) {
+		List<Room> V = getAllTitledRooms();
+		for (int v = 0; v < V.size(); v++) {
+			Room R = V.get(v);
+			LandTitle T = CMLib.law().getLandTitle(R);
+			if (T != null)
+				T.updateLot(optPlayerList);
 		}
 	}
 
-	public void updateTitle()
-	{
-		LandTitle T=fetchALandTitle();
-		if(T!=null) T.updateTitle();
+	public void updateTitle() {
+		LandTitle T = fetchALandTitle();
+		if (T != null)
+			T.updateTitle();
 	}
 
-	public List<Room> getConnectedPropertyRooms()
-	{
-		Room R=CMLib.map().getRoom(landPropertyID());
-		if(R!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(R);
-			if(A!=null) return A.getConnectedPropertyRooms();
+	public List<Room> getConnectedPropertyRooms() {
+		Room R = CMLib.map().getRoom(landPropertyID());
+		if (R != null) {
+			LandTitle A = CMLib.law().getLandTitle(R);
+			if (A != null)
+				return A.getConnectedPropertyRooms();
 		}
-		Area area=CMLib.map().getArea(landPropertyID());
-		if(area!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(area);
-			if(A!=null) return A.getConnectedPropertyRooms();
-		}
-		return new Vector();
-	}
-	
-	public List<Room> getAllTitledRooms()
-	{
-		Room R=CMLib.map().getRoom(landPropertyID());
-		if(R!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(R);
-			if(A!=null) return A.getAllTitledRooms();
-		}
-		Area area=CMLib.map().getArea(landPropertyID());
-		if(area!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(area);
-			if(A!=null) return A.getAllTitledRooms();
+		Area area = CMLib.map().getArea(landPropertyID());
+		if (area != null) {
+			LandTitle A = CMLib.law().getLandTitle(area);
+			if (A != null)
+				return A.getConnectedPropertyRooms();
 		}
 		return new Vector();
 	}
 
-	public String getTitleID()
-	{
-		Room R=CMLib.map().getRoom(landPropertyID());
-		if(R!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(R);
-			if(A!=null) return A.getTitleID();
+	public List<Room> getAllTitledRooms() {
+		Room R = CMLib.map().getRoom(landPropertyID());
+		if (R != null) {
+			LandTitle A = CMLib.law().getLandTitle(R);
+			if (A != null)
+				return A.getAllTitledRooms();
 		}
-		Area area=CMLib.map().getArea(landPropertyID());
-		if(area!=null)
-		{
-			LandTitle A=CMLib.law().getLandTitle(area);
-			if(A!=null) return A.getTitleID();
+		Area area = CMLib.map().getArea(landPropertyID());
+		if (area != null) {
+			LandTitle A = CMLib.law().getLandTitle(area);
+			if (A != null)
+				return A.getAllTitledRooms();
+		}
+		return new Vector();
+	}
+
+	public String getTitleID() {
+		Room R = CMLib.map().getRoom(landPropertyID());
+		if (R != null) {
+			LandTitle A = CMLib.law().getLandTitle(R);
+			if (A != null)
+				return A.getTitleID();
+		}
+		Area area = CMLib.map().getArea(landPropertyID());
+		if (area != null) {
+			LandTitle A = CMLib.law().getLandTitle(area);
+			if (A != null)
+				return A.getTitleID();
 		}
 		return "";
 	}
 
-	public void recoverPhyStats(){CMLib.flags().setReadable(this,true); super.recoverPhyStats();}
+	public void recoverPhyStats() {
+		CMLib.flags().setReadable(this, true);
+		super.recoverPhyStats();
+	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if((msg.targetMinor()==CMMsg.TYP_WRITE)
-		&&(msg.amITarget(this)))
-		{
-			MOB mob=msg.source();
-			mob.tell("You shouldn't write on "+name()+".");
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if ((msg.targetMinor() == CMMsg.TYP_WRITE) && (msg.amITarget(this))) {
+			MOB mob = msg.source();
+			mob.tell("You shouldn't write on " + name() + ".");
 			return false;
-		}
-		else
-		if((msg.targetMinor()==CMMsg.TYP_GET)
-		&&(msg.amITarget(this))
-		&&(msg.tool() instanceof ShopKeeper))
-		{
-			LandTitle A=fetchALandTitle();
-			if(A==null)
-			{
+		} else if ((msg.targetMinor() == CMMsg.TYP_GET)
+				&& (msg.amITarget(this)) && (msg.tool() instanceof ShopKeeper)) {
+			LandTitle A = fetchALandTitle();
+			if (A == null) {
 				destroy();
 				msg.source().tell("You can't buy that.");
 				return false;
 			}
-			if(A.getOwnerName().length()==0)
-			{
-				Area AREA=CMLib.map().getArea(A.landPropertyID());
-				if((AREA!=null)&&(AREA.Name().indexOf("UNNAMED")>=0)&&(msg.source().isMonster()))
+			if (A.getOwnerName().length() == 0) {
+				Area AREA = CMLib.map().getArea(A.landPropertyID());
+				if ((AREA != null) && (AREA.Name().indexOf("UNNAMED") >= 0)
+						&& (msg.source().isMonster()))
 					return false;
 			}
-		}
-		else
-		if((msg.targetMinor()==CMMsg.TYP_BUY)
-		&&(msg.target() instanceof MOB)
-		&&(msg.tool()==this))
-		{
-			LandTitle A=fetchALandTitle();
-			if((A!=null)&&(A.getOwnerName().length()>0))
-			{
-				ShopKeeper SK=CMLib.coffeeShops().getShopKeeper(msg.target());
-				if((((SK.isSold(ShopKeeper.DEAL_CLANBANKER))||(SK.isSold(ShopKeeper.DEAL_CLANDSELLER)))
-						&&(msg.source().getClanRole(A.getOwnerName())==null))
-				||(((SK.isSold(ShopKeeper.DEAL_BANKER))||(SK.isSold(ShopKeeper.DEAL_CLANBANKER)))
-						&&(!A.getOwnerName().equals(msg.source().Name())))
-				||(((SK.isSold(ShopKeeper.DEAL_POSTMAN))||(SK.isSold(ShopKeeper.DEAL_CLANPOSTMAN)))
-						&&(!A.getOwnerName().equals(msg.source().Name()))))
-				{
-					String str="I'm sorry, '"+msg.tool().Name()+" is not for sale.  It already belongs to "+A.getOwnerName()+".  It should be destroyed.";
-					if(((MOB)msg.target()).isMonster())
-						CMLib.commands().postSay((MOB)msg.target(),msg.source(),str,false,false);
+		} else if ((msg.targetMinor() == CMMsg.TYP_BUY)
+				&& (msg.target() instanceof MOB) && (msg.tool() == this)) {
+			LandTitle A = fetchALandTitle();
+			if ((A != null) && (A.getOwnerName().length() > 0)) {
+				ShopKeeper SK = CMLib.coffeeShops().getShopKeeper(msg.target());
+				if ((((SK.isSold(ShopKeeper.DEAL_CLANBANKER)) || (SK
+						.isSold(ShopKeeper.DEAL_CLANDSELLER))) && (msg.source()
+						.getClanRole(A.getOwnerName()) == null))
+						|| (((SK.isSold(ShopKeeper.DEAL_BANKER)) || (SK
+								.isSold(ShopKeeper.DEAL_CLANBANKER))) && (!A
+								.getOwnerName().equals(msg.source().Name())))
+						|| (((SK.isSold(ShopKeeper.DEAL_POSTMAN)) || (SK
+								.isSold(ShopKeeper.DEAL_CLANPOSTMAN))) && (!A
+								.getOwnerName().equals(msg.source().Name())))) {
+					String str = "I'm sorry, '" + msg.tool().Name()
+							+ " is not for sale.  It already belongs to "
+							+ A.getOwnerName() + ".  It should be destroyed.";
+					if (((MOB) msg.target()).isMonster())
+						CMLib.commands().postSay((MOB) msg.target(),
+								msg.source(), str, false, false);
 					else
-						((MOB)msg.target()).tell(str+" You might want to tell the customer.");
-					SK.getShop().removeStock(Name(),msg.source());
+						((MOB) msg.target()).tell(str
+								+ " You might want to tell the customer.");
+					SK.getShop().removeStock(Name(), msg.source());
 					destroy();
 					return false;
 				}
 
 			}
-		}
-		else
-		if((msg.targetMinor()==CMMsg.TYP_WITHDRAW)
-		&&(msg.target() instanceof MOB)
-		&&(msg.tool()==this))
-		{
-			LandTitle A=fetchALandTitle();
-			if((A!=null)
-			&&((A.getOwnerName().length()==0)
-			||((A.getOwnerName().length()>0)
-				&&(!A.getOwnerName().equals(msg.source().Name()))
-				&&(!((msg.source().isMarriedToLiege())&&(A.getOwnerName().equals(msg.source().getLiegeID()))))
-				&&(msg.source().getClanRole(A.getOwnerName())==null))))
-			{
-				String str="I'm sorry, '"+msg.tool().Name()+" must be destroyed.";
-				if(((MOB)msg.target()).isMonster())
-					CMLib.commands().postSay((MOB)msg.target(),msg.source(),str,false,false);
+		} else if ((msg.targetMinor() == CMMsg.TYP_WITHDRAW)
+				&& (msg.target() instanceof MOB) && (msg.tool() == this)) {
+			LandTitle A = fetchALandTitle();
+			if ((A != null)
+					&& ((A.getOwnerName().length() == 0) || ((A.getOwnerName()
+							.length() > 0)
+							&& (!A.getOwnerName().equals(msg.source().Name()))
+							&& (!((msg.source().isMarriedToLiege()) && (A
+									.getOwnerName().equals(msg.source()
+									.getLiegeID())))) && (msg.source()
+							.getClanRole(A.getOwnerName()) == null)))) {
+				String str = "I'm sorry, '" + msg.tool().Name()
+						+ " must be destroyed.";
+				if (((MOB) msg.target()).isMonster())
+					CMLib.commands().postSay((MOB) msg.target(), msg.source(),
+							str, false, false);
 				else
-					((MOB)msg.target()).tell(str+" You might want to tell the customer.");
-				ShopKeeper SK=CMLib.coffeeShops().getShopKeeper(msg.target());
-				if(SK!=null) SK.getShop().removeStock(msg.tool().Name(),msg.source());
+					((MOB) msg.target()).tell(str
+							+ " You might want to tell the customer.");
+				ShopKeeper SK = CMLib.coffeeShops().getShopKeeper(msg.target());
+				if (SK != null)
+					SK.getShop().removeStock(msg.tool().Name(), msg.source());
 				destroy();
 				return false;
 			}
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		if((msg.amITarget(this))
-		&&(msg.targetMinor()==CMMsg.TYP_READ))
-		{
-			if(CMLib.flags().canBeSeenBy(this,msg.source()))
-			{
-				if((landPropertyID()==null)||(landPropertyID().length()==0))
-					msg.source().tell("It appears to be a blank property title.");
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		if ((msg.amITarget(this)) && (msg.targetMinor() == CMMsg.TYP_READ)) {
+			if (CMLib.flags().canBeSeenBy(this, msg.source())) {
+				if ((landPropertyID() == null)
+						|| (landPropertyID().length() == 0))
+					msg.source().tell(
+							"It appears to be a blank property title.");
+				else if ((getOwnerName() == null)
+						|| (getOwnerName().length() == 0))
+					msg.source().tell(
+							"It states that the property herein known as '"
+									+ landPropertyID()
+									+ "' is available for ownership.");
 				else
-				if((getOwnerName()==null)||(getOwnerName().length()==0))
-					msg.source().tell("It states that the property herein known as '"+landPropertyID()+"' is available for ownership.");
-				else
-					msg.source().tell("It states that the property herein known as '"+landPropertyID()+"' is deeded to "+getOwnerName()+".");
-			}
-			else
+					msg.source().tell(
+							"It states that the property herein known as '"
+									+ landPropertyID() + "' is deeded to "
+									+ getOwnerName() + ".");
+			} else
 				msg.source().tell("You can't see that!");
-			msg.modify(msg.source(),msg.target(),msg.tool(),msg.sourceCode(),msg.sourceMessage(),msg.targetCode(),"CANCEL",msg.othersCode(),msg.othersMessage());
+			msg.modify(msg.source(), msg.target(), msg.tool(),
+					msg.sourceCode(), msg.sourceMessage(), msg.targetCode(),
+					"CANCEL", msg.othersCode(), msg.othersMessage());
 		}
 
-		super.executeMsg(myHost,msg);
+		super.executeMsg(myHost, msg);
 
-		if((msg.targetMinor()==CMMsg.TYP_SELL)
-		&&(msg.tool()==this)
-		&&(msg.target()!=null)
-		&&(msg.target() instanceof ShopKeeper))
-		{
-			LandTitle A=fetchALandTitle();
-			if(A==null)
-			{
-				Log.errOut("StdTitle","Unsellable room: "+landPropertyID());
+		if ((msg.targetMinor() == CMMsg.TYP_SELL) && (msg.tool() == this)
+				&& (msg.target() != null)
+				&& (msg.target() instanceof ShopKeeper)) {
+			LandTitle A = fetchALandTitle();
+			if (A == null) {
+				Log.errOut("StdTitle", "Unsellable room: " + landPropertyID());
 				destroy();
 				return;
 			}
@@ -369,103 +376,106 @@ public class StdTitle extends StdItem implements LandTitle
 			updateTitle();
 			updateLot(null);
 			recoverPhyStats();
-		}
-		else
-		if((msg.targetMinor()==CMMsg.TYP_GIVE)
-		&&(msg.tool()==this)
-		&&(msg.source()!=null)
-		&&(getOwnerName().length()>0)
-		&&((msg.source().Name().equals(getOwnerName()))
-			||(msg.source().getLiegeID().equals(getOwnerName())&&msg.source().isMarriedToLiege())
-			||(CMLib.clans().checkClanPrivilege(msg.source(), getOwnerName(), Clan.Function.PROPERTY_OWNER)))
-		&&(msg.target()!=null)
-		&&(msg.target() instanceof MOB)
-		&&(!(msg.target() instanceof Banker))
-		&&(!(msg.target() instanceof Auctioneer))
-		&&(!(msg.target() instanceof PostOffice)))
-		{
-			LandTitle A=fetchALandTitle();
-			if(A==null)
-			{
-				Log.errOut("StdTitle","Unsellable room: "+landPropertyID());
+		} else if ((msg.targetMinor() == CMMsg.TYP_GIVE)
+				&& (msg.tool() == this)
+				&& (msg.source() != null)
+				&& (getOwnerName().length() > 0)
+				&& ((msg.source().Name().equals(getOwnerName()))
+						|| (msg.source().getLiegeID().equals(getOwnerName()) && msg
+								.source().isMarriedToLiege()) || (CMLib.clans()
+						.checkClanPrivilege(msg.source(), getOwnerName(),
+								Clan.Function.PROPERTY_OWNER)))
+				&& (msg.target() != null) && (msg.target() instanceof MOB)
+				&& (!(msg.target() instanceof Banker))
+				&& (!(msg.target() instanceof Auctioneer))
+				&& (!(msg.target() instanceof PostOffice))) {
+			LandTitle A = fetchALandTitle();
+			if (A == null) {
+				Log.errOut("StdTitle", "Unsellable room: " + landPropertyID());
 				destroy();
 				return;
 			}
-			if(CMLib.clans().checkClanPrivilege(msg.source(), getOwnerName(), Clan.Function.PROPERTY_OWNER))
-			{
-				Pair<Clan,Integer> targetClan=CMLib.clans().findPrivilegedClan((MOB)msg.target(), Clan.Function.PROPERTY_OWNER);
-				if(targetClan!=null)
+			if (CMLib.clans().checkClanPrivilege(msg.source(), getOwnerName(),
+					Clan.Function.PROPERTY_OWNER)) {
+				Pair<Clan, Integer> targetClan = CMLib.clans()
+						.findPrivilegedClan((MOB) msg.target(),
+								Clan.Function.PROPERTY_OWNER);
+				if (targetClan != null)
 					A.setOwnerName(targetClan.first.clanID());
 				else
 					A.setOwnerName(msg.target().Name());
-			}
-			else
+			} else
 				A.setOwnerName(msg.target().Name());
 			A.setBackTaxes(0);
 			updateTitle();
 			updateLot(null);
 			recoverPhyStats();
-			msg.source().tell(name()+" is now signed over to "+A.getOwnerName()+".");
-			if(A.rentalProperty())
-				msg.source().tell("This property is a rental.  Your rent will be paid every mud-month out of your bank account.");
-			else
-			{
-				List<Room> allRooms=getAllTitledRooms();
-				if((allRooms!=null)&&(allRooms.size()>0))
-				{
-					Room R=allRooms.get(0);
-					LegalBehavior B=CMLib.law().getLegalBehavior(R);
-					if(B!=null)
-					{
-						Area A2=CMLib.law().getLegalObject(R);
-						if(A2==null)
-							Log.errOut("StdTitle",CMLib.map().getExtendedRoomID(R)+" has a legal behavior, but no area!");
-						else
-						{
-							Law theLaw=B.legalInfo(A2);
-							if(theLaw==null)
-								Log.errOut("StdTitle",A2.Name()+" has no law.");
-							else
-							{
-								String taxs=(String)theLaw.taxLaws().get("PROPERTYTAX");
-								if((taxs!=null)&&(taxs.length()==0)&&(CMath.s_double(taxs)>0.0))
-									msg.source().tell("A property tax of "+CMath.s_double(taxs)+"% of "+A.getPrice()+" will be paid monthly out of your bank account.");
+			msg.source()
+					.tell(name() + " is now signed over to " + A.getOwnerName()
+							+ ".");
+			if (A.rentalProperty())
+				msg.source()
+						.tell("This property is a rental.  Your rent will be paid every mud-month out of your bank account.");
+			else {
+				List<Room> allRooms = getAllTitledRooms();
+				if ((allRooms != null) && (allRooms.size() > 0)) {
+					Room R = allRooms.get(0);
+					LegalBehavior B = CMLib.law().getLegalBehavior(R);
+					if (B != null) {
+						Area A2 = CMLib.law().getLegalObject(R);
+						if (A2 == null)
+							Log.errOut("StdTitle", CMLib.map()
+									.getExtendedRoomID(R)
+									+ " has a legal behavior, but no area!");
+						else {
+							Law theLaw = B.legalInfo(A2);
+							if (theLaw == null)
+								Log.errOut("StdTitle", A2.Name()
+										+ " has no law.");
+							else {
+								String taxs = (String) theLaw.taxLaws().get(
+										"PROPERTYTAX");
+								if ((taxs != null) && (taxs.length() == 0)
+										&& (CMath.s_double(taxs) > 0.0))
+									msg.source()
+											.tell("A property tax of "
+													+ CMath.s_double(taxs)
+													+ "% of "
+													+ A.getPrice()
+													+ " will be paid monthly out of your bank account.");
 							}
 						}
 					}
 				}
 			}
-		}
-		else
-		if((msg.targetMinor()==CMMsg.TYP_GET)
-		&&(msg.amITarget(this))
-		&&(msg.tool()!=null)
-		&&(msg.tool() instanceof ShopKeeper))
-		{
-			LandTitle A=fetchALandTitle();
-			if(A==null)
-			{
-				Log.errOut("StdTitle","Unsellable room: "+landPropertyID());
+		} else if ((msg.targetMinor() == CMMsg.TYP_GET)
+				&& (msg.amITarget(this)) && (msg.tool() != null)
+				&& (msg.tool() instanceof ShopKeeper)) {
+			LandTitle A = fetchALandTitle();
+			if (A == null) {
+				Log.errOut("StdTitle", "Unsellable room: " + landPropertyID());
 				destroy();
 				return;
 			}
-			if(A.getOwnerName().length()==0)
-			{
-				String newOwnerName=msg.source().Name();
-				if(((ShopKeeper)msg.tool()).isSold(ShopKeeper.DEAL_CLANDSELLER))
-				{
-					Pair<Clan,Integer> clanPair=CMLib.clans().findPrivilegedClan(msg.source(), Clan.Function.PROPERTY_OWNER);
-					if(clanPair!=null)
-						newOwnerName=clanPair.first.clanID();
+			if (A.getOwnerName().length() == 0) {
+				String newOwnerName = msg.source().Name();
+				if (((ShopKeeper) msg.tool())
+						.isSold(ShopKeeper.DEAL_CLANDSELLER)) {
+					Pair<Clan, Integer> clanPair = CMLib.clans()
+							.findPrivilegedClan(msg.source(),
+									Clan.Function.PROPERTY_OWNER);
+					if (clanPair != null)
+						newOwnerName = clanPair.first.clanID();
 				}
-				
+
 				A.setOwnerName(newOwnerName);
-				if(A.getOwnerName().length()>0)
-				{
+				if (A.getOwnerName().length() > 0) {
 					setBackTaxes(0);
 					updateTitle();
 					updateLot(null);
-					msg.source().tell(name()+" is now signed over to "+A.getOwnerName()+".");
+					msg.source().tell(
+							name() + " is now signed over to "
+									+ A.getOwnerName() + ".");
 				}
 			}
 			recoverPhyStats();

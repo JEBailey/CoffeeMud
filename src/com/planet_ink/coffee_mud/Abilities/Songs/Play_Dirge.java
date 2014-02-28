@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Songs;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -15,108 +16,140 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.CMProps;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Play_Dirge extends Play
-{
-	public String ID() { return "Play_Dirge"; }
-	public String name(){ return "Dirge";}
-	protected int canAffectCode(){return 0;}
-	public int abstractQuality(){ return Ability.QUALITY_BENEFICIAL_OTHERS;}
-	protected boolean persistantSong(){return false;}
-	protected boolean skipStandardSongTick(){return true;}
-	protected String songOf(){return "a "+name();}
-	protected boolean HAS_QUANTITATIVE_ASPECT(){return false;}
-	protected boolean skipStandardSongInvoke(){return true;}
+public class Play_Dirge extends Play {
+	public String ID() {
+		return "Play_Dirge";
+	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(mob.isInCombat())
+	public String name() {
+		return "Dirge";
+	}
+
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_BENEFICIAL_OTHERS;
+	}
+
+	protected boolean persistantSong() {
+		return false;
+	}
+
+	protected boolean skipStandardSongTick() {
+		return true;
+	}
+
+	protected String songOf() {
+		return "a " + name();
+	}
+
+	protected boolean HAS_QUANTITATIVE_ASPECT() {
+		return false;
+	}
+
+	protected boolean skipStandardSongInvoke() {
+		return true;
+	}
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (mob.isInCombat())
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		timeOut=0;
-		Item target=getTarget(mob,mob.location(),givenTarget,commands,Wearable.FILTER_UNWORNONLY);
-		if(target==null) return false;
 
-		if((!(target instanceof DeadBody))||(target.rawSecretIdentity().toUpperCase().indexOf("FAKE")>=0))
-		{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		timeOut = 0;
+		Item target = getTarget(mob, mob.location(), givenTarget, commands,
+				Wearable.FILTER_UNWORNONLY);
+		if (target == null)
+			return false;
+
+		if ((!(target instanceof DeadBody))
+				|| (target.rawSecretIdentity().toUpperCase().indexOf("FAKE") >= 0)) {
 			mob.tell("You may only play this for the dead.");
 			return false;
 		}
-		if((((DeadBody)target).playerCorpse())&&(((DeadBody)target).getContents().size()>0))
-		{
+		if ((((DeadBody) target).playerCorpse())
+				&& (((DeadBody) target).getContents().size() > 0)) {
 			mob.tell("You may not play for that body");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		unplayAll(mob,mob);
-		if(success)
-		{
-			invoker=mob;
-			originRoom=mob.location();
-			commonRoomSet=getInvokerScopeRoomSet(null);
-			String str=auto?"^S"+songOf()+" begins to play!^?":"^S<S-NAME> begin(s) to play "+songOf()+" on "+instrumentName()+".^?";
-			if((!auto)&&(mob.fetchEffect(this.ID())!=null))
-				str="^S<S-NAME> start(s) playing "+songOf()+" on "+instrumentName()+" again.^?";
+		boolean success = proficiencyCheck(mob, 0, auto);
+		unplayAll(mob, mob);
+		if (success) {
+			invoker = mob;
+			originRoom = mob.location();
+			commonRoomSet = getInvokerScopeRoomSet(null);
+			String str = auto ? "^S" + songOf() + " begins to play!^?"
+					: "^S<S-NAME> begin(s) to play " + songOf() + " on "
+							+ instrumentName() + ".^?";
+			if ((!auto) && (mob.fetchEffect(this.ID()) != null))
+				str = "^S<S-NAME> start(s) playing " + songOf() + " on "
+						+ instrumentName() + " again.^?";
 
-			for(int v=0;v<commonRoomSet.size();v++)
-			{
-				Room R=(Room)commonRoomSet.elementAt(v);
-				String msgStr=getCorrectMsgString(R,str,v);
-				CMMsg msg=CMClass.getMsg(mob,null,this,somanticCastCode(mob,null,auto),msgStr);
-				if(R.okMessage(mob,msg))
-				{
-					Set<MOB> h=super.sendMsgAndGetTargets(mob, R, msg, givenTarget, auto);
-					if(h==null) continue;
-	
-					for(Iterator f=h.iterator();f.hasNext();)
-					{
-						MOB follower=(MOB)f.next();
-	
-						double exp=10.0;
-						int levelLimit=CMProps.getIntVar(CMProps.Int.EXPRATE);
-						int levelDiff=follower.phyStats().level()-target.phyStats().level();
-						if(levelDiff>levelLimit) exp=0.0;
-						int expGained=(int)Math.round(exp);
-	
+			for (int v = 0; v < commonRoomSet.size(); v++) {
+				Room R = (Room) commonRoomSet.elementAt(v);
+				String msgStr = getCorrectMsgString(R, str, v);
+				CMMsg msg = CMClass.getMsg(mob, null, this,
+						somanticCastCode(mob, null, auto), msgStr);
+				if (R.okMessage(mob, msg)) {
+					Set<MOB> h = super.sendMsgAndGetTargets(mob, R, msg,
+							givenTarget, auto);
+					if (h == null)
+						continue;
+
+					for (Iterator f = h.iterator(); f.hasNext();) {
+						MOB follower = (MOB) f.next();
+
+						double exp = 10.0;
+						int levelLimit = CMProps.getIntVar(CMProps.Int.EXPRATE);
+						int levelDiff = follower.phyStats().level()
+								- target.phyStats().level();
+						if (levelDiff > levelLimit)
+							exp = 0.0;
+						int expGained = (int) Math.round(exp);
+
 						// malicious songs must not affect the invoker!
-						if(CMLib.flags().canBeHeardSpeakingBy(invoker,follower)&&(expGained>0))
-							CMLib.leveler().postExperience(follower,null,null,expGained,false);
+						if (CMLib.flags().canBeHeardSpeakingBy(invoker,
+								follower)
+								&& (expGained > 0))
+							CMLib.leveler().postExperience(follower, null,
+									null, expGained, false);
 					}
 					R.recoverRoomStats();
-					R.showHappens(CMMsg.MSG_OK_VISUAL,target.name()+" fades away.");
+					R.showHappens(CMMsg.MSG_OK_VISUAL, target.name()
+							+ " fades away.");
 					target.destroy();
 				}
 			}
-		}
-		else
-			mob.location().show(mob,null,CMMsg.MSG_NOISE,"<S-NAME> hit(s) a foul note.");
+		} else
+			mob.location().show(mob, null, CMMsg.MSG_NOISE,
+					"<S-NAME> hit(s) a foul note.");
 
 		return success;
 	}

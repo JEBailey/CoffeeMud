@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.Software;
+
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,315 +16,323 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.Directions;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class EmissionScanProgram extends GenSoftware
-{
-	public String ID(){	return "EmissionScanProgram";}
-	
-	protected final static short AUTO_TICKDOWN=4;
-	
-	protected boolean activated=false;
-	protected short activatedTickdown=AUTO_TICKDOWN;
-	
-	public EmissionScanProgram()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class EmissionScanProgram extends GenSoftware {
+	public String ID() {
+		return "EmissionScanProgram";
+	}
+
+	protected final static short AUTO_TICKDOWN = 4;
+
+	protected boolean activated = false;
+	protected short activatedTickdown = AUTO_TICKDOWN;
+
+	public EmissionScanProgram() {
 		super();
 		setName("a lifescan minidisk");
 		setDisplayText("a minidisk sits here.");
 		setDescription("Emissions software, for small computer/scanners, will locate electronic and wave emissions.");
 		super.setCurrentScreenDisplay("EMISSIONSCAN: Activate for continual scanning, type for on-demand.\n\r");
-		basePhyStats().setWeight(2); // the higher the weight, the wider the scan
+		basePhyStats().setWeight(2); // the higher the weight, the wider the
+										// scan
 		recoverPhyStats();
 	}
-	
-	@Override public String getParentMenu() { return ""; }
-	@Override public String getInternalName() { return "";}
-	
-	public boolean isEmitting(Item I)
-	{
-		return ((I instanceof Electronics)&&(((Electronics)I).activated()));
+
+	@Override
+	public String getParentMenu() {
+		return "";
 	}
-	
-	public CMMsg getScanMsg(Room R)
-	{
-		return CMClass.getMsg(CMLib.map().getFactoryMOB(R), null, this, CMMsg.MASK_CNTRLMSG|CMMsg.MSG_SNIFF, null); // cntrlmsg is important
+
+	@Override
+	public String getInternalName() {
+		return "";
 	}
-	
-	public void getDirDesc(String dirBuilder, StringBuilder str, boolean useShipDirs)
-	{
-		int numDone=0;
-		int numTotal=0;
-		for(int d=0;d<dirBuilder.length();d++)
-			numTotal+=(Character.isLowerCase(dirBuilder.charAt(d))?1:0);
-		if(dirBuilder.length()==0)
+
+	public boolean isEmitting(Item I) {
+		return ((I instanceof Electronics) && (((Electronics) I).activated()));
+	}
+
+	public CMMsg getScanMsg(Room R) {
+		return CMClass.getMsg(CMLib.map().getFactoryMOB(R), null, this,
+				CMMsg.MASK_CNTRLMSG | CMMsg.MSG_SNIFF, null); // cntrlmsg is
+																// important
+	}
+
+	public void getDirDesc(String dirBuilder, StringBuilder str,
+			boolean useShipDirs) {
+		int numDone = 0;
+		int numTotal = 0;
+		for (int d = 0; d < dirBuilder.length(); d++)
+			numTotal += (Character.isLowerCase(dirBuilder.charAt(d)) ? 1 : 0);
+		if (dirBuilder.length() == 0)
 			str.append(" here");
 		else
-		for(int d=0;d<dirBuilder.length();d++)
-		{
-			if(dirBuilder.charAt(d)=='S')
-			{
-				if(numDone==0)
-					str.append(" inside a ship");
+			for (int d = 0; d < dirBuilder.length(); d++) {
+				if (dirBuilder.charAt(d) == 'S') {
+					if (numDone == 0)
+						str.append(" inside a ship");
+					else if (numDone < numTotal - 1)
+						str.append(", inside a ship");
+					else
+						str.append(", and then inside a ship");
+					numDone++;
+					continue;
+				}
+				String locDesc = "";
+				if (dirBuilder.charAt(d) == 'D') {
+					locDesc = "behind a door ";
+					d++;
+				}
+				if (dirBuilder.charAt(d) == 'I') {
+					locDesc = "inside a room ";
+					d++;
+				}
+				if (dirBuilder.charAt(d) == 'o') {
+					locDesc = "outdoors ";
+					d++;
+				}
+				int dir = dirBuilder.charAt(d) - 'a';
+				if (numDone == 0)
+					str.append(" ")
+							.append(locDesc)
+							.append(useShipDirs ? Directions
+									.getShipDirectionName(dir) : Directions
+									.getDirectionName(dir));
+				else if (numDone < numTotal - 1)
+					str.append(", ")
+							.append(locDesc)
+							.append(useShipDirs ? Directions
+									.getShipDirectionName(dir) : Directions
+									.getDirectionName(dir));
 				else
-				if(numDone<numTotal-1)
-					str.append(", inside a ship");
-				else
-					str.append(", and then inside a ship");
+					str.append(", and then ")
+							.append(locDesc)
+							.append(useShipDirs ? Directions
+									.getShipInDirectionName(dir) : Directions
+									.getInDirectionName(dir));
 				numDone++;
-				continue;
 			}
-			String locDesc="";
-			if(dirBuilder.charAt(d)=='D')
-			{
-				locDesc="behind a door ";
-				d++;
-			}
-			if(dirBuilder.charAt(d)=='I')
-			{
-				locDesc="inside a room ";
-				d++;
-			}
-			if(dirBuilder.charAt(d)=='o')
-			{
-				locDesc="outdoors ";
-				d++;
-			}
-			int dir=dirBuilder.charAt(d)-'a';
-			if(numDone==0)
-				str.append(" ").append(locDesc).append(useShipDirs?Directions.getShipDirectionName(dir):Directions.getDirectionName(dir));
-			else
-			if(numDone<numTotal-1)
-				str.append(", ").append(locDesc).append(useShipDirs?Directions.getShipDirectionName(dir):Directions.getDirectionName(dir));
-			else
-				str.append(", and then ").append(locDesc).append(useShipDirs?Directions.getShipInDirectionName(dir):Directions.getInDirectionName(dir));
-			numDone++;
-		}
 	}
-	
-	public int getScanMsg(MOB viewerM, Room R, Set<Room> roomsDone, String dirBuilder, int depthLeft, CMMsg scanMsg, StringBuilder str)
-	{
-		if((R==null)||(roomsDone.contains(R))) return 0;
+
+	public int getScanMsg(MOB viewerM, Room R, Set<Room> roomsDone,
+			String dirBuilder, int depthLeft, CMMsg scanMsg, StringBuilder str) {
+		if ((R == null) || (roomsDone.contains(R)))
+			return 0;
 		roomsDone.add(R);
-		int numFound=0;
-		final boolean useShipDirs=(R instanceof SpaceShip)||(R.getArea() instanceof SpaceShip);
-		for(int m=0;m<R.numInhabitants();m++)
-		{
-			MOB M=R.fetchInhabitant(m);
-			if(M!=null)
-			for(int i=0;i<M.numItems();i++)
-			{
-				Item I=M.getItem(i);
-				if(isEmitting(I))
-				{
-					scanMsg.setTarget(I);
-					if(R.okMessage(scanMsg.source(), scanMsg))
-					{
-						numFound++;
-						if(roomsDone.size()==1)
-						{
-							if(CMLib.flags().canBeSeenBy(M, viewerM))
-								str.append("Something on "+M.name(viewerM));
-							else
-								str.append("Something on someone");
+		int numFound = 0;
+		final boolean useShipDirs = (R instanceof SpaceShip)
+				|| (R.getArea() instanceof SpaceShip);
+		for (int m = 0; m < R.numInhabitants(); m++) {
+			MOB M = R.fetchInhabitant(m);
+			if (M != null)
+				for (int i = 0; i < M.numItems(); i++) {
+					Item I = M.getItem(i);
+					if (isEmitting(I)) {
+						scanMsg.setTarget(I);
+						if (R.okMessage(scanMsg.source(), scanMsg)) {
+							numFound++;
+							if (roomsDone.size() == 1) {
+								if (CMLib.flags().canBeSeenBy(M, viewerM))
+									str.append("Something on "
+											+ M.name(viewerM));
+								else
+									str.append("Something on someone");
+							} else
+								str.append("Something");
+							getDirDesc(dirBuilder, str, useShipDirs);
+							str.append(".\n\r");
+							break;
 						}
-						else
-							str.append("Something");
-						getDirDesc(dirBuilder, str, useShipDirs);
-						str.append(".\n\r");
-						break;
 					}
 				}
-			}
 		}
-		for(int i=0;i<R.numItems();i++)
-		{
-			Item I=R.getItem(i);
-			if(isEmitting(I))
-			{
+		for (int i = 0; i < R.numItems(); i++) {
+			Item I = R.getItem(i);
+			if (isEmitting(I)) {
 				scanMsg.setTarget(I);
-				if(R.okMessage(scanMsg.source(), scanMsg))
-				{
+				if (R.okMessage(scanMsg.source(), scanMsg)) {
 					numFound++;
-					if(roomsDone.size()==1)
-					{
-						Item C=I.ultimateContainer(null);
-						if((C!=null)&&(C!=I))
-						{
-							if(CMLib.flags().canBeSeenBy(C, viewerM))
-								str.append("Something in "+C.name(viewerM));
+					if (roomsDone.size() == 1) {
+						Item C = I.ultimateContainer(null);
+						if ((C != null) && (C != I)) {
+							if (CMLib.flags().canBeSeenBy(C, viewerM))
+								str.append("Something in " + C.name(viewerM));
 							else
 								str.append("Something inside something else");
-						}
-						else
-						if(CMLib.flags().canBeSeenBy(I, viewerM))
+						} else if (CMLib.flags().canBeSeenBy(I, viewerM))
 							str.append(I.name(viewerM));
 						else
 							str.append("Something");
-					}
-					else
+					} else
 						str.append("Something");
 					getDirDesc(dirBuilder, str, useShipDirs);
 					str.append(".\n\r");
 				}
 			}
-			if((I instanceof SpaceShip)&&(depthLeft>0))
-			{
-				Room shipR=null;
-				for(Enumeration<Room> r=((SpaceShip)I).getShipArea().getProperMap(); r.hasMoreElements(); )
-				{
-					Room R2=r.nextElement();
-					for(int d=0;d<Directions.NUM_DIRECTIONS();d++)
-					{
-						if(R2.getRoomInDir(d)==R)
-						{
-							Exit E2=R2.getExitInDir(d);
-							if(E2==null) continue;
-							shipR=R2;
+			if ((I instanceof SpaceShip) && (depthLeft > 0)) {
+				Room shipR = null;
+				for (Enumeration<Room> r = ((SpaceShip) I).getShipArea()
+						.getProperMap(); r.hasMoreElements();) {
+					Room R2 = r.nextElement();
+					for (int d = 0; d < Directions.NUM_DIRECTIONS(); d++) {
+						if (R2.getRoomInDir(d) == R) {
+							Exit E2 = R2.getExitInDir(d);
+							if (E2 == null)
+								continue;
+							shipR = R2;
 							break;
 						}
 					}
-					if(shipR!=null)
+					if (shipR != null)
 						break;
 				}
-				if(shipR!=null)
-					numFound+=getScanMsg(viewerM,shipR,roomsDone, dirBuilder+'S', depthLeft-1, scanMsg, str);
+				if (shipR != null)
+					numFound += getScanMsg(viewerM, shipR, roomsDone,
+							dirBuilder + 'S', depthLeft - 1, scanMsg, str);
 			}
 		}
-		if(depthLeft>0)
-		{
-			boolean isIndoors=(R.domainType()&Room.INDOORS)==Room.INDOORS;
-			for(int d=0;d<Directions.NUM_DIRECTIONS();d++)
-			{
-				Room R2=R.getRoomInDir(d);
-				Exit E2=R.getExitInDir(d);
-				if((R2==null)||(E2==null)) continue;
-				boolean willIndoors=(R.domainType()&Room.INDOORS)==Room.INDOORS;
-				boolean willADoor=E2.hasADoor() && !E2.isOpen();
-				String dirBCode=willADoor?"D":
-								(isIndoors && (!willIndoors))?"O":
-								(!isIndoors && (willIndoors))?"I":
-								"";
-				numFound+=getScanMsg(viewerM,R2, roomsDone, dirBuilder+dirBCode+((char)('a'+d)), depthLeft-1, scanMsg, str);
+		if (depthLeft > 0) {
+			boolean isIndoors = (R.domainType() & Room.INDOORS) == Room.INDOORS;
+			for (int d = 0; d < Directions.NUM_DIRECTIONS(); d++) {
+				Room R2 = R.getRoomInDir(d);
+				Exit E2 = R.getExitInDir(d);
+				if ((R2 == null) || (E2 == null))
+					continue;
+				boolean willIndoors = (R.domainType() & Room.INDOORS) == Room.INDOORS;
+				boolean willADoor = E2.hasADoor() && !E2.isOpen();
+				String dirBCode = willADoor ? "D"
+						: (isIndoors && (!willIndoors)) ? "O"
+								: (!isIndoors && (willIndoors)) ? "I" : "";
+				numFound += getScanMsg(viewerM, R2, roomsDone, dirBuilder
+						+ dirBCode + ((char) ('a' + d)), depthLeft - 1,
+						scanMsg, str);
 			}
 		}
 		return numFound;
 	}
-	
-	public String getScanMsg(MOB viewerM)
-	{
-		final Room R=CMLib.map().roomLocation(this);
-		if(R==null) return "";
-		StringBuilder str=new StringBuilder("");
-		int numFound=getScanMsg(viewerM, R,new HashSet<Room>(), "",phyStats().weight()+1,getScanMsg(R),str);
-		if(activated)
-			super.setCurrentScreenDisplay("EMISSIONSCAN: Activated: "+numFound+" found last scan.\n\r");
+
+	public String getScanMsg(MOB viewerM) {
+		final Room R = CMLib.map().roomLocation(this);
+		if (R == null)
+			return "";
+		StringBuilder str = new StringBuilder("");
+		int numFound = getScanMsg(viewerM, R, new HashSet<Room>(), "",
+				phyStats().weight() + 1, getScanMsg(R), str);
+		if (activated)
+			super.setCurrentScreenDisplay("EMISSIONSCAN: Activated: "
+					+ numFound + " found last scan.\n\r");
 		else
 			super.setCurrentScreenDisplay("EMISSIONSCAN: Activate for continual scanning, type for on-demand.\n\r");
-		if(str.length()==0)
+		if (str.length() == 0)
 			return "No emissions detected.";
 		return str.toString().toLowerCase();
 	}
-	
-	@Override 
-	public boolean isActivationString(String word) 
-	{ 
-		return "emissionscan".startsWith(CMLib.english().getFirstWord(word.toLowerCase())); 
-	}
-	
-	@Override 
-	public boolean isDeActivationString(String word) 
-	{ 
-		return "emissionscan".startsWith(CMLib.english().getFirstWord(word.toLowerCase())); 
-	}
-	
-	@Override 
-	public boolean isCommandString(String word, boolean isActive) 
-	{ 
-		return "emissionscan".startsWith(CMLib.english().getFirstWord(word.toLowerCase()));
+
+	@Override
+	public boolean isActivationString(String word) {
+		return "emissionscan".startsWith(CMLib.english().getFirstWord(
+				word.toLowerCase()));
 	}
 
-	@Override 
-	public String getActivationMenu() 
-	{ 
-		return super.getActivationMenu(); 
+	@Override
+	public boolean isDeActivationString(String word) {
+		return "emissionscan".startsWith(CMLib.english().getFirstWord(
+				word.toLowerCase()));
 	}
-	
-	@Override 
-	public boolean checkActivate(MOB mob, String message)
-	{
+
+	@Override
+	public boolean isCommandString(String word, boolean isActive) {
+		return "emissionscan".startsWith(CMLib.english().getFirstWord(
+				word.toLowerCase()));
+	}
+
+	@Override
+	public String getActivationMenu() {
+		return super.getActivationMenu();
+	}
+
+	@Override
+	public boolean checkActivate(MOB mob, String message) {
 		return super.checkActivate(mob, message);
 	}
-	
-	@Override 
-	public boolean checkDeactivate(MOB mob, String message)
-	{
+
+	@Override
+	public boolean checkDeactivate(MOB mob, String message) {
 		return super.checkDeactivate(mob, message);
 	}
-	
-	@Override 
-	public boolean checkTyping(MOB mob, String message)
-	{
+
+	@Override
+	public boolean checkTyping(MOB mob, String message) {
 		return super.checkTyping(mob, message);
 	}
-	
-	@Override 
-	public boolean checkPowerCurrent(int value)
-	{
+
+	@Override
+	public boolean checkPowerCurrent(int value) {
 		return super.checkPowerCurrent(value);
 	}
-	
-	@Override 
-	public void onActivate(MOB mob, String message)
-	{
+
+	@Override
+	public void onActivate(MOB mob, String message) {
 		super.onActivate(mob, message);
-		this.activated=true;
-		activatedTickdown=AUTO_TICKDOWN;
-		//TODO: emissionscan for particular items? Is that a special version of emissionscan?
-		String scan=getScanMsg(mob);
-		if(scan.length()>0)
+		this.activated = true;
+		activatedTickdown = AUTO_TICKDOWN;
+		// TODO: emissionscan for particular items? Is that a special version of
+		// emissionscan?
+		String scan = getScanMsg(mob);
+		if (scan.length() > 0)
 			super.addScreenMessage(scan);
 	}
-	
-	@Override 
-	public void onDeactivate(MOB mob, String message)
-	{
+
+	@Override
+	public void onDeactivate(MOB mob, String message) {
 		super.onDeactivate(mob, message);
-		if(activated)
+		if (activated)
 			super.addScreenMessage("Emission scanning deactivated.");
-		this.activated=false;
+		this.activated = false;
 	}
-	
-	@Override 
-	public void onTyping(MOB mob, String message)
-	{
+
+	@Override
+	public void onTyping(MOB mob, String message) {
 		super.onTyping(mob, message);
-		String scan=getScanMsg(mob);
-		if(scan.length()>0)
+		String scan = getScanMsg(mob);
+		if (scan.length() > 0)
 			super.addScreenMessage(scan);
 	}
-	
-	@Override 
-	public void onPowerCurrent(int value)
-	{
+
+	@Override
+	public void onPowerCurrent(int value) {
 		super.onPowerCurrent(value);
-		if((value != 0)&&(activated)&&(--activatedTickdown>=0)) // means there was power to give, 2 means is active menu, which doesn't apply 
+		if ((value != 0) && (activated) && (--activatedTickdown >= 0)) // means
+																		// there
+																		// was
+																		// power
+																		// to
+																		// give,
+																		// 2
+																		// means
+																		// is
+																		// active
+																		// menu,
+																		// which
+																		// doesn't
+																		// apply
 		{
-			MOB M=(owner() instanceof MOB)?((MOB)owner()):null;
-			String scan=getScanMsg(M);
-			if(scan.length()>0)
+			MOB M = (owner() instanceof MOB) ? ((MOB) owner()) : null;
+			String scan = getScanMsg(M);
+			if (scan.length() > 0)
 				super.addScreenMessage(scan);
 		}
 	}

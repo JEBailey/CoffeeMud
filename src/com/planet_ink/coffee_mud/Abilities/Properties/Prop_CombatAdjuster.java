@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Properties;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Abilities.interfaces.TriggeredAffect;
 import com.planet_ink.coffee_mud.Common.interfaces.CharState;
@@ -9,68 +10,89 @@ import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Prop_CombatAdjuster extends Property implements TriggeredAffect
-{
-	public String ID() { return "Prop_CombatAdjuster"; }
-	public String name(){ return "Adjust combat stats";}
-	protected int canAffectCode(){return 0;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Prop_CombatAdjuster extends Property implements TriggeredAffect {
+	public String ID() {
+		return "Prop_CombatAdjuster";
+	}
+
+	public String name() {
+		return "Adjust combat stats";
+	}
+
+	protected int canAffectCode() {
+		return 0;
+	}
+
 	// attack, damage, armor, hp, mana, move
-	protected double[] alladj={1.0,1.0,1.0,1.0,1.0,1.0};
-	public String accountForYourself()
-	{ return "Adjusted combat stats";	}
+	protected double[] alladj = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
 
-	public long flags(){return Ability.FLAG_ADJUSTER;}
+	public String accountForYourself() {
+		return "Adjusted combat stats";
+	}
 
-	public int triggerMask()
-	{ 
+	public long flags() {
+		return Ability.FLAG_ADJUSTER;
+	}
+
+	public int triggerMask() {
 		return TriggeredAffect.TRIGGER_ALWAYS;
 	}
 
-	public void affectPhyStats(Physical affectedMOB, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affectedMOB,affectableStats);
-		if(alladj[2]!=1.0)
-			affectableStats.setArmor((int)Math.round(CMath.mul(affectableStats.armor()-100,alladj[2]))+100);
-		if(alladj[0]!=1.0)
-			affectableStats.setAttackAdjustment((int)Math.round(CMath.mul(affectableStats.attackAdjustment(),alladj[0])));
-		if(alladj[1]!=1.0)
-			affectableStats.setDamage((int)Math.round(CMath.mul(affectableStats.damage(),alladj[1])));
+	public void affectPhyStats(Physical affectedMOB, PhyStats affectableStats) {
+		super.affectPhyStats(affectedMOB, affectableStats);
+		if (alladj[2] != 1.0)
+			affectableStats.setArmor((int) Math.round(CMath.mul(
+					affectableStats.armor() - 100, alladj[2])) + 100);
+		if (alladj[0] != 1.0)
+			affectableStats.setAttackAdjustment((int) Math.round(CMath.mul(
+					affectableStats.attackAdjustment(), alladj[0])));
+		if (alladj[1] != 1.0)
+			affectableStats.setDamage((int) Math.round(CMath.mul(
+					affectableStats.damage(), alladj[1])));
 	}
-	public void affectCharState(MOB mob, CharState maxState)
-	{
-		super.affectCharState(mob,maxState);
-		if(alladj[3]!=1.0)
-			maxState.setHitPoints((int)Math.round(CMath.mul(maxState.getHitPoints(),alladj[3])));
-		if(alladj[4]!=1.0)
-			maxState.setMana((int)Math.round(CMath.mul(maxState.getMana(),alladj[4])));
-		if(alladj[5]!=1.0)
-			maxState.setMovement((int)Math.round(CMath.mul(maxState.getMovement(),alladj[5])));
+
+	public void affectCharState(MOB mob, CharState maxState) {
+		super.affectCharState(mob, maxState);
+		if (alladj[3] != 1.0)
+			maxState.setHitPoints((int) Math.round(CMath.mul(
+					maxState.getHitPoints(), alladj[3])));
+		if (alladj[4] != 1.0)
+			maxState.setMana((int) Math.round(CMath.mul(maxState.getMana(),
+					alladj[4])));
+		if (alladj[5] != 1.0)
+			maxState.setMovement((int) Math.round(CMath.mul(
+					maxState.getMovement(), alladj[5])));
 	}
-	public void setMiscText(String newMiscText)
-	{
+
+	public void setMiscText(String newMiscText) {
 		super.setMiscText(newMiscText);
-		if(newMiscText.length()>0)
-		{
-			alladj[0]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"ATTACK"),100.0);
-			alladj[1]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"DAMAGE"),100.0);
-			alladj[2]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"ARMOR"),100.0);
-			alladj[3]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"HP"),100.0);
-			alladj[4]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"MANA"),100.0);
-			alladj[5]=1.0+CMath.div(CMParms.getParmPlus(newMiscText,"MOVE"),100.0);
+		if (newMiscText.length() > 0) {
+			alladj[0] = 1.0 + CMath.div(
+					CMParms.getParmPlus(newMiscText, "ATTACK"), 100.0);
+			alladj[1] = 1.0 + CMath.div(
+					CMParms.getParmPlus(newMiscText, "DAMAGE"), 100.0);
+			alladj[2] = 1.0 + CMath.div(
+					CMParms.getParmPlus(newMiscText, "ARMOR"), 100.0);
+			alladj[3] = 1.0 + CMath.div(CMParms.getParmPlus(newMiscText, "HP"),
+					100.0);
+			alladj[4] = 1.0 + CMath.div(
+					CMParms.getParmPlus(newMiscText, "MANA"), 100.0);
+			alladj[5] = 1.0 + CMath.div(
+					CMParms.getParmPlus(newMiscText, "MOVE"), 100.0);
 		}
 	}
 

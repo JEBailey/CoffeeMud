@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Properties;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Common.interfaces.CharStats;
@@ -11,140 +12,162 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Prop_WizInvis extends Property
-{
-	public String ID() { return "Prop_WizInvis"; }
-	
-	public long flags(){return Ability.FLAG_ADJUSTER;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Prop_WizInvis extends Property {
+	public String ID() {
+		return "Prop_WizInvis";
+	}
 
-	public String displayText() 
-	{
-		if(CMath.bset(abilityCode(),PhyStats.IS_CLOAKED|PhyStats.IS_NOT_SEEN))
+	public long flags() {
+		return Ability.FLAG_ADJUSTER;
+	}
+
+	public String displayText() {
+		if (CMath.bset(abilityCode(), PhyStats.IS_CLOAKED
+				| PhyStats.IS_NOT_SEEN))
 			return "(Wizard Invisibility)";
-		else
-		if(CMath.bset(abilityCode(),PhyStats.IS_NOT_SEEN))
+		else if (CMath.bset(abilityCode(), PhyStats.IS_NOT_SEEN))
 			return "(WizUndetectable)";
-		else
-		if(CMath.bset(abilityCode(),PhyStats.IS_CLOAKED))
+		else if (CMath.bset(abilityCode(), PhyStats.IS_CLOAKED))
 			return "(Cloaked)";
 		else
 			return "";
 	}
-	public String name(){ return "Wizard Invisibility";}
-	protected int canAffectCode(){return Ability.CAN_MOBS;}
-	protected boolean disabled=false;
-	protected int abilityCode=PhyStats.IS_NOT_SEEN|PhyStats.IS_CLOAKED;
-	public int abilityCode(){return abilityCode;}
-	public void setAbilityCode(int newCode){abilityCode=newCode;}
 
-	public String accountForYourself()
-	{ return "Wizard Invisibile";	}
+	public String name() {
+		return "Wizard Invisibility";
+	}
 
+	protected int canAffectCode() {
+		return Ability.CAN_MOBS;
+	}
 
-	public boolean canBeUninvoked(){return true;}
-	public boolean isAnAutoEffect(){return false;}
+	protected boolean disabled = false;
+	protected int abilityCode = PhyStats.IS_NOT_SEEN | PhyStats.IS_CLOAKED;
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
+	public int abilityCode() {
+		return abilityCode;
+	}
+
+	public void setAbilityCode(int newCode) {
+		abilityCode = newCode;
+	}
+
+	public String accountForYourself() {
+		return "Wizard Invisibile";
+	}
+
+	public boolean canBeUninvoked() {
+		return true;
+	}
+
+	public boolean isAnAutoEffect() {
+		return false;
+	}
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
 		// when this spell is on a MOBs Affected list,
 		// it should consistantly put the mob into
 		// a sleeping state, so that nothing they do
 		// can get them out of it.
-		affectableStats.setDisposition(affectableStats.disposition()|abilityCode);
-		if(CMath.bset(abilityCode(),PhyStats.IS_NOT_SEEN))
-		{
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_INVISIBLE);
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_HIDDEN);
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_SNEAKING);
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_FLYING);
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_CLIMBING);
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_SWIMMING);
+		affectableStats.setDisposition(affectableStats.disposition()
+				| abilityCode);
+		if (CMath.bset(abilityCode(), PhyStats.IS_NOT_SEEN)) {
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_INVISIBLE);
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_HIDDEN);
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_SNEAKING);
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_FLYING);
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_CLIMBING);
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_SWIMMING);
 		}
-		affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_SEE_HIDDEN);
-		affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_SEE_SNEAKERS);
-		affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_SEE_DARK);
-		affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_SEE_INVISIBLE);
+		affectableStats.setSensesMask(affectableStats.sensesMask()
+				| PhyStats.CAN_SEE_HIDDEN);
+		affectableStats.setSensesMask(affectableStats.sensesMask()
+				| PhyStats.CAN_SEE_SNEAKERS);
+		affectableStats.setSensesMask(affectableStats.sensesMask()
+				| PhyStats.CAN_SEE_DARK);
+		affectableStats.setSensesMask(affectableStats.sensesMask()
+				| PhyStats.CAN_SEE_INVISIBLE);
 	}
 
-	public void affectCharStats(MOB affected, CharStats affectableStats)
-	{
-		super.affectCharStats(affected,affectableStats);
-		affected.curState().setHunger(affected.maxState().maxHunger(affected.baseWeight()));
-		affected.curState().setThirst(affected.maxState().maxThirst(affected.baseWeight()));
+	public void affectCharStats(MOB affected, CharStats affectableStats) {
+		super.affectCharStats(affected, affectableStats);
+		affected.curState().setHunger(
+				affected.maxState().maxHunger(affected.baseWeight()));
+		affected.curState().setThirst(
+				affected.maxState().maxThirst(affected.baseWeight()));
 	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
-		if(affected==null) return;
-		Physical being=affected;
+		if (affected == null)
+			return;
+		Physical being = affected;
 
-		if(this.canBeUninvoked())
-		{
+		if (this.canBeUninvoked()) {
 			being.delEffect(this);
-			if(being instanceof Room)
-				((Room)being).recoverRoomStats();
-			else
-			if(being instanceof MOB)
-			{
-				if(((MOB)being).location()!=null)
-					((MOB)being).location().recoverRoomStats();
-				else
-				{
+			if (being instanceof Room)
+				((Room) being).recoverRoomStats();
+			else if (being instanceof MOB) {
+				if (((MOB) being).location() != null)
+					((MOB) being).location().recoverRoomStats();
+				else {
 					being.recoverPhyStats();
-					((MOB)being).recoverCharStats();
-					((MOB)being).recoverMaxState();
+					((MOB) being).recoverCharStats();
+					((MOB) being).recoverMaxState();
 				}
-			}
-			else
+			} else
 				being.recoverPhyStats();
 			mob.tell("You begin to fade back into view.");
 		}
 	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if((CMath.bset(msg.targetMajor(),CMMsg.MASK_MALICIOUS)&&(msg.amITarget(affected))&&(affected!=null)&&(!disabled)))
-		{
-			if(msg.source()!=msg.target())
-			{
-				msg.source().tell("Ah, leave "+affected.name()+" alone.");
-				if(affected instanceof MOB)
-					((MOB)affected).makePeace();
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if ((CMath.bset(msg.targetMajor(), CMMsg.MASK_MALICIOUS)
+				&& (msg.amITarget(affected)) && (affected != null) && (!disabled))) {
+			if (msg.source() != msg.target()) {
+				msg.source().tell("Ah, leave " + affected.name() + " alone.");
+				if (affected instanceof MOB)
+					((MOB) affected).makePeace();
 			}
 			return false;
-		}
-		else
-		if((affected!=null)&&(affected instanceof MOB))
-		{
-			if((CMath.bset(msg.targetMajor(),CMMsg.MASK_MALICIOUS))&&(msg.amISource((MOB)affected)))
-				disabled=true;
-			else
-			if((msg.amISource((MOB)affected))
-			&&(CMath.bset(msg.source().getBitmap(),MOB.ATT_SYSOPMSGS))
-			&&(msg.source().location()!=null)
-			&&(!CMSecurity.isAllowed(msg.source(),msg.source().location(),CMSecurity.SecFlag.SYSMSGS)))
-				msg.source().setBitmap(CMath.unsetb(msg.source().getBitmap(),MOB.ATT_SYSOPMSGS));
+		} else if ((affected != null) && (affected instanceof MOB)) {
+			if ((CMath.bset(msg.targetMajor(), CMMsg.MASK_MALICIOUS))
+					&& (msg.amISource((MOB) affected)))
+				disabled = true;
+			else if ((msg.amISource((MOB) affected))
+					&& (CMath.bset(msg.source().getBitmap(), MOB.ATT_SYSOPMSGS))
+					&& (msg.source().location() != null)
+					&& (!CMSecurity.isAllowed(msg.source(), msg.source()
+							.location(), CMSecurity.SecFlag.SYSMSGS)))
+				msg.source().setBitmap(
+						CMath.unsetb(msg.source().getBitmap(),
+								MOB.ATT_SYSOPMSGS));
 		}
 
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 }

@@ -8,53 +8,53 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class DeityNext extends StdWebMacro
-{
-	public String name() { return "DeityNext"; }
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class DeityNext extends StdWebMacro {
+	public String name() {
+		return "DeityNext";
+	}
 
-	public String runMacro(HTTPRequest httpReq, String parm)
-	{
-		java.util.Map<String,String> parms=parseParms(parm);
-		String last=httpReq.getUrlParameter("DEITY");
-		if(parms.containsKey("RESET"))
-		{	
-			if(last!=null) httpReq.removeUrlParameter("DEITY");
+	public String runMacro(HTTPRequest httpReq, String parm) {
+		java.util.Map<String, String> parms = parseParms(parm);
+		String last = httpReq.getUrlParameter("DEITY");
+		if (parms.containsKey("RESET")) {
+			if (last != null)
+				httpReq.removeUrlParameter("DEITY");
 			return "";
 		}
-		String lastID="";
-		HashSet heavensfound=new HashSet();
-		for(Enumeration d=CMLib.map().deities();d.hasMoreElements();)
-		{
-			Deity D=(Deity)d.nextElement();
-			if((D.location()!=null)&&(!heavensfound.contains(D.location())))
-			{
-				if(parms.containsKey("HEAVENS"))
+		String lastID = "";
+		HashSet heavensfound = new HashSet();
+		for (Enumeration d = CMLib.map().deities(); d.hasMoreElements();) {
+			Deity D = (Deity) d.nextElement();
+			if ((D.location() != null)
+					&& (!heavensfound.contains(D.location()))) {
+				if (parms.containsKey("HEAVENS"))
 					heavensfound.add(D.location());
-				if((last==null)||((last.length()>0)&&(last.equals(lastID))&&(!D.Name().equals(lastID))))
-				{
-					httpReq.addFakeUrlParameter("DEITY",D.Name());
+				if ((last == null)
+						|| ((last.length() > 0) && (last.equals(lastID)) && (!D
+								.Name().equals(lastID)))) {
+					httpReq.addFakeUrlParameter("DEITY", D.Name());
 					return "";
 				}
-				lastID=D.Name();
+				lastID = D.Name();
 			}
 		}
-		httpReq.addFakeUrlParameter("DEITY","");
-		if(parms.containsKey("EMPTYOK"))
+		httpReq.addFakeUrlParameter("DEITY", "");
+		if (parms.containsKey("EMPTYOK"))
 			return "<!--EMPTY-->";
 		return " @break@";
 	}

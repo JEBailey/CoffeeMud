@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Common;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,124 +18,121 @@ import com.planet_ink.coffee_mud.core.exceptions.CMException;
 import com.planet_ink.coffee_mud.core.interfaces.CMObject;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class DefaultCharStats implements CharStats
-{
-	public String ID(){return "DefaultCharStats";}
-	public String name() { return ID();}
-	
-	public CMObject newInstance()
-	{
-		try
-		{
-			final DefaultCharStats newStats=getClass().newInstance();
-			if(newStats.myRace==null) newStats.myRace=CMClass.getRace("StdRace");
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class DefaultCharStats implements CharStats {
+	public String ID() {
+		return "DefaultCharStats";
+	}
+
+	public String name() {
+		return ID();
+	}
+
+	public CMObject newInstance() {
+		try {
+			final DefaultCharStats newStats = getClass().newInstance();
+			if (newStats.myRace == null)
+				newStats.myRace = CMClass.getRace("StdRace");
 			return newStats;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			return new DefaultCharStats();
 		}
 	}
-	public void initializeClass(){}
+
+	public void initializeClass() {
+	}
+
 	// competency characteristics
-	protected short[] stats=new short[CharStats.CODES.instance().total()];
-	protected CharClass[] myClasses=null;
-	protected Integer[] myLevels=null;
+	protected short[] stats = new short[CharStats.CODES.instance().total()];
+	protected CharClass[] myClasses = null;
+	protected Integer[] myLevels = null;
 	protected Race myRace;
-	protected String raceName=null;
-	protected String genderName=null;
-	protected String displayClassName=null;
-	protected String displayClassLevel=null;
-	protected short[] bodyAlterations=null;
-	protected long unwearableBitmap=0;
-	protected int[] breathables=null;
-	
-	public DefaultCharStats()
-	{
+	protected String raceName = null;
+	protected String genderName = null;
+	protected String displayClassName = null;
+	protected String displayClassLevel = null;
+	protected short[] bodyAlterations = null;
+	protected long unwearableBitmap = 0;
+	protected int[] breathables = null;
+
+	public DefaultCharStats() {
 		reset();
 		setMyRace(CMClass.getRace("StdRace"));
 		setCurrentClass(CMClass.getCharClass("StdCharClass"));
 	}
-	
-	public void setAllBaseValues(int def)
-	{
-		if((def>Short.MAX_VALUE)||(def<Short.MIN_VALUE))
-			Log.errOut("Value out of range",new CMException("Value out of range: "+def+" for all"));
-		for(int i : CharStats.CODES.BASE())
-			stats[i]=(short)def;
-	}
-	public void setAllValues(int def)
-	{
-		if((def>Short.MAX_VALUE)||(def<Short.MIN_VALUE))
-			Log.errOut("Value out of range",new CMException("Value out of range: "+def+" for all"));
-		for(int i: CharStats.CODES.ALL())
-			stats[i]=(short)def;
-		unwearableBitmap=0;
+
+	public void setAllBaseValues(int def) {
+		if ((def > Short.MAX_VALUE) || (def < Short.MIN_VALUE))
+			Log.errOut("Value out of range", new CMException(
+					"Value out of range: " + def + " for all"));
+		for (int i : CharStats.CODES.BASE())
+			stats[i] = (short) def;
 	}
 
-	public void reset()
-	{
-		setAllBaseValues(VALUE_ALLSTATS_DEFAULT);
-		stats[STAT_GENDER]='M';
+	public void setAllValues(int def) {
+		if ((def > Short.MAX_VALUE) || (def < Short.MIN_VALUE))
+			Log.errOut("Value out of range", new CMException(
+					"Value out of range: " + def + " for all"));
+		for (int i : CharStats.CODES.ALL())
+			stats[i] = (short) def;
+		unwearableBitmap = 0;
 	}
-	
-	public void copyInto(CharStats intoStats)
-	{
-		if(intoStats instanceof DefaultCharStats)
-		{
-			if(myClasses==null)
-				((DefaultCharStats)intoStats).myClasses=null;
+
+	public void reset() {
+		setAllBaseValues(VALUE_ALLSTATS_DEFAULT);
+		stats[STAT_GENDER] = 'M';
+	}
+
+	public void copyInto(CharStats intoStats) {
+		if (intoStats instanceof DefaultCharStats) {
+			if (myClasses == null)
+				((DefaultCharStats) intoStats).myClasses = null;
+			else if ((((DefaultCharStats) intoStats).myClasses != null)
+					&& (((DefaultCharStats) intoStats).myClasses.length == myClasses.length))
+				for (int i = 0; i < myClasses.length; i++)
+					((DefaultCharStats) intoStats).myClasses[i] = myClasses[i];
 			else
-			if((((DefaultCharStats)intoStats).myClasses!=null)
-			&&(((DefaultCharStats)intoStats).myClasses.length==myClasses.length))
-				for(int i=0;i<myClasses.length;i++)
-					((DefaultCharStats)intoStats).myClasses[i]=myClasses[i];
+				((DefaultCharStats) intoStats).myClasses = myClasses.clone();
+			if (myLevels == null)
+				((DefaultCharStats) intoStats).myLevels = null;
+			else if ((((DefaultCharStats) intoStats).myLevels != null)
+					&& (((DefaultCharStats) intoStats).myLevels.length == myLevels.length))
+				for (int i = 0; i < myLevels.length; i++)
+					((DefaultCharStats) intoStats).myLevels[i] = myLevels[i];
 			else
-				((DefaultCharStats)intoStats).myClasses=myClasses.clone();
-			if(myLevels==null)
-				((DefaultCharStats)intoStats).myLevels=null;
+				((DefaultCharStats) intoStats).myLevels = myLevels.clone();
+			if (myRace != null)
+				((DefaultCharStats) intoStats).myRace = myRace;
+			((DefaultCharStats) intoStats).raceName = raceName;
+			((DefaultCharStats) intoStats).genderName = genderName;
+			((DefaultCharStats) intoStats).displayClassName = displayClassName;
+			((DefaultCharStats) intoStats).displayClassLevel = displayClassLevel;
+			if (bodyAlterations == null)
+				((DefaultCharStats) intoStats).bodyAlterations = null;
+			else if ((((DefaultCharStats) intoStats).bodyAlterations != null)
+					&& (((DefaultCharStats) intoStats).bodyAlterations.length == bodyAlterations.length))
+				for (int i = 0; i < bodyAlterations.length; i++)
+					((DefaultCharStats) intoStats).bodyAlterations[i] = bodyAlterations[i];
 			else
-			if((((DefaultCharStats)intoStats).myLevels!=null)
-			&&(((DefaultCharStats)intoStats).myLevels.length==myLevels.length))
-				for(int i=0;i<myLevels.length;i++)
-					((DefaultCharStats)intoStats).myLevels[i]=myLevels[i];
-			else
-				((DefaultCharStats)intoStats).myLevels=myLevels.clone();
-			if(myRace!=null)
-				((DefaultCharStats)intoStats).myRace=myRace;
-			((DefaultCharStats)intoStats).raceName=raceName;
-			((DefaultCharStats)intoStats).genderName=genderName;
-			((DefaultCharStats)intoStats).displayClassName=displayClassName;
-			((DefaultCharStats)intoStats).displayClassLevel=displayClassLevel;
-			if(bodyAlterations==null)
-				((DefaultCharStats)intoStats).bodyAlterations=null;
-			else
-			if((((DefaultCharStats)intoStats).bodyAlterations!=null)
-			&&(((DefaultCharStats)intoStats).bodyAlterations.length==bodyAlterations.length))
-				for(int i=0;i<bodyAlterations.length;i++)
-					((DefaultCharStats)intoStats).bodyAlterations[i]=bodyAlterations[i];
-			else
-				((DefaultCharStats)intoStats).bodyAlterations=bodyAlterations.clone();
-			for(int i=0;i<stats.length;i++)
-				((DefaultCharStats)intoStats).stats[i]=stats[i];
-			((DefaultCharStats)intoStats).unwearableBitmap=unwearableBitmap;
-		}
-		else
-		{
+				((DefaultCharStats) intoStats).bodyAlterations = bodyAlterations
+						.clone();
+			for (int i = 0; i < stats.length; i++)
+				((DefaultCharStats) intoStats).stats[i] = stats[i];
+			((DefaultCharStats) intoStats).unwearableBitmap = unwearableBitmap;
+		} else {
 			intoStats.setMyClasses(getMyClassesStr());
 			intoStats.setMyLevels(getMyLevelsStr());
 			intoStats.setMyRace(getMyRace());
@@ -148,664 +146,692 @@ public class DefaultCharStats implements CharStats
 		}
 	}
 
-	public void setMyClasses(String classes)
-	{
-		int x=classes.indexOf(';');
-		ArrayList<CharClass> classV=new ArrayList<CharClass>();
-		CharClass C=null;
-		while(x>=0)
-		{
-			String theClass=classes.substring(0,x).trim();
-			classes=classes.substring(x+1);
-			if(theClass.length()>0)
-			{
-				C=CMClass.getCharClass(theClass);
-				if(C==null) C=CMClass.getCharClass("StdCharClass");
+	public void setMyClasses(String classes) {
+		int x = classes.indexOf(';');
+		ArrayList<CharClass> classV = new ArrayList<CharClass>();
+		CharClass C = null;
+		while (x >= 0) {
+			String theClass = classes.substring(0, x).trim();
+			classes = classes.substring(x + 1);
+			if (theClass.length() > 0) {
+				C = CMClass.getCharClass(theClass);
+				if (C == null)
+					C = CMClass.getCharClass("StdCharClass");
 				classV.add(C);
 			}
-			x=classes.indexOf(';');
+			x = classes.indexOf(';');
 		}
-		if(classes.trim().length()>0)
-		{
-			C=CMClass.getCharClass(classes.trim());
-			if(C==null) C=CMClass.getCharClass("StdCharClass");
+		if (classes.trim().length() > 0) {
+			C = CMClass.getCharClass(classes.trim());
+			if (C == null)
+				C = CMClass.getCharClass("StdCharClass");
 			classV.add(C);
 		}
-		myClasses=classV.toArray(new CharClass[0]);
+		myClasses = classV.toArray(new CharClass[0]);
 	}
-	public void setMyLevels(String levels)
-	{
-		if((levels.length()==0)&&(myClasses!=null)&&(myClasses.length>0)) 
-			levels="0";
-		int x=levels.indexOf(';');
-		ArrayList<Integer> levelV=new ArrayList<Integer>();
-		while(x>=0)
-		{
-			String theLevel=levels.substring(0,x).trim();
-			levels=levels.substring(x+1);
-			if(theLevel.length()>0)
+
+	public void setMyLevels(String levels) {
+		if ((levels.length() == 0) && (myClasses != null)
+				&& (myClasses.length > 0))
+			levels = "0";
+		int x = levels.indexOf(';');
+		ArrayList<Integer> levelV = new ArrayList<Integer>();
+		while (x >= 0) {
+			String theLevel = levels.substring(0, x).trim();
+			levels = levels.substring(x + 1);
+			if (theLevel.length() > 0)
 				levelV.add(Integer.valueOf(CMath.s_int(theLevel)));
-			x=levels.indexOf(';');
+			x = levels.indexOf(';');
 		}
-		if(levels.trim().length()>0)
+		if (levels.trim().length() > 0)
 			levelV.add(Integer.valueOf(CMath.s_int(levels)));
-		myLevels=levelV.toArray(new Integer[0]);
+		myLevels = levelV.toArray(new Integer[0]);
 	}
-	public String getMyClassesStr()
-	{
-		if(myClasses==null)    return "StdCharClass";
-		String classStr="";
-		for(int i=0;i<myClasses.length;i++)
-			classStr+=";"+myClasses[i].ID();
-		if(classStr.length()>0)
-			classStr=classStr.substring(1);
+
+	public String getMyClassesStr() {
+		if (myClasses == null)
+			return "StdCharClass";
+		String classStr = "";
+		for (int i = 0; i < myClasses.length; i++)
+			classStr += ";" + myClasses[i].ID();
+		if (classStr.length() > 0)
+			classStr = classStr.substring(1);
 		return classStr;
 	}
-	public String getMyLevelsStr()
-	{
-		if(myLevels==null) return "";
-		String levelStr="";
-		for(int i=0;i<myLevels.length;i++)
-			levelStr+=";"+myLevels[i].intValue();
-		if(levelStr.length()>0)
-			levelStr=levelStr.substring(1);
-		return levelStr;
-	}
-	public long getWearableRestrictionsBitmap(){return unwearableBitmap|this.getMyRace().forbiddenWornBits();}
-	public void setWearableRestrictionsBitmap(long bitmap){ unwearableBitmap=bitmap;}
-	
-	public int numClasses()
-	{
-		if(myClasses==null) return 0;
-		return myClasses.length;
-	}
-	public int combinedSubLevels()
-	{
-		if((myClasses==null)
-		   ||(myLevels==null)
-		   ||(myClasses.length<2))
-			return 0;
-		
-		int combined=0;
-		for(int i=0;i<myLevels.length-1;i++)
-			combined+=myLevels[i].intValue();
-		return combined;
-	}
-	public int combinedLevels()
-	{
-		if((myClasses==null)
-		   ||(myLevels==null))
-			return 0;
-		
-		int combined=0;
-		for(int i=0;i<myLevels.length-1;i++)
-			combined+=myLevels[i].intValue();
-		return combined;
-	}
-	public void setDisplayClassName(String newName){displayClassName=newName;}
-	public String displayClassName()
-	{    
-		if(displayClassName!=null) return displayClassName;
-		return getCurrentClass().name(getCurrentClassLevel());
-	}
-	public void setDisplayClassLevel(String newLevel){displayClassLevel=newLevel;}
-	public String displayClassLevel(MOB mob, boolean shortForm)
-	{
-		if(displayClassLevel!=null)
-		{
-			if(shortForm)
-				return displayClassName()+" "+displayClassLevel;
-			return "level "+displayClassLevel+" "+displayClassName;
-		}
-		if(mob==null) return "";
-		int classLevel=getClassLevel(getCurrentClass());
-		String levelStr=null;
-		if(classLevel>=mob.phyStats().level())
-			levelStr=""+mob.phyStats().level();
-		else
-			levelStr=classLevel+"/"+mob.phyStats().level();
-		if(shortForm)
-			return displayClassName()+" "+levelStr;
-		return "level "+levelStr+" "+displayClassName();
-	}
-	
-	public String displayClassLevelOnly(MOB mob)
-	{
-		if(mob==null) return "";
-		if(displayClassLevel!=null)
-			return displayClassLevel;
-		int classLevel=getClassLevel(getCurrentClass());
-		String levelStr=null;
-		if(classLevel>=mob.phyStats().level())
-			levelStr=""+mob.phyStats().level();
-		else
-			levelStr=classLevel+"/"+mob.phyStats().level();
+
+	public String getMyLevelsStr() {
+		if (myLevels == null)
+			return "";
+		String levelStr = "";
+		for (int i = 0; i < myLevels.length; i++)
+			levelStr += ";" + myLevels[i].intValue();
+		if (levelStr.length() > 0)
+			levelStr = levelStr.substring(1);
 		return levelStr;
 	}
 
-	public String getNonBaseStatsAsString()
-	{
-		StringBuffer str=new StringBuffer("");
-		CharStats.CODES C = CharStats.CODES.instance(); 
-		for(int x : C.all())
-			if((!C.isBase(x))&&(x!=CharStats.STAT_GENDER))
-				str.append(stats[x]+";");
+	public long getWearableRestrictionsBitmap() {
+		return unwearableBitmap | this.getMyRace().forbiddenWornBits();
+	}
+
+	public void setWearableRestrictionsBitmap(long bitmap) {
+		unwearableBitmap = bitmap;
+	}
+
+	public int numClasses() {
+		if (myClasses == null)
+			return 0;
+		return myClasses.length;
+	}
+
+	public int combinedSubLevels() {
+		if ((myClasses == null) || (myLevels == null) || (myClasses.length < 2))
+			return 0;
+
+		int combined = 0;
+		for (int i = 0; i < myLevels.length - 1; i++)
+			combined += myLevels[i].intValue();
+		return combined;
+	}
+
+	public int combinedLevels() {
+		if ((myClasses == null) || (myLevels == null))
+			return 0;
+
+		int combined = 0;
+		for (int i = 0; i < myLevels.length - 1; i++)
+			combined += myLevels[i].intValue();
+		return combined;
+	}
+
+	public void setDisplayClassName(String newName) {
+		displayClassName = newName;
+	}
+
+	public String displayClassName() {
+		if (displayClassName != null)
+			return displayClassName;
+		return getCurrentClass().name(getCurrentClassLevel());
+	}
+
+	public void setDisplayClassLevel(String newLevel) {
+		displayClassLevel = newLevel;
+	}
+
+	public String displayClassLevel(MOB mob, boolean shortForm) {
+		if (displayClassLevel != null) {
+			if (shortForm)
+				return displayClassName() + " " + displayClassLevel;
+			return "level " + displayClassLevel + " " + displayClassName;
+		}
+		if (mob == null)
+			return "";
+		int classLevel = getClassLevel(getCurrentClass());
+		String levelStr = null;
+		if (classLevel >= mob.phyStats().level())
+			levelStr = "" + mob.phyStats().level();
+		else
+			levelStr = classLevel + "/" + mob.phyStats().level();
+		if (shortForm)
+			return displayClassName() + " " + levelStr;
+		return "level " + levelStr + " " + displayClassName();
+	}
+
+	public String displayClassLevelOnly(MOB mob) {
+		if (mob == null)
+			return "";
+		if (displayClassLevel != null)
+			return displayClassLevel;
+		int classLevel = getClassLevel(getCurrentClass());
+		String levelStr = null;
+		if (classLevel >= mob.phyStats().level())
+			levelStr = "" + mob.phyStats().level();
+		else
+			levelStr = classLevel + "/" + mob.phyStats().level();
+		return levelStr;
+	}
+
+	public String getNonBaseStatsAsString() {
+		StringBuffer str = new StringBuffer("");
+		CharStats.CODES C = CharStats.CODES.instance();
+		for (int x : C.all())
+			if ((!C.isBase(x)) && (x != CharStats.STAT_GENDER))
+				str.append(stats[x] + ";");
 		return str.toString();
 	}
-	
-	public void setNonBaseStatsFromString(String str)
-	{
-		List<String> V=CMParms.parseSemicolons(str,false);
-		CharStats.CODES C = CharStats.CODES.instance(); 
-		for(int x : C.all())
-			if((!C.isBase(x))&&(x!=CharStats.STAT_GENDER)&&(V.size()>0))
-			{
-				final long val=CMath.s_long(V.remove(0));
-				if((val>Short.MAX_VALUE)||(val<Short.MIN_VALUE))
-					Log.errOut("Value out of range","Value out of range: "+val+" for "+x+" from "+str);
-				stats[x]=(short)val;
+
+	public void setNonBaseStatsFromString(String str) {
+		List<String> V = CMParms.parseSemicolons(str, false);
+		CharStats.CODES C = CharStats.CODES.instance();
+		for (int x : C.all())
+			if ((!C.isBase(x)) && (x != CharStats.STAT_GENDER)
+					&& (V.size() > 0)) {
+				final long val = CMath.s_long(V.remove(0));
+				if ((val > Short.MAX_VALUE) || (val < Short.MIN_VALUE))
+					Log.errOut("Value out of range", "Value out of range: "
+							+ val + " for " + x + " from " + str);
+				stats[x] = (short) val;
 			}
 	}
-	
-	public void setRaceName(String newRaceName)
-	{
-		raceName=newRaceName;
+
+	public void setRaceName(String newRaceName) {
+		raceName = newRaceName;
 	}
-	
-	public String raceName()
-	{
-		if(raceName!=null) return raceName;
-		if(myRace!=null) return myRace.name();
+
+	public String raceName() {
+		if (raceName != null)
+			return raceName;
+		if (myRace != null)
+			return myRace.name();
 		return "MOB";
 	}
-	
-	public CharClass getMyClass(int i)
-	{
-		if((myClasses==null)
-		||(i<0)
-		||(i>=myClasses.length)) 
+
+	public CharClass getMyClass(int i) {
+		if ((myClasses == null) || (i < 0) || (i >= myClasses.length))
 			return CMClass.getCharClass("StdCharClass");
 		return myClasses[i];
 	}
-	
-	public int getClassLevel(String aClass)
-	{
-		if(myClasses==null)    return -1;
-		for(int i=0;i<myClasses.length;i++)
-			if((myClasses[i]!=null)
-			&&(myClasses[i].ID().equals(aClass))
-			&&(i<myLevels.length))
-			   return myLevels[i].intValue();
+
+	public int getClassLevel(String aClass) {
+		if (myClasses == null)
+			return -1;
+		for (int i = 0; i < myClasses.length; i++)
+			if ((myClasses[i] != null) && (myClasses[i].ID().equals(aClass))
+					&& (i < myLevels.length))
+				return myLevels[i].intValue();
 		return -1;
 	}
-	
-	public int getClassLevel(CharClass aClass)
-	{
-		if((myClasses==null)||(aClass==null))    return -1;
-		for(int i=0;i<myClasses.length;i++)
-			if((myClasses[i]!=null)
-			&&(myClasses[i].ID().equals(aClass.ID()))
-			&&(i<myLevels.length))
-			   return myLevels[i].intValue();
+
+	public int getClassLevel(CharClass aClass) {
+		if ((myClasses == null) || (aClass == null))
+			return -1;
+		for (int i = 0; i < myClasses.length; i++)
+			if ((myClasses[i] != null)
+					&& (myClasses[i].ID().equals(aClass.ID()))
+					&& (i < myLevels.length))
+				return myLevels[i].intValue();
 		return -1;
 	}
-	
-	public void setClassLevel(CharClass aClass, int level)
-	{
-		if(aClass==null) return;
-		if(myClasses==null)
-		{
-			myClasses=new CharClass[1];
-			myLevels=new Integer[1];
-			myClasses[0]=aClass;
-			myLevels[0]=Integer.valueOf(level);
-		}
-		else
-		{
-			if((level<0)&&(myClasses.length>1))
-			{
-				CharClass[] oldClasses=myClasses;
-				Integer[] oldLevels=myLevels;
-				CharClass[] myNewClasses=new CharClass[oldClasses.length-1];
-				Integer[] myNewLevels=new Integer[oldClasses.length-1];
-				for(int c=0;c<myNewClasses.length;c++)
-				{
-					myNewClasses[c]=oldClasses[c];
-					if(c<oldLevels.length)
-						myNewLevels[c]=oldLevels[c];
+
+	public void setClassLevel(CharClass aClass, int level) {
+		if (aClass == null)
+			return;
+		if (myClasses == null) {
+			myClasses = new CharClass[1];
+			myLevels = new Integer[1];
+			myClasses[0] = aClass;
+			myLevels[0] = Integer.valueOf(level);
+		} else {
+			if ((level < 0) && (myClasses.length > 1)) {
+				CharClass[] oldClasses = myClasses;
+				Integer[] oldLevels = myLevels;
+				CharClass[] myNewClasses = new CharClass[oldClasses.length - 1];
+				Integer[] myNewLevels = new Integer[oldClasses.length - 1];
+				for (int c = 0; c < myNewClasses.length; c++) {
+					myNewClasses[c] = oldClasses[c];
+					if (c < oldLevels.length)
+						myNewLevels[c] = oldLevels[c];
 					else
-						myNewLevels[c]=Integer.valueOf(0);
+						myNewLevels[c] = Integer.valueOf(0);
 				}
-				myClasses=myNewClasses;
-				myLevels=myNewLevels;
-			}
-			else
-			if(getClassLevel(aClass)<0)
+				myClasses = myNewClasses;
+				myLevels = myNewLevels;
+			} else if (getClassLevel(aClass) < 0)
 				setCurrentClass(aClass);
-			for(int i=0;i<numClasses();i++)
-			{
-				CharClass C=getMyClass(i);
-				if((C==aClass)&&(myLevels[i].intValue()!=level))
-				{
-					myLevels[i]=Integer.valueOf(level);
+			for (int i = 0; i < numClasses(); i++) {
+				CharClass C = getMyClass(i);
+				if ((C == aClass) && (myLevels[i].intValue() != level)) {
+					myLevels[i] = Integer.valueOf(level);
 					break;
 				}
 			}
 		}
 	}
-	
+
 	public boolean isLevelCapped(CharClass C) {
-		if((C==null)||(C.getLevelCap()<0)||(C.getLevelCap()==Integer.MAX_VALUE))
+		if ((C == null) || (C.getLevelCap() < 0)
+				|| (C.getLevelCap() == Integer.MAX_VALUE))
 			return false;
 		return getClassLevel(C) >= C.getLevelCap();
 	}
-	
-	public void setCurrentClassLevel(int level)
-	{
-		CharClass currentClass=getCurrentClass();
-		if(currentClass!=null)
-			setClassLevel(currentClass,level);
-	}
-	
-	public void setCurrentClass(CharClass aClass)
-	{
-		if(aClass==null) return;
-		if(((myClasses==null)||(myLevels==null))
-		||((numClasses()==1)&&(myClasses[0].ID().equals("StdCharClass"))))
-		{
-			myClasses=new CharClass[1];
-			myLevels=new Integer[1];
-			myClasses[0]=aClass;
-			myLevels[0]=Integer.valueOf(0);
-			return;
-		}
-		
-		int level=getClassLevel(aClass);
-		if(level<0)
-		{
-			CharClass[] oldClasses=myClasses;
-			Integer[] oldLevels=myLevels;
-			CharClass[] myNewClasses=new CharClass[oldClasses.length+1];
-			Integer[] myNewLevels=new Integer[oldClasses.length+1];
-			for(int c=0;c<oldClasses.length;c++)
-			{
-				myNewClasses[c]=oldClasses[c];
-				myNewLevels[c]=oldLevels[c];
-			}
-			myNewClasses[oldClasses.length]=aClass;
-			myNewLevels[oldClasses.length]=Integer.valueOf(0);
-			myClasses=myNewClasses;
-			myLevels=myNewLevels;
-		}
-		else
-		{
-			if(myClasses[myClasses.length-1]==aClass)
-				return;
-			Integer oldI=Integer.valueOf(level);
-			boolean go=false;
-			CharClass[] myNewClasses=myClasses.clone();
-			Integer[] myNewLevels=myLevels.clone();
-			for(int i=0;i<myNewClasses.length-1;i++)
-			{
-				CharClass C=getMyClass(i);
-				if((C==aClass)||(go))
-				{
-					go=true;
-					myNewClasses[i]=myNewClasses[i+1];
-					myNewLevels[i]=myNewLevels[i+1];
-				}
-			}
-			myNewClasses[myNewClasses.length-1]=aClass;
-			myNewLevels[myNewClasses.length-1]=oldI;
-			myClasses=myNewClasses;
-			myLevels=myNewLevels;
-		}
-	}
-	public CharClass getCurrentClass()
-	{
-		return myClasses[myClasses.length-1];
-	}
-	
-	public Collection<CharClass> getCharClasses() { return Arrays.asList(myClasses);}
-	
-	public int getCurrentClassLevel()
-	{
-		if(myLevels==null) return -1;
-		return myLevels[myLevels.length-1].intValue();
-	}
-	
-	public Race getMyRace()
-	{
-		return myRace;
-	}
-	
-	public void setMyRace(Race newVal)
-	{
-		if(newVal != null)
-			myRace=newVal;
-	}
-	
-	public int[] getBreathables() 
-	{ 
-		return (breathables!=null)?breathables:myRace.getBreathables(); 
-	}
-	
-	public void setBreathables(int[] newArray)
-	{
-		breathables=newArray;
-	}
-	public int getBodyPart(int racialPartNumber)
-	{
-		int num=getMyRace().bodyMask()[racialPartNumber];
-		if((num<0)||(bodyAlterations==null)) return num;
-		num+=bodyAlterations[racialPartNumber];
-		if(num<0) return 0;
-		return num;
-	}
-	
-	public String getBodyPartsAsString()
-	{
-		StringBuffer str=new StringBuffer("");
-		for(int i=0;i<getMyRace().bodyMask().length;i++)
-			str.append(getBodyPart(i)+";");
-		return str.toString();
-	}
-	
-	public void setBodyPartsFromStringAfterRace(String str)
-	{
-		List<String> V=CMParms.parseSemicolons(str,true);
-		bodyAlterations=null;
-		for(int i=0;i<getMyRace().bodyMask().length;i++)
-		{
-			if(V.size()<=i) break;
-			int val=CMath.s_int(V.get(i));
-			int num=getMyRace().bodyMask()[i];
-			if(num!=val) alterBodypart(i,val-num);
-		}
-	}
-	
-	public int getBodypartAlteration(int racialPartNumber)
-	{
-		if(bodyAlterations==null) return 0;
-		return bodyAlterations[racialPartNumber];
-	}
-	public void alterBodypart(int racialPartNumber, int deviation)
-	{
-		if(bodyAlterations==null) bodyAlterations=new short[Race.BODY_PARTS];
-		bodyAlterations[racialPartNumber]+=deviation;
-	}
-	
-	public int ageCategory()
-	{
-		int age=getStat(STAT_AGE);
-		int cat=Race.AGE_INFANT;
-		int[] chart=getMyRace().getAgingChart();
-		if(age<chart[1]) return cat;
-		while((cat<=Race.AGE_ANCIENT)&&(age>=chart[cat]))
-			cat++;
-		return cat-1;
+
+	public void setCurrentClassLevel(int level) {
+		CharClass currentClass = getCurrentClass();
+		if (currentClass != null)
+			setClassLevel(currentClass, level);
 	}
 
-	public String ageName()
-	{
-		int cat=ageCategory();
-		if(cat<Race.AGE_ANCIENT) return Race.AGE_DESCS[cat];
-		int age=getStat(STAT_AGE);
-		int[] chart=getMyRace().getAgingChart();
-		int diff=chart[Race.AGE_ANCIENT]-chart[Race.AGE_VENERABLE];
-		age=age-chart[Race.AGE_ANCIENT];
-		int num=(diff>0)?(int)Math.abs(Math.floor(CMath.div(age,diff))):0;
-		if(num<=0) return Race.AGE_DESCS[cat];
-		return Race.AGE_DESCS[cat]+" "+CMath.convertToRoman(num);
+	public void setCurrentClass(CharClass aClass) {
+		if (aClass == null)
+			return;
+		if (((myClasses == null) || (myLevels == null))
+				|| ((numClasses() == 1) && (myClasses[0].ID()
+						.equals("StdCharClass")))) {
+			myClasses = new CharClass[1];
+			myLevels = new Integer[1];
+			myClasses[0] = aClass;
+			myLevels[0] = Integer.valueOf(0);
+			return;
+		}
+
+		int level = getClassLevel(aClass);
+		if (level < 0) {
+			CharClass[] oldClasses = myClasses;
+			Integer[] oldLevels = myLevels;
+			CharClass[] myNewClasses = new CharClass[oldClasses.length + 1];
+			Integer[] myNewLevels = new Integer[oldClasses.length + 1];
+			for (int c = 0; c < oldClasses.length; c++) {
+				myNewClasses[c] = oldClasses[c];
+				myNewLevels[c] = oldLevels[c];
+			}
+			myNewClasses[oldClasses.length] = aClass;
+			myNewLevels[oldClasses.length] = Integer.valueOf(0);
+			myClasses = myNewClasses;
+			myLevels = myNewLevels;
+		} else {
+			if (myClasses[myClasses.length - 1] == aClass)
+				return;
+			Integer oldI = Integer.valueOf(level);
+			boolean go = false;
+			CharClass[] myNewClasses = myClasses.clone();
+			Integer[] myNewLevels = myLevels.clone();
+			for (int i = 0; i < myNewClasses.length - 1; i++) {
+				CharClass C = getMyClass(i);
+				if ((C == aClass) || (go)) {
+					go = true;
+					myNewClasses[i] = myNewClasses[i + 1];
+					myNewLevels[i] = myNewLevels[i + 1];
+				}
+			}
+			myNewClasses[myNewClasses.length - 1] = aClass;
+			myNewLevels[myNewClasses.length - 1] = oldI;
+			myClasses = myNewClasses;
+			myLevels = myNewLevels;
+		}
 	}
-	
-	public int getSave(int which)
-	{
-		switch(which)
-		{
+
+	public CharClass getCurrentClass() {
+		return myClasses[myClasses.length - 1];
+	}
+
+	public Collection<CharClass> getCharClasses() {
+		return Arrays.asList(myClasses);
+	}
+
+	public int getCurrentClassLevel() {
+		if (myLevels == null)
+			return -1;
+		return myLevels[myLevels.length - 1].intValue();
+	}
+
+	public Race getMyRace() {
+		return myRace;
+	}
+
+	public void setMyRace(Race newVal) {
+		if (newVal != null)
+			myRace = newVal;
+	}
+
+	public int[] getBreathables() {
+		return (breathables != null) ? breathables : myRace.getBreathables();
+	}
+
+	public void setBreathables(int[] newArray) {
+		breathables = newArray;
+	}
+
+	public int getBodyPart(int racialPartNumber) {
+		int num = getMyRace().bodyMask()[racialPartNumber];
+		if ((num < 0) || (bodyAlterations == null))
+			return num;
+		num += bodyAlterations[racialPartNumber];
+		if (num < 0)
+			return 0;
+		return num;
+	}
+
+	public String getBodyPartsAsString() {
+		StringBuffer str = new StringBuffer("");
+		for (int i = 0; i < getMyRace().bodyMask().length; i++)
+			str.append(getBodyPart(i) + ";");
+		return str.toString();
+	}
+
+	public void setBodyPartsFromStringAfterRace(String str) {
+		List<String> V = CMParms.parseSemicolons(str, true);
+		bodyAlterations = null;
+		for (int i = 0; i < getMyRace().bodyMask().length; i++) {
+			if (V.size() <= i)
+				break;
+			int val = CMath.s_int(V.get(i));
+			int num = getMyRace().bodyMask()[i];
+			if (num != val)
+				alterBodypart(i, val - num);
+		}
+	}
+
+	public int getBodypartAlteration(int racialPartNumber) {
+		if (bodyAlterations == null)
+			return 0;
+		return bodyAlterations[racialPartNumber];
+	}
+
+	public void alterBodypart(int racialPartNumber, int deviation) {
+		if (bodyAlterations == null)
+			bodyAlterations = new short[Race.BODY_PARTS];
+		bodyAlterations[racialPartNumber] += deviation;
+	}
+
+	public int ageCategory() {
+		int age = getStat(STAT_AGE);
+		int cat = Race.AGE_INFANT;
+		int[] chart = getMyRace().getAgingChart();
+		if (age < chart[1])
+			return cat;
+		while ((cat <= Race.AGE_ANCIENT) && (age >= chart[cat]))
+			cat++;
+		return cat - 1;
+	}
+
+	public String ageName() {
+		int cat = ageCategory();
+		if (cat < Race.AGE_ANCIENT)
+			return Race.AGE_DESCS[cat];
+		int age = getStat(STAT_AGE);
+		int[] chart = getMyRace().getAgingChart();
+		int diff = chart[Race.AGE_ANCIENT] - chart[Race.AGE_VENERABLE];
+		age = age - chart[Race.AGE_ANCIENT];
+		int num = (diff > 0) ? (int) Math.abs(Math.floor(CMath.div(age, diff)))
+				: 0;
+		if (num <= 0)
+			return Race.AGE_DESCS[cat];
+		return Race.AGE_DESCS[cat] + " " + CMath.convertToRoman(num);
+	}
+
+	public int getSave(int which) {
+		switch (which) {
 		case STAT_SAVE_PARALYSIS:
-			return getStat(STAT_SAVE_PARALYSIS)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_STRENGTH),2.0));
+			return getStat(STAT_SAVE_PARALYSIS)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_STRENGTH), 2.0));
 		case STAT_SAVE_FIRE:
-			return getStat(STAT_SAVE_FIRE)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_DEXTERITY),2.0));
+			return getStat(STAT_SAVE_FIRE)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_DEXTERITY), 2.0));
 		case STAT_SAVE_COLD:
-			return getStat(STAT_SAVE_COLD)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_DEXTERITY),2.0));
+			return getStat(STAT_SAVE_COLD)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_DEXTERITY), 2.0));
 		case STAT_SAVE_WATER:
-			return getStat(STAT_SAVE_WATER)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_DEXTERITY),2.0));
+			return getStat(STAT_SAVE_WATER)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_DEXTERITY), 2.0));
 		case STAT_SAVE_GAS:
-			return getStat(STAT_SAVE_GAS)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_STRENGTH),2.0));
+			return getStat(STAT_SAVE_GAS)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_STRENGTH), 2.0));
 		case STAT_SAVE_MIND:
-			return getStat(STAT_SAVE_MIND)+(int)Math.round(CMath.div(getStat(STAT_WISDOM)+getStat(STAT_INTELLIGENCE)+getStat(STAT_CHARISMA),3.0));
+			return getStat(STAT_SAVE_MIND)
+					+ (int) Math.round(CMath.div(getStat(STAT_WISDOM)
+							+ getStat(STAT_INTELLIGENCE)
+							+ getStat(STAT_CHARISMA), 3.0));
 		case STAT_SAVE_GENERAL:
-			return getStat(STAT_SAVE_GENERAL)+getStat(STAT_CONSTITUTION);
+			return getStat(STAT_SAVE_GENERAL) + getStat(STAT_CONSTITUTION);
 		case STAT_SAVE_JUSTICE:
-			return getStat(STAT_SAVE_JUSTICE)+getStat(STAT_CHARISMA);
+			return getStat(STAT_SAVE_JUSTICE) + getStat(STAT_CHARISMA);
 		case STAT_SAVE_ACID:
-			return getStat(STAT_SAVE_ACID)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_DEXTERITY),2.0));
+			return getStat(STAT_SAVE_ACID)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_DEXTERITY), 2.0));
 		case STAT_SAVE_ELECTRIC:
-			return getStat(STAT_SAVE_ELECTRIC)+(int)Math.round(CMath.div(getStat(STAT_CONSTITUTION)+getStat(STAT_DEXTERITY),2.0));
+			return getStat(STAT_SAVE_ELECTRIC)
+					+ (int) Math.round(CMath.div(getStat(STAT_CONSTITUTION)
+							+ getStat(STAT_DEXTERITY), 2.0));
 		case STAT_SAVE_POISON:
-			return getStat(STAT_SAVE_POISON)+getStat(STAT_CONSTITUTION);
+			return getStat(STAT_SAVE_POISON) + getStat(STAT_CONSTITUTION);
 		case STAT_SAVE_UNDEAD:
-			return getStat(STAT_SAVE_UNDEAD)+getStat(STAT_WISDOM)+getStat(STAT_FAITH);
+			return getStat(STAT_SAVE_UNDEAD) + getStat(STAT_WISDOM)
+					+ getStat(STAT_FAITH);
 		case STAT_SAVE_DISEASE:
-			return getStat(STAT_SAVE_DISEASE)+getStat(STAT_CONSTITUTION);
+			return getStat(STAT_SAVE_DISEASE) + getStat(STAT_CONSTITUTION);
 		case STAT_SAVE_MAGIC:
-			return getStat(STAT_SAVE_MAGIC)+getStat(STAT_INTELLIGENCE);
+			return getStat(STAT_SAVE_MAGIC) + getStat(STAT_INTELLIGENCE);
 		case STAT_SAVE_TRAPS:
-			return getStat(STAT_SAVE_TRAPS)+getStat(STAT_DEXTERITY);
+			return getStat(STAT_SAVE_TRAPS) + getStat(STAT_DEXTERITY);
 		case STAT_SAVE_OVERLOOKING:
 			return getStat(STAT_SAVE_OVERLOOKING);
-		case STAT_SAVE_DETECTION: 
+		case STAT_SAVE_DETECTION:
 			return getStat(STAT_SAVE_DETECTION);
-		case STAT_FAITH: 
+		case STAT_FAITH:
 			return getStat(STAT_FAITH);
 		}
 		return getStat(which);
 	}
 
 	// create a new one of these
-	public CMObject copyOf()
-	{
-		DefaultCharStats newOne=new DefaultCharStats();
-		if(myClasses!=null)
-			newOne.myClasses=myClasses.clone();
-		if(myRace!=null)
-			newOne.myRace=myRace;
-		if(myLevels!=null)
-			newOne.myLevels=myLevels.clone();
-		if(bodyAlterations!=null)
-			newOne.bodyAlterations=bodyAlterations.clone();
-		newOne.stats=stats.clone();
+	public CMObject copyOf() {
+		DefaultCharStats newOne = new DefaultCharStats();
+		if (myClasses != null)
+			newOne.myClasses = myClasses.clone();
+		if (myRace != null)
+			newOne.myRace = myRace;
+		if (myLevels != null)
+			newOne.myLevels = myLevels.clone();
+		if (bodyAlterations != null)
+			newOne.bodyAlterations = bodyAlterations.clone();
+		newOne.stats = stats.clone();
 		return newOne;
 	}
 
-	public void setGenderName(String gname)
-	{
-		genderName=gname;
+	public void setGenderName(String gname) {
+		genderName = gname;
 	}
-	
-	public String genderName()
-	{
-		if(genderName!=null) 
+
+	public String genderName() {
+		if (genderName != null)
 			return genderName;
-		switch(getStat(STAT_GENDER))
-		{
-		case 'M': return "male";
-		case 'F': return "female";
-		default: return "neuter";
-		}
-	}
-	public String himher()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "him";
-		case 'F': return "her";
-		default: return "it";
+		switch (getStat(STAT_GENDER)) {
+		case 'M':
+			return "male";
+		case 'F':
+			return "female";
+		default:
+			return "neuter";
 		}
 	}
 
-	public String hisher()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "his";
-		case 'F': return "her";
-		default: return "its";
+	public String himher() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "him";
+		case 'F':
+			return "her";
+		default:
+			return "it";
 		}
 	}
 
-	public String heshe()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "he";
-		case 'F': return "she";
-		default: return "it";
-		}
-	}
-	public String sirmadam()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "sir";
-		case 'F': return "madam";
-		default: return "sir";
-		}
-	}
-	public String SirMadam()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "Sir";
-		case 'F': return "Madam";
-		default: return "Sir";
+	public String hisher() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "his";
+		case 'F':
+			return "her";
+		default:
+			return "its";
 		}
 	}
 
-	public String HeShe()
-	{
-		char c=(char)getStat(STAT_GENDER);
-		if((genderName!=null)&&(genderName.length()>0))
-			c=Character.toUpperCase(genderName.charAt(0));
-		switch(c)
-		{
-		case 'M': return "He";
-		case 'F': return "She";
-		default: return "It";
+	public String heshe() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "he";
+		case 'F':
+			return "she";
+		default:
+			return "it";
 		}
 	}
 
-	public int getStat(int abilityCode)
-	{
-		if(abilityCode<stats.length)
+	public String sirmadam() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "sir";
+		case 'F':
+			return "madam";
+		default:
+			return "sir";
+		}
+	}
+
+	public String SirMadam() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "Sir";
+		case 'F':
+			return "Madam";
+		default:
+			return "Sir";
+		}
+	}
+
+	public String HeShe() {
+		char c = (char) getStat(STAT_GENDER);
+		if ((genderName != null) && (genderName.length() > 0))
+			c = Character.toUpperCase(genderName.charAt(0));
+		switch (c) {
+		case 'M':
+			return "He";
+		case 'F':
+			return "She";
+		default:
+			return "It";
+		}
+	}
+
+	public int getStat(int abilityCode) {
+		if (abilityCode < stats.length)
 			return stats[abilityCode];
 		return 0;
 	}
 
-	public void setPermanentStat(int abilityCode, int value)
-	{
-		setStat(abilityCode,value);
-		if(CharStats.CODES.isBASE(abilityCode))
-			setStat(CharStats.CODES.toMAXBASE(abilityCode),value-CMProps.getIntVar(CMProps.Int.BASEMAXSTAT));
+	public void setPermanentStat(int abilityCode, int value) {
+		setStat(abilityCode, value);
+		if (CharStats.CODES.isBASE(abilityCode))
+			setStat(CharStats.CODES.toMAXBASE(abilityCode),
+					value - CMProps.getIntVar(CMProps.Int.BASEMAXSTAT));
 	}
-	
-	public int getMaxStat(int abilityCode)
-	{
+
+	public int getMaxStat(int abilityCode) {
 		int baseMax = CMProps.getIntVar(CMProps.Int.BASEMAXSTAT);
 		return baseMax + getStat(CharStats.CODES.toMAXBASE(abilityCode));
 	}
-	
-	public int getRacialStat(MOB mob, int statNum)
-	{
-		CharStats copyStats=(CharStats)copyOf();
-		getMyRace().affectCharStats(mob,copyStats);
-		for(int c=0;c<numClasses();c++)
-			getMyClass(c).affectCharStats(mob,copyStats);
+
+	public int getRacialStat(MOB mob, int statNum) {
+		CharStats copyStats = (CharStats) copyOf();
+		getMyRace().affectCharStats(mob, copyStats);
+		for (int c = 0; c < numClasses(); c++)
+			getMyClass(c).affectCharStats(mob, copyStats);
 		return copyStats.getStat(statNum);
 	}
 
-	public void setRacialStat(final int abilityCode, final int racialMax)
-	{
-		if((!CharStats.CODES.isBASE(abilityCode))||(getStat(abilityCode)==VALUE_ALLSTATS_DEFAULT)) 
-			setPermanentStat(abilityCode,racialMax);
-		else
-		{
-			final int baseMax=CMProps.getIntVar(CMProps.Int.BASEMAXSTAT);
-			int currMax=getStat(CharStats.CODES.toMAXBASE(abilityCode))+baseMax;
-			if(currMax<=0) currMax=1;
-			int curStat=getStat(abilityCode);
-			if(curStat > currMax*7)
-			{
-				Log.warnOut("Detected mob with "+curStat+"/"+currMax+" "+CharStats.CODES.ABBR(abilityCode));
-				curStat=currMax*7;
+	public void setRacialStat(final int abilityCode, final int racialMax) {
+		if ((!CharStats.CODES.isBASE(abilityCode))
+				|| (getStat(abilityCode) == VALUE_ALLSTATS_DEFAULT))
+			setPermanentStat(abilityCode, racialMax);
+		else {
+			final int baseMax = CMProps.getIntVar(CMProps.Int.BASEMAXSTAT);
+			int currMax = getStat(CharStats.CODES.toMAXBASE(abilityCode))
+					+ baseMax;
+			if (currMax <= 0)
+				currMax = 1;
+			int curStat = getStat(abilityCode);
+			if (curStat > currMax * 7) {
+				Log.warnOut("Detected mob with " + curStat + "/" + currMax
+						+ " " + CharStats.CODES.ABBR(abilityCode));
+				curStat = currMax * 7;
 			}
-			final int pctOfMax=Math.round(((float)curStat/(float)currMax)*racialMax);
-			final int stdMaxAdj=Math.round((((float)(currMax-VALUE_ALLSTATS_DEFAULT))/(float)currMax)*racialMax);
-			final int racialStat=pctOfMax+stdMaxAdj;
-			setStat(abilityCode,((racialStat<1)&&(racialMax>0))?1:racialStat);
-			setStat(CharStats.CODES.toMAXBASE(abilityCode),racialMax-baseMax);
+			final int pctOfMax = Math.round(((float) curStat / (float) currMax)
+					* racialMax);
+			final int stdMaxAdj = Math
+					.round((((float) (currMax - VALUE_ALLSTATS_DEFAULT)) / (float) currMax)
+							* racialMax);
+			final int racialStat = pctOfMax + stdMaxAdj;
+			setStat(abilityCode, ((racialStat < 1) && (racialMax > 0)) ? 1
+					: racialStat);
+			setStat(CharStats.CODES.toMAXBASE(abilityCode), racialMax - baseMax);
 		}
 	}
-	
-	public void setStat(int abilityCode, int value)
-	{
-		if((value>Short.MAX_VALUE)||(value<Short.MIN_VALUE))
-			Log.errOut("Value out of range",new CMException("Value out of range: "+value+" for "+abilityCode));
-		if(abilityCode<stats.length)
-			stats[abilityCode]=(short)value;
+
+	public void setStat(int abilityCode, int value) {
+		if ((value > Short.MAX_VALUE) || (value < Short.MIN_VALUE))
+			Log.errOut("Value out of range", new CMException(
+					"Value out of range: " + value + " for " + abilityCode));
+		if (abilityCode < stats.length)
+			stats[abilityCode] = (short) value;
 	}
 
-	public int getCode(String abilityName)
-	{
+	public int getCode(String abilityName) {
 		String[] DESCS = CODES.DESCS();
-		for(int i : CharStats.CODES.ALL())
-			if(DESCS[i].startsWith(abilityName))
+		for (int i : CharStats.CODES.ALL())
+			if (DESCS[i].startsWith(abilityName))
 				return i;
 		return -1;
 	}
-	public int compareTo(CMObject o){ return CMClass.classID(this).compareToIgnoreCase(CMClass.classID(o));}
-	public int getSaveStatIndex() { return getStatCodes().length;}
-	
-	public String getStat(String abilityName)
-	{
-		int dex=CMParms.indexOfIgnoreCase(getStatCodes(),abilityName);
-		if(dex>=0) return Integer.toString(getStat(dex));
-		
-		String[] DESCS=CODES.DESCS();
-		for(int i : CharStats.CODES.ALL())
-			if(DESCS[i].startsWith(abilityName))
+
+	public int compareTo(CMObject o) {
+		return CMClass.classID(this).compareToIgnoreCase(CMClass.classID(o));
+	}
+
+	public int getSaveStatIndex() {
+		return getStatCodes().length;
+	}
+
+	public String getStat(String abilityName) {
+		int dex = CMParms.indexOfIgnoreCase(getStatCodes(), abilityName);
+		if (dex >= 0)
+			return Integer.toString(getStat(dex));
+
+		String[] DESCS = CODES.DESCS();
+		for (int i : CharStats.CODES.ALL())
+			if (DESCS[i].startsWith(abilityName))
 				return Integer.toString(getStat(i));
 		return null;
 	}
-	
-	public String[] getStatCodes() { return CharStats.CODES.NAMES();}
-	public boolean isStat(String code) { return CMParms.containsIgnoreCase(getStatCodes(),code);}
+
+	public String[] getStatCodes() {
+		return CharStats.CODES.NAMES();
+	}
+
+	public boolean isStat(String code) {
+		return CMParms.containsIgnoreCase(getStatCodes(), code);
+	}
+
 	public void setStat(String code, String val) {
-		int dex=CMParms.indexOfIgnoreCase(getStatCodes(),code);
-		if(dex>=0) 
-			setStat(dex,CMath.s_parseIntExpression(val));
+		int dex = CMParms.indexOfIgnoreCase(getStatCodes(), code);
+		if (dex >= 0)
+			setStat(dex, CMath.s_parseIntExpression(val));
 		else
-		for(int i : CharStats.CODES.ALL())
-			if(CODES.DESC(i).startsWith(code))
-			{
-				setStat(dex,CMath.s_parseIntExpression(val));
-				return;
-			}
+			for (int i : CharStats.CODES.ALL())
+				if (CODES.DESC(i).startsWith(code)) {
+					setStat(dex, CMath.s_parseIntExpression(val));
+					return;
+				}
 	}
 }

@@ -1,12 +1,13 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.packets;
+
 import java.io.Serializable;
 
 import com.planet_ink.coffee_mud.core.intermud.i3.persist.Persistent;
+
 /**
  * com.planet_ink.coffee_mud.core.intermud.i3.packets.Channel
  * An I3 channel.
  */
-
 
 /**
  * This class represents an I3 channel.  The ChannelList
@@ -16,20 +17,19 @@ import com.planet_ink.coffee_mud.core.intermud.i3.persist.Persistent;
  */
 
 /**
- * Copyright (c) 1996 George Reese
- * This source code may not be modified, copied,
- * redistributed, or used in any fashion without the
- * express written consent of George Reese.
+ * Copyright (c) 1996 George Reese This source code may not be modified, copied,
+ * redistributed, or used in any fashion without the express written consent of
+ * George Reese.
  */
-public class Channel implements Serializable 
-{
-	public static final long serialVersionUID=0;
+public class Channel implements Serializable {
+	public static final long serialVersionUID = 0;
 	/**
 	 * The name of the channel
 	 */
 	public String channel;
 	/**
 	 * The modification status of this channel
+	 * 
 	 * @see com.planet_ink.coffee_mud.core.intermud.i3.persist.Persistent
 	 */
 	public int modified;
@@ -40,7 +40,7 @@ public class Channel implements Serializable
 	/**
 	 * The type of the mud channel
 	 */
-	public int    type;
+	public int type;
 
 	/**
 	 * Constructs a new mud channel object
@@ -52,7 +52,9 @@ public class Channel implements Serializable
 
 	/**
 	 * Constructs a copy of an existing channel
-	 * @param other the other channel
+	 * 
+	 * @param other
+	 *            the other channel
 	 */
 	public Channel(Channel other) {
 		super();

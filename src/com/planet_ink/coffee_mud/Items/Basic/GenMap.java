@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.Basic;
+
 import com.planet_ink.coffee_mud.Items.interfaces.RawMaterial;
 import com.planet_ink.coffee_mud.Libraries.interfaces.GenericBuilder;
 import com.planet_ink.coffee_mud.core.CMLib;
@@ -6,88 +7,100 @@ import com.planet_ink.coffee_mud.core.CMProps;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class GenMap extends StdMap
-{
-	public String ID(){	return "GenMap";}
-	protected String	readableText="";
-	public GenMap()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class GenMap extends StdMap {
+	public String ID() {
+		return "GenMap";
+	}
+
+	protected String readableText = "";
+
+	public GenMap() {
 		super();
 		setName("a generic map");
 		basePhyStats.setWeight(1);
 		setDisplayText("a generic map sits here.");
 		setDescription("");
-		baseGoldValue=5;
+		baseGoldValue = 5;
 		setMaterial(RawMaterial.RESOURCE_PAPER);
 		recoverPhyStats();
 	}
 
-	public boolean isGeneric(){return true;}
-
-	public String text()
-	{
-		return CMLib.coffeeMaker().getPropertiesStr(this,false);
+	public boolean isGeneric() {
+		return true;
 	}
-	public String readableText(){return readableText;}
-	public String getMapArea(){return readableText;}
-	public void setMapArea(String mapName)
-	{
+
+	public String text() {
+		return CMLib.coffeeMaker().getPropertiesStr(this, false);
+	}
+
+	public String readableText() {
+		return readableText;
+	}
+
+	public String getMapArea() {
+		return readableText;
+	}
+
+	public void setMapArea(String mapName) {
 		setReadableText(mapName);
 	}
 
-	public void setReadableText(String newReadableText)
-	{
-		String oldName=Name();
-		String oldDesc=description();
-		readableText=newReadableText;
+	public void setReadableText(String newReadableText) {
+		String oldName = Name();
+		String oldDesc = description();
+		readableText = newReadableText;
 		doMapArea();
 		setName(oldName);
 		setDescription(oldDesc);
 	}
-	public void setMiscText(String newText)
-	{
-		miscText="";
-		CMLib.coffeeMaker().setPropertiesStr(this,newText,false);
+
+	public void setMiscText(String newText) {
+		miscText = "";
+		CMLib.coffeeMaker().setPropertiesStr(this, newText, false);
 		recoverPhyStats();
 	}
-	public String getStat(String code)
-	{
-		if(CMLib.coffeeMaker().getGenItemCodeNum(code)>=0)
-			return CMLib.coffeeMaker().getGenItemStat(this,code);
-		return CMProps.getStatCodeExtensionValue(getStatCodes(), xtraValues, code);
+
+	public String getStat(String code) {
+		if (CMLib.coffeeMaker().getGenItemCodeNum(code) >= 0)
+			return CMLib.coffeeMaker().getGenItemStat(this, code);
+		return CMProps.getStatCodeExtensionValue(getStatCodes(), xtraValues,
+				code);
 	}
-	public void setStat(String code, String val)
-	{
-		if(CMLib.coffeeMaker().getGenItemCodeNum(code)>=0)
-			CMLib.coffeeMaker().setGenItemStat(this,code,val);
-		CMProps.setStatCodeExtensionValue(getStatCodes(), xtraValues, code,val);
+
+	public void setStat(String code, String val) {
+		if (CMLib.coffeeMaker().getGenItemCodeNum(code) >= 0)
+			CMLib.coffeeMaker().setGenItemStat(this, code, val);
+		CMProps.setStatCodeExtensionValue(getStatCodes(), xtraValues, code, val);
 	}
-	private static String[] codes=null;
-	public String[] getStatCodes()
-	{
-		if(codes==null)
-			codes=CMProps.getStatCodesList(GenericBuilder.GENITEMCODES,this);
-		return codes; 
+
+	private static String[] codes = null;
+
+	public String[] getStatCodes() {
+		if (codes == null)
+			codes = CMProps.getStatCodesList(GenericBuilder.GENITEMCODES, this);
+		return codes;
 	}
-	public boolean sameAs(Environmental E)
-	{
-		if(!(E instanceof GenMap)) return false;
-		for(int i=0;i<getStatCodes().length;i++)
-			if(!E.getStat(getStatCodes()[i]).equals(getStat(getStatCodes()[i])))
+
+	public boolean sameAs(Environmental E) {
+		if (!(E instanceof GenMap))
+			return false;
+		for (int i = 0; i < getStatCodes().length; i++)
+			if (!E.getStat(getStatCodes()[i])
+					.equals(getStat(getStatCodes()[i])))
 				return false;
 		return true;
 	}

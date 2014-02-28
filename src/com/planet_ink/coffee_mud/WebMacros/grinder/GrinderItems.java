@@ -39,681 +39,698 @@ import com.planet_ink.coffee_mud.core.interfaces.Rideable;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class GrinderItems
-{
-	private static final String[] okparms={
-		  "NAME","CLASSES","DISPLAYTEXT","DESCRIPTION"," LEVEL",
-		  " ABILITY"," REJUV"," MISCTEXT","MATERIALS","ISGENERIC",
-		  "ISREADABLE","READABLETEXT","ISDRINK","LIQUIDHELD","QUENCHED",
-		  "ISCONTAINER","CAPACITY","ISARMOR","ARMOR","WORNDATA",
-		  " HEIGHT","ISWEAPON","WEAPONTYPE","WEAPONCLASS","ATTACK",
-		  "DAMAGE","MINRANGE","MAXRANGE","SECRETIDENTITY",
-		  "ISGETTABLE","ISREMOVABLE","ISDROPPABLE","ISTWOHANDED","ISTRAPPED",
-		  "READABLESPELLS","ISWAND"," USESREMAIN","VALUE","WEIGHT",
-		  "ISMAP","MAPAREAS","ISFOOD","ISPILL","ISSUPERPILL",
-		  "ISPOTION","LIQUIDTYPES","AMMOTYPE","AMMOCAP","READABLESPELL",
-		  "ISRIDEABLE","RIDEABLETYPE","MOBSHELD","HASALID","HASALOCK",
-		  "KEYCODE","ISWALLPAPER","NOURISHMENT","CONTAINER","ISLIGHTSOURCE",
-		  "DURATION","NONLOCATABLE","ISKEY","CONTENTTYPES","ISINSTRUMENT",
-		  "INSTRUMENTTYPE","ISAMMO","ISMOBITEM","ISDUST","ISPERFUME",
-		  "SMELLS","IMAGE","ISEXIT","EXITNAME","EXITCLOSEDTEXT",
-		  "NUMCOINS","CURRENCY","DENOM","ISRECIPE","RECIPESKILL",
-		  "RECIPEDATA", "LAYER","SEETHRU","MULTIWEAR","ISCATALOGED",
-		  "CATARATE","CATALIVE","CATAMASK","BITE","MAXUSES","CATACAT"};
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class GrinderItems {
+	private static final String[] okparms = { "NAME", "CLASSES", "DISPLAYTEXT",
+			"DESCRIPTION", " LEVEL", " ABILITY", " REJUV", " MISCTEXT",
+			"MATERIALS", "ISGENERIC", "ISREADABLE", "READABLETEXT", "ISDRINK",
+			"LIQUIDHELD", "QUENCHED", "ISCONTAINER", "CAPACITY", "ISARMOR",
+			"ARMOR", "WORNDATA", " HEIGHT", "ISWEAPON", "WEAPONTYPE",
+			"WEAPONCLASS", "ATTACK", "DAMAGE", "MINRANGE", "MAXRANGE",
+			"SECRETIDENTITY", "ISGETTABLE", "ISREMOVABLE", "ISDROPPABLE",
+			"ISTWOHANDED", "ISTRAPPED", "READABLESPELLS", "ISWAND",
+			" USESREMAIN", "VALUE", "WEIGHT", "ISMAP", "MAPAREAS", "ISFOOD",
+			"ISPILL", "ISSUPERPILL", "ISPOTION", "LIQUIDTYPES", "AMMOTYPE",
+			"AMMOCAP", "READABLESPELL", "ISRIDEABLE", "RIDEABLETYPE",
+			"MOBSHELD", "HASALID", "HASALOCK", "KEYCODE", "ISWALLPAPER",
+			"NOURISHMENT", "CONTAINER", "ISLIGHTSOURCE", "DURATION",
+			"NONLOCATABLE", "ISKEY", "CONTENTTYPES", "ISINSTRUMENT",
+			"INSTRUMENTTYPE", "ISAMMO", "ISMOBITEM", "ISDUST", "ISPERFUME",
+			"SMELLS", "IMAGE", "ISEXIT", "EXITNAME", "EXITCLOSEDTEXT",
+			"NUMCOINS", "CURRENCY", "DENOM", "ISRECIPE", "RECIPESKILL",
+			"RECIPEDATA", "LAYER", "SEETHRU", "MULTIWEAR", "ISCATALOGED",
+			"CATARATE", "CATALIVE", "CATAMASK", "BITE", "MAXUSES", "CATACAT" };
+
 	public static String editItem(HTTPRequest httpReq,
-								  java.util.Map<String,String> parms,
-								  MOB whom,
-								  Room R,
-								  MOB playerM)
-	{
-		String itemCode=httpReq.getUrlParameter("ITEM");
-		if(itemCode==null) return "@break@";
+			java.util.Map<String, String> parms, MOB whom, Room R, MOB playerM) {
+		String itemCode = httpReq.getUrlParameter("ITEM");
+		if (itemCode == null)
+			return "@break@";
 
-		String mobNum=httpReq.getUrlParameter("MOB");
-		String newClassID=httpReq.getUrlParameter("CLASSES");
+		String mobNum = httpReq.getUrlParameter("MOB");
+		String newClassID = httpReq.getUrlParameter("CLASSES");
 
-		String sync=("SYNC"+((R==null)?((playerM!=null)?playerM.Name():null):R.roomID()));
-		synchronized(sync.intern())
-		{
-			if(R!=null)
-			{
-				R=CMLib.map().getRoom(R);
+		String sync = ("SYNC" + ((R == null) ? ((playerM != null) ? playerM
+				.Name() : null) : R.roomID()));
+		synchronized (sync.intern()) {
+			if (R != null) {
+				R = CMLib.map().getRoom(R);
 				CMLib.map().resetRoom(R);
 			}
 
-			Item I=null;
-			MOB M=null;
-			if(playerM!=null)
-				M=playerM;
-			else
-			if((mobNum!=null)&&(mobNum.length()>0))
-			{
-				if(R!=null)
-					M=RoomData.getMOBFromCode(R,mobNum);
+			Item I = null;
+			MOB M = null;
+			if (playerM != null)
+				M = playerM;
+			else if ((mobNum != null) && (mobNum.length() > 0)) {
+				if (R != null)
+					M = RoomData.getMOBFromCode(R, mobNum);
 				else
-					M=RoomData.getMOBFromCode(RoomData.getMOBCache(),mobNum);
-				if(M==null)
-				{
-					StringBuffer str=new StringBuffer("No MOB?!");
-					str.append(" Got: "+mobNum);
+					M = RoomData.getMOBFromCode(RoomData.getMOBCache(), mobNum);
+				if (M == null) {
+					StringBuffer str = new StringBuffer("No MOB?!");
+					str.append(" Got: " + mobNum);
 					str.append(", Includes: ");
-					if(R!=null)
-					for(int m=0;m<R.numInhabitants();m++)
-					{
-						MOB M2=R.fetchInhabitant(m);
-						if((M2!=null)&&(M2.isSavable()))
-						   str.append(M2.Name()+"="+RoomData.getMOBCode(R,M2));
-					}
+					if (R != null)
+						for (int m = 0; m < R.numInhabitants(); m++) {
+							MOB M2 = R.fetchInhabitant(m);
+							if ((M2 != null) && (M2.isSavable()))
+								str.append(M2.Name() + "="
+										+ RoomData.getMOBCode(R, M2));
+						}
 					return str.toString();
 				}
 			}
-			if(itemCode.equals("NEW")||itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-				I=CMClass.getItem(newClassID);
+			if (itemCode.equals("NEW") || itemCode.startsWith("CATALOG-")
+					|| itemCode.startsWith("NEWCATA-"))
+				I = CMClass.getItem(newClassID);
+			else if (M != null)
+				I = RoomData.getItemFromCode(M, itemCode);
 			else
-			if(M!=null)
-				I=RoomData.getItemFromCode(M,itemCode);
-			else
-				I=RoomData.getItemFromCode(R,itemCode);
+				I = RoomData.getItemFromCode(R, itemCode);
 
-			if(I==null)
-			{
-				StringBuffer str=new StringBuffer("No Item?!");
-				str.append(" Got: "+itemCode);
+			if (I == null) {
+				StringBuffer str = new StringBuffer("No Item?!");
+				str.append(" Got: " + itemCode);
 				str.append(", Includes: ");
-				if(M==null)
-				{
-					if(R!=null)
-					for(int i=0;i<R.numItems();i++)
-					{
-						Item I2=R.getItem(i);
-						if(I2!=null) str.append(I2.Name()+"="+RoomData.getItemCode(R,I2));
-					}
-				}
-				else
-					for(int i=0;i<M.numItems();i++)
-					{
-						Item I2=M.getItem(i);
-						if(I2!=null) str.append(I2.Name()+"="+RoomData.getItemCode(M,I2));
+				if (M == null) {
+					if (R != null)
+						for (int i = 0; i < R.numItems(); i++) {
+							Item I2 = R.getItem(i);
+							if (I2 != null)
+								str.append(I2.Name() + "="
+										+ RoomData.getItemCode(R, I2));
+						}
+				} else
+					for (int i = 0; i < M.numItems(); i++) {
+						Item I2 = M.getItem(i);
+						if (I2 != null)
+							str.append(I2.Name() + "="
+									+ RoomData.getItemCode(M, I2));
 					}
 				return str.toString();
 			}
-			Item copyItem=(Item)I.copyOf();
-			Item oldI=I;
-			if((newClassID!=null)&&(!newClassID.equals(CMClass.classID(I))))
-			{
-				I=CMClass.getItem(newClassID);
-				if(I==null) Log.errOut("GrinderItems","Error: bad class id: "+newClassID);
+			Item copyItem = (Item) I.copyOf();
+			Item oldI = I;
+			if ((newClassID != null)
+					&& (!newClassID.equals(CMClass.classID(I)))) {
+				I = CMClass.getItem(newClassID);
+				if (I == null)
+					Log.errOut("GrinderItems", "Error: bad class id: "
+							+ newClassID);
 			}
-			
-			if(I==null)
-			{
+
+			if (I == null) {
 				copyItem.destroy();
 				return "[error]";
 			}
-			
-			CatalogLibrary.CataData cataData=null;
 
-			for(int o=0;o<okparms.length;o++)
-			{
-				String parm=okparms[o];
-				boolean generic=true;
-				if(parm.startsWith(" "))
-				{
-					generic=false;
-					parm=parm.substring(1);
+			CatalogLibrary.CataData cataData = null;
+
+			for (int o = 0; o < okparms.length; o++) {
+				String parm = okparms[o];
+				boolean generic = true;
+				if (parm.startsWith(" ")) {
+					generic = false;
+					parm = parm.substring(1);
 				}
-				if((!httpReq.isUrlParameter(parm))
-				&&(newClassID==null)
-				&&(CMLib.flags().isCataloged(oldI))
-				&&(!parm.equalsIgnoreCase("CONTAINER"))
-				&&(!parm.equalsIgnoreCase("BEINGWORN")))
+				if ((!httpReq.isUrlParameter(parm)) && (newClassID == null)
+						&& (CMLib.flags().isCataloged(oldI))
+						&& (!parm.equalsIgnoreCase("CONTAINER"))
+						&& (!parm.equalsIgnoreCase("BEINGWORN")))
 					continue;
 
-				String old=httpReq.getUrlParameter(parm);
-				if(old==null) old="";
+				String old = httpReq.getUrlParameter(parm);
+				if (old == null)
+					old = "";
 
-				if((I.isGeneric()||(!generic)))
-				switch(o)
-				{
-				case 0: // name
-					I.setName(old);
-					break;
-				case 1: // classes
-					break;
-				case 2: // displaytext
-					I.setDisplayText(old);
-					break;
-				case 3: // description
-					I.setDescription(old);
-					break;
-				case 4: // level
-					I.basePhyStats().setLevel(CMath.s_int(old));
-					break;
-				case 5: // ability;
-					I.basePhyStats().setAbility(CMath.s_int(old));
-					break;
-				case 6: // rejuv;
-					I.basePhyStats().setRejuv(CMath.s_int(old));
-					break;
-				case 7: // misctext
-					if(!I.isGeneric())
-						I.setMiscText(old);
-					break;
-				case 8: // materials
-					I.setMaterial(CMath.s_int(old));
-					break;
-				case 9: // is generic
-					break;
-				case 10: // isreadable
-					CMLib.flags().setReadable(I,old.equals("on"));
-					break;
-				case 11: // readable text
-					if(!(I instanceof Ammunition))
-						I.setReadableText(old);
-					break;
-				case 12: // is drink
-					break;
-				case 13: // liquid held
-					if(I instanceof Drink)
-					{
-						((Drink)I).setLiquidHeld(CMath.s_int(old));
-						((Drink)I).setLiquidRemaining(CMath.s_int(old));
-					}
-					break;
-				case 14: // quenched
-					if(I instanceof Drink)
-						((Drink)I).setThirstQuenched(CMath.s_int(old));
-					break;
-				case 15: // is container
-					break;
-				case 16: // capacity
-					if(I instanceof Container)
-						((Container)I).setCapacity(CMath.s_int(old));
-					break;
-				case 17: // is armor
-					break;
-				case 18: // armor
-					if(I instanceof Armor)
-						I.basePhyStats().setArmor(CMath.s_int(old));
-					break;
-				case 19: // worn data
-					if(((I instanceof Armor)||(I instanceof MusicalInstrument))
-					&&(httpReq.isUrlParameter("WORNDATA")))
-					{
-						int climate=CMath.s_int(httpReq.getUrlParameter("WORNDATA"));
-						for(int i=1;;i++)
-							if(httpReq.isUrlParameter("WORNDATA"+(Integer.toString(i))))
-								climate=climate|CMath.s_int(httpReq.getUrlParameter("WORNDATA"+(Integer.toString(i))));
-							else
-								break;
-						I.setRawProperLocationBitmap(climate);
-					}
-					break;
-				case 20: // height
-					if(I instanceof Armor)
-						I.basePhyStats().setHeight(CMath.s_int(old));
-					break;
-				case 21: // is weapon
-					break;
-				case 22: // weapon type
-					if(I instanceof Weapon)
-						((Weapon)I).setWeaponType(CMath.s_int(old));
-					break;
-				case 23: // weapon class
-					if(I instanceof Weapon)
-						((Weapon)I).setWeaponClassification(CMath.s_int(old));
-					break;
-				case 24: // attack
-					if(I instanceof Weapon)
-						I.basePhyStats().setAttackAdjustment(CMath.s_int(old));
-					break;
-				case 25: // damage
-					if(I instanceof Weapon)
-						I.basePhyStats().setDamage(CMath.s_int(old));
-					break;
-				case 26: // min range
-					if(I instanceof Weapon)
-						((Weapon)I).setRanges(CMath.s_int(old),I.maxRange());
-					break;
-				case 27: // max range
-					if(I instanceof Weapon)
-						((Weapon)I).setRanges(I.minRange(),CMath.s_int(old));
-					break;
-				case 28: // secret identity
-					I.setSecretIdentity(old);
-					break;
-				case 29: // is gettable
-					CMLib.flags().setGettable(I,old.equals("on"));
-					break;
-				case 30: // is removable
-					CMLib.flags().setRemovable(I,old.equals("on"));
-					break;
-				case 31: // is droppable
-					CMLib.flags().setDroppable(I,old.equals("on"));
-					break;
-				case 32: // is two handed
-					if((I instanceof Weapon)||(I instanceof Armor))
-						I.setRawLogicalAnd(old.equals("on"));
-					break;
-				case 33: // is trapped
-					break;
-				case 34: // readable spells
-					if(((I instanceof SpellHolder))
-					&&(CMClass.classID(I).indexOf("SuperPill")<0))
-					{
-						StringBuilder sp=new StringBuilder("");
-						if(httpReq.isUrlParameter("RSPELL1"))
-						{
-							int num=1;
-							String aff=httpReq.getUrlParameter("RSPELL"+num);
-							String theparm=httpReq.getUrlParameter("RSPDATA"+num);
-							while((aff!=null)&&(theparm!=null))
-							{
-								if(aff.length()>0)
-								{
-									Ability B=CMClass.getAbility(aff);
-									if(B==null) return "Unknown Ability '"+aff+"'.";
-									if(sp.length()>0)
-										sp.append(";");
-									sp.append(B.ID());
-									if(theparm.trim().length()>0)
-										sp.append("(").append(theparm).append(")");
-								}
-								num++;
-								aff=httpReq.getUrlParameter("RSPELL"+num);
-								theparm=httpReq.getUrlParameter("RSPDATA"+num);
-							}
+				if ((I.isGeneric() || (!generic)))
+					switch (o) {
+					case 0: // name
+						I.setName(old);
+						break;
+					case 1: // classes
+						break;
+					case 2: // displaytext
+						I.setDisplayText(old);
+						break;
+					case 3: // description
+						I.setDescription(old);
+						break;
+					case 4: // level
+						I.basePhyStats().setLevel(CMath.s_int(old));
+						break;
+					case 5: // ability;
+						I.basePhyStats().setAbility(CMath.s_int(old));
+						break;
+					case 6: // rejuv;
+						I.basePhyStats().setRejuv(CMath.s_int(old));
+						break;
+					case 7: // misctext
+						if (!I.isGeneric())
+							I.setMiscText(old);
+						break;
+					case 8: // materials
+						I.setMaterial(CMath.s_int(old));
+						break;
+					case 9: // is generic
+						break;
+					case 10: // isreadable
+						CMLib.flags().setReadable(I, old.equals("on"));
+						break;
+					case 11: // readable text
+						if (!(I instanceof Ammunition))
+							I.setReadableText(old);
+						break;
+					case 12: // is drink
+						break;
+					case 13: // liquid held
+						if (I instanceof Drink) {
+							((Drink) I).setLiquidHeld(CMath.s_int(old));
+							((Drink) I).setLiquidRemaining(CMath.s_int(old));
 						}
-						((SpellHolder)I).setSpellList(sp.toString());
-					}
-					break;
-				case 35: // is wand
-					break;
-				case 36: // uses
-					I.setUsesRemaining(CMath.s_int(old));
-					break;
-				case 37: // value
-					I.setBaseValue(CMath.s_int(old));
-					break;
-				case 38: // weight
-					I.basePhyStats().setWeight(CMath.s_int(old));
-					break;
-				case 39: // is map
-					break;
-				case 40: // map areas
-					if(I instanceof com.planet_ink.coffee_mud.Items.interfaces.RoomMap)
-					{
-						Vector<String> V=new Vector<String>();
-						if(httpReq.isUrlParameter("MAPAREAS"))
-						{
-							old=httpReq.getUrlParameter("MAPAREAS").trim();
-							if(old.length()>0)
-								V.add(old);
-							for(int i=1;;i++)
-								if(httpReq.isUrlParameter("MAPAREAS"+(Integer.toString(i))))
-								{
-									old=httpReq.getUrlParameter("MAPAREAS"+(Integer.toString(i))).trim();
-									if(old.length()>0)
-										V.add(old);
-								}
+						break;
+					case 14: // quenched
+						if (I instanceof Drink)
+							((Drink) I).setThirstQuenched(CMath.s_int(old));
+						break;
+					case 15: // is container
+						break;
+					case 16: // capacity
+						if (I instanceof Container)
+							((Container) I).setCapacity(CMath.s_int(old));
+						break;
+					case 17: // is armor
+						break;
+					case 18: // armor
+						if (I instanceof Armor)
+							I.basePhyStats().setArmor(CMath.s_int(old));
+						break;
+					case 19: // worn data
+						if (((I instanceof Armor) || (I instanceof MusicalInstrument))
+								&& (httpReq.isUrlParameter("WORNDATA"))) {
+							int climate = CMath.s_int(httpReq
+									.getUrlParameter("WORNDATA"));
+							for (int i = 1;; i++)
+								if (httpReq.isUrlParameter("WORNDATA"
+										+ (Integer.toString(i))))
+									climate = climate
+											| CMath.s_int(httpReq.getUrlParameter("WORNDATA"
+													+ (Integer.toString(i))));
 								else
 									break;
+							I.setRawProperLocationBitmap(climate);
 						}
-						old = CMParms.toSemicolonList(V);
-						CMLib.flags().setReadable(I,false);
-						I.setReadableText(old);
-					}
-					break;
-				case 41: // is readable
-					break;
-				case 42: // is pill
-					break;
-				case 43: // is super pill
-					break;
-				case 44: // is potion
-					break;
-				case 45: // liquid types
-					if((I instanceof Drink)&&(!(I instanceof Potion)))
-						((Drink)I).setLiquidType(CMath.s_int(old));
-					break;
-				case 46: // ammo types
-					if(I instanceof Ammunition)
-						((Ammunition)I).setAmmunitionType(old);
-					else
-					if((I instanceof AmmunitionWeapon)&&(!(I instanceof Wand)))
-						((AmmunitionWeapon)I).setAmmunitionType(old);
-					break;
-				case 47: // ammo capacity
-					if((I instanceof AmmunitionWeapon)&&(!(I instanceof Wand)))
-					{
-						((AmmunitionWeapon)I).setAmmoCapacity(CMath.s_int(old));
-						if((((AmmunitionWeapon)I).requiresAmmunition())||(((AmmunitionWeapon)I).ammunitionCapacity()>0))
-							((AmmunitionWeapon)I).setAmmoRemaining(CMath.s_int(old));
-					}
-					break;
-				case 48: // readable spell
-					if(I instanceof Wand)
-						((Wand)I).setSpell(CMClass.findAbility(old));
-					break;
-				case 49: // is map
-					break;
-				case 50: // rideable type
-					if(I instanceof Rideable)
-						((Rideable)I).setRideBasis(CMath.s_int(old));
-					break;
-				case 51: // mob capacity
-					if(I instanceof Rideable)
-						((Rideable)I).setRiderCapacity(CMath.s_int(old));
-					break;
-				case 52: // has a lid
-					if(I instanceof Container)
-						((Container)I).setLidsNLocks(old.equals("on"),!old.equals("on"),((Container)I).hasALock(),((Container)I).hasALock());
-					break;
-				case 53: // has a lock
-					if(I instanceof Container)
-					{
-						boolean hasALid=((Container)I).hasALid();
-						((Container)I).setLidsNLocks(hasALid||old.equals("on"),!(hasALid||old.equals("on")),old.equals("on"),old.equals("on"));
-					}
-					break;
-				case 54: // key code
-					if((I instanceof Container)&&(((Container)I).hasALock()))
-						((Container)I).setKeyName(old);
-					break;
-				case 55: // is wallpaper
-					break;
-				case 56: // nourishment
-					if(I instanceof Food)
-						((Food)I).setNourishment(CMath.s_int(old));
-					break;
-				case 57: // container
-					/* pushed back to room/mob, where it belongs
-					if(!RoomData.isAllNum(old))
-						I.setContainer(null);
-					else
-					if(M==null)
-						I.setContainer(RoomData.getItemFromCode(R,old));
-					else
-						I.setContainer(RoomData.getItemFromCode(M,old));
-					*/
-					break;
-				case 58: // is light
-					break;
-				case 59:
-					if(I instanceof Light)
-						((Light)I).setDuration(CMath.s_int(old));
-					break;
-				case 60:
-					if(old.equals("on"))
-						I.basePhyStats().setSensesMask(I.basePhyStats().sensesMask()|PhyStats.SENSE_UNLOCATABLE);
-					else
-					if((I.basePhyStats().sensesMask()&PhyStats.SENSE_UNLOCATABLE)>0)
-						I.basePhyStats().setSensesMask(I.basePhyStats().sensesMask()-PhyStats.SENSE_UNLOCATABLE);
-					break;
-				case 61: // is key
-					break;
-				case 62: // content types
-					if((I instanceof Container)&&(httpReq.isUrlParameter("CONTENTTYPES")))
-					{
-						long content=CMath.s_long(httpReq.getUrlParameter("CONTENTTYPES"));
-						if(content>0)
-						for(int i=1;;i++)
-							if(httpReq.isUrlParameter("CONTENTTYPES"+(Integer.toString(i))))
-								content=content|CMath.s_int(httpReq.getUrlParameter("CONTENTTYPES"+(Integer.toString(i))));
-							else
-								break;
-						((Container)I).setContainTypes(content);
-					}
-					break;
-				case 63: // is instrument:
-					break;
-				case 64: // instrumenttype
-					if(I instanceof MusicalInstrument)
-						((MusicalInstrument)I).setInstrumentType(CMath.s_int(old));
-					break;
-				case 65: // isammo
-					break;
-				case 66: // is mob type
-					break;
-				case 67: // is dust
-					break;
-				case 68: // is perfume
-					break;
-				case 69: // smells
-					if(I instanceof Perfume)
-						((Perfume)I).setSmellList(old);
-					break;
-				case 70:
-					I.setImage(old);
-					break;
-				case 71: // is exit
-					break;
-				case 72: // exit name
-					if(I instanceof Exit)
-						((Exit)I).setExitParams(old,((Exit)I).closeWord(),((Exit)I).openWord(),((Exit)I).closedText());
-					break;
-				case 73: // exit closed text
-					if(I instanceof Exit)
-						((Exit)I).setExitParams(((Exit)I).doorName(),((Exit)I).closeWord(),((Exit)I).openWord(),old);
-					break;
-				case 74: // numcoins
-					if(I instanceof Coins)
-						((Coins)I).setNumberOfCoins(CMath.s_long(old));
-					break;
-				case 75: // currency
-					if(I instanceof Coins)
-						((Coins)I).setCurrency(old);
-					break;
-				case 76: // denomination
-					if(I instanceof Coins)
-						((Coins)I).setDenomination(CMath.s_double(old));
-					break;
-				case 77: // isrecipe
-					break;
-				case 78: // recipeskill
-					if(I instanceof Recipe)
-						((Recipe)I).setCommonSkillID(old);
-					break;
-				case 79: // recipedata
-					if(I instanceof Recipe)
-					{
-						String fieldName=parms.get("RECIPEFIELDNAME");
-						if(fieldName==null) return "No recipefieldname!";
-						int x=0;
-						String thisFieldname = CMStrings.replaceAll(fieldName,"###", ""+x);
-						List<String> finalData=new ArrayList<String>();
-						while(httpReq.isUrlParameter(thisFieldname))
-						{
-							old = httpReq.getUrlParameter(thisFieldname);
-							finalData.add(CMStrings.replaceAll(old,",","\t"));
-							thisFieldname = CMStrings.replaceAll(fieldName,"###", ""+(++x));
+						break;
+					case 20: // height
+						if (I instanceof Armor)
+							I.basePhyStats().setHeight(CMath.s_int(old));
+						break;
+					case 21: // is weapon
+						break;
+					case 22: // weapon type
+						if (I instanceof Weapon)
+							((Weapon) I).setWeaponType(CMath.s_int(old));
+						break;
+					case 23: // weapon class
+						if (I instanceof Weapon)
+							((Weapon) I).setWeaponClassification(CMath
+									.s_int(old));
+						break;
+					case 24: // attack
+						if (I instanceof Weapon)
+							I.basePhyStats().setAttackAdjustment(
+									CMath.s_int(old));
+						break;
+					case 25: // damage
+						if (I instanceof Weapon)
+							I.basePhyStats().setDamage(CMath.s_int(old));
+						break;
+					case 26: // min range
+						if (I instanceof Weapon)
+							((Weapon) I).setRanges(CMath.s_int(old),
+									I.maxRange());
+						break;
+					case 27: // max range
+						if (I instanceof Weapon)
+							((Weapon) I).setRanges(I.minRange(),
+									CMath.s_int(old));
+						break;
+					case 28: // secret identity
+						I.setSecretIdentity(old);
+						break;
+					case 29: // is gettable
+						CMLib.flags().setGettable(I, old.equals("on"));
+						break;
+					case 30: // is removable
+						CMLib.flags().setRemovable(I, old.equals("on"));
+						break;
+					case 31: // is droppable
+						CMLib.flags().setDroppable(I, old.equals("on"));
+						break;
+					case 32: // is two handed
+						if ((I instanceof Weapon) || (I instanceof Armor))
+							I.setRawLogicalAnd(old.equals("on"));
+						break;
+					case 33: // is trapped
+						break;
+					case 34: // readable spells
+						if (((I instanceof SpellHolder))
+								&& (CMClass.classID(I).indexOf("SuperPill") < 0)) {
+							StringBuilder sp = new StringBuilder("");
+							if (httpReq.isUrlParameter("RSPELL1")) {
+								int num = 1;
+								String aff = httpReq.getUrlParameter("RSPELL"
+										+ num);
+								String theparm = httpReq
+										.getUrlParameter("RSPDATA" + num);
+								while ((aff != null) && (theparm != null)) {
+									if (aff.length() > 0) {
+										Ability B = CMClass.getAbility(aff);
+										if (B == null)
+											return "Unknown Ability '" + aff
+													+ "'.";
+										if (sp.length() > 0)
+											sp.append(";");
+										sp.append(B.ID());
+										if (theparm.trim().length() > 0)
+											sp.append("(").append(theparm)
+													.append(")");
+									}
+									num++;
+									aff = httpReq.getUrlParameter("RSPELL"
+											+ num);
+									theparm = httpReq.getUrlParameter("RSPDATA"
+											+ num);
+								}
+							}
+							((SpellHolder) I).setSpellList(sp.toString());
 						}
-						((Recipe)I).setRecipeCodeLines(finalData.toArray(new String[0]));
+						break;
+					case 35: // is wand
+						break;
+					case 36: // uses
+						I.setUsesRemaining(CMath.s_int(old));
+						break;
+					case 37: // value
+						I.setBaseValue(CMath.s_int(old));
+						break;
+					case 38: // weight
+						I.basePhyStats().setWeight(CMath.s_int(old));
+						break;
+					case 39: // is map
+						break;
+					case 40: // map areas
+						if (I instanceof com.planet_ink.coffee_mud.Items.interfaces.RoomMap) {
+							Vector<String> V = new Vector<String>();
+							if (httpReq.isUrlParameter("MAPAREAS")) {
+								old = httpReq.getUrlParameter("MAPAREAS")
+										.trim();
+								if (old.length() > 0)
+									V.add(old);
+								for (int i = 1;; i++)
+									if (httpReq.isUrlParameter("MAPAREAS"
+											+ (Integer.toString(i)))) {
+										old = httpReq
+												.getUrlParameter(
+														"MAPAREAS"
+																+ (Integer
+																		.toString(i)))
+												.trim();
+										if (old.length() > 0)
+											V.add(old);
+									} else
+										break;
+							}
+							old = CMParms.toSemicolonList(V);
+							CMLib.flags().setReadable(I, false);
+							I.setReadableText(old);
+						}
+						break;
+					case 41: // is readable
+						break;
+					case 42: // is pill
+						break;
+					case 43: // is super pill
+						break;
+					case 44: // is potion
+						break;
+					case 45: // liquid types
+						if ((I instanceof Drink) && (!(I instanceof Potion)))
+							((Drink) I).setLiquidType(CMath.s_int(old));
+						break;
+					case 46: // ammo types
+						if (I instanceof Ammunition)
+							((Ammunition) I).setAmmunitionType(old);
+						else if ((I instanceof AmmunitionWeapon)
+								&& (!(I instanceof Wand)))
+							((AmmunitionWeapon) I).setAmmunitionType(old);
+						break;
+					case 47: // ammo capacity
+						if ((I instanceof AmmunitionWeapon)
+								&& (!(I instanceof Wand))) {
+							((AmmunitionWeapon) I).setAmmoCapacity(CMath
+									.s_int(old));
+							if ((((AmmunitionWeapon) I).requiresAmmunition())
+									|| (((AmmunitionWeapon) I)
+											.ammunitionCapacity() > 0))
+								((AmmunitionWeapon) I).setAmmoRemaining(CMath
+										.s_int(old));
+						}
+						break;
+					case 48: // readable spell
+						if (I instanceof Wand)
+							((Wand) I).setSpell(CMClass.findAbility(old));
+						break;
+					case 49: // is map
+						break;
+					case 50: // rideable type
+						if (I instanceof Rideable)
+							((Rideable) I).setRideBasis(CMath.s_int(old));
+						break;
+					case 51: // mob capacity
+						if (I instanceof Rideable)
+							((Rideable) I).setRiderCapacity(CMath.s_int(old));
+						break;
+					case 52: // has a lid
+						if (I instanceof Container)
+							((Container) I).setLidsNLocks(old.equals("on"),
+									!old.equals("on"),
+									((Container) I).hasALock(),
+									((Container) I).hasALock());
+						break;
+					case 53: // has a lock
+						if (I instanceof Container) {
+							boolean hasALid = ((Container) I).hasALid();
+							((Container) I).setLidsNLocks(
+									hasALid || old.equals("on"),
+									!(hasALid || old.equals("on")),
+									old.equals("on"), old.equals("on"));
+						}
+						break;
+					case 54: // key code
+						if ((I instanceof Container)
+								&& (((Container) I).hasALock()))
+							((Container) I).setKeyName(old);
+						break;
+					case 55: // is wallpaper
+						break;
+					case 56: // nourishment
+						if (I instanceof Food)
+							((Food) I).setNourishment(CMath.s_int(old));
+						break;
+					case 57: // container
+						/*
+						 * pushed back to room/mob, where it belongs
+						 * if(!RoomData.isAllNum(old)) I.setContainer(null);
+						 * else if(M==null)
+						 * I.setContainer(RoomData.getItemFromCode(R,old)); else
+						 * I.setContainer(RoomData.getItemFromCode(M,old));
+						 */
+						break;
+					case 58: // is light
+						break;
+					case 59:
+						if (I instanceof Light)
+							((Light) I).setDuration(CMath.s_int(old));
+						break;
+					case 60:
+						if (old.equals("on"))
+							I.basePhyStats().setSensesMask(
+									I.basePhyStats().sensesMask()
+											| PhyStats.SENSE_UNLOCATABLE);
+						else if ((I.basePhyStats().sensesMask() & PhyStats.SENSE_UNLOCATABLE) > 0)
+							I.basePhyStats().setSensesMask(
+									I.basePhyStats().sensesMask()
+											- PhyStats.SENSE_UNLOCATABLE);
+						break;
+					case 61: // is key
+						break;
+					case 62: // content types
+						if ((I instanceof Container)
+								&& (httpReq.isUrlParameter("CONTENTTYPES"))) {
+							long content = CMath.s_long(httpReq
+									.getUrlParameter("CONTENTTYPES"));
+							if (content > 0)
+								for (int i = 1;; i++)
+									if (httpReq.isUrlParameter("CONTENTTYPES"
+											+ (Integer.toString(i))))
+										content = content
+												| CMath.s_int(httpReq.getUrlParameter("CONTENTTYPES"
+														+ (Integer.toString(i))));
+									else
+										break;
+							((Container) I).setContainTypes(content);
+						}
+						break;
+					case 63: // is instrument:
+						break;
+					case 64: // instrumenttype
+						if (I instanceof MusicalInstrument)
+							((MusicalInstrument) I).setInstrumentType(CMath
+									.s_int(old));
+						break;
+					case 65: // isammo
+						break;
+					case 66: // is mob type
+						break;
+					case 67: // is dust
+						break;
+					case 68: // is perfume
+						break;
+					case 69: // smells
+						if (I instanceof Perfume)
+							((Perfume) I).setSmellList(old);
+						break;
+					case 70:
+						I.setImage(old);
+						break;
+					case 71: // is exit
+						break;
+					case 72: // exit name
+						if (I instanceof Exit)
+							((Exit) I).setExitParams(old,
+									((Exit) I).closeWord(),
+									((Exit) I).openWord(),
+									((Exit) I).closedText());
+						break;
+					case 73: // exit closed text
+						if (I instanceof Exit)
+							((Exit) I).setExitParams(((Exit) I).doorName(),
+									((Exit) I).closeWord(),
+									((Exit) I).openWord(), old);
+						break;
+					case 74: // numcoins
+						if (I instanceof Coins)
+							((Coins) I).setNumberOfCoins(CMath.s_long(old));
+						break;
+					case 75: // currency
+						if (I instanceof Coins)
+							((Coins) I).setCurrency(old);
+						break;
+					case 76: // denomination
+						if (I instanceof Coins)
+							((Coins) I).setDenomination(CMath.s_double(old));
+						break;
+					case 77: // isrecipe
+						break;
+					case 78: // recipeskill
+						if (I instanceof Recipe)
+							((Recipe) I).setCommonSkillID(old);
+						break;
+					case 79: // recipedata
+						if (I instanceof Recipe) {
+							String fieldName = parms.get("RECIPEFIELDNAME");
+							if (fieldName == null)
+								return "No recipefieldname!";
+							int x = 0;
+							String thisFieldname = CMStrings.replaceAll(
+									fieldName, "###", "" + x);
+							List<String> finalData = new ArrayList<String>();
+							while (httpReq.isUrlParameter(thisFieldname)) {
+								old = httpReq.getUrlParameter(thisFieldname);
+								finalData.add(CMStrings.replaceAll(old, ",",
+										"\t"));
+								thisFieldname = CMStrings.replaceAll(fieldName,
+										"###", "" + (++x));
+							}
+							((Recipe) I).setRecipeCodeLines(finalData
+									.toArray(new String[0]));
+						}
+						break;
+					case 80: // layer
+						if (I instanceof Armor)
+							((Armor) I).setClothingLayer(CMath.s_short(old));
+						break;
+					case 81: // see-thru
+						if (I instanceof Armor) {
+							if (old.equals("on"))
+								((Armor) I)
+										.setLayerAttributes((short) (((Armor) I)
+												.getLayerAttributes() | Armor.LAYERMASK_SEETHROUGH));
+							else if ((((Armor) I).getLayerAttributes() & Armor.LAYERMASK_SEETHROUGH) > 0)
+								((Armor) I)
+										.setLayerAttributes((short) (((Armor) I)
+												.getLayerAttributes() - Armor.LAYERMASK_SEETHROUGH));
+						}
+						break;
+					case 82: // multi-wear
+						if (I instanceof Armor) {
+							if (old.equals("on"))
+								((Armor) I)
+										.setLayerAttributes((short) (((Armor) I)
+												.getLayerAttributes() | Armor.LAYERMASK_MULTIWEAR));
+							else if ((((Armor) I).getLayerAttributes() & Armor.LAYERMASK_MULTIWEAR) > 0)
+								((Armor) I)
+										.setLayerAttributes((short) (((Armor) I)
+												.getLayerAttributes() - Armor.LAYERMASK_MULTIWEAR));
+						}
+						break;
+					case 83: // iscataloged
+						break;
+					case 84: // catarate
+						if (itemCode.startsWith("CATALOG-")
+								|| itemCode.startsWith("NEWCATA-")) {
+							if (cataData == null)
+								cataData = CMLib.catalog().sampleCataData("");
+							cataData.setRate(CMath.s_pct(old));
+						}
+						break;
+					case 85: // catalive
+						if (itemCode.startsWith("CATALOG-")
+								|| itemCode.startsWith("NEWCATA-")) {
+							if (cataData == null)
+								cataData = CMLib.catalog().sampleCataData("");
+							cataData.setWhenLive((old.equalsIgnoreCase("on")));
+						}
+						break;
+					case 86: // catamask
+						if (itemCode.startsWith("CATALOG-")
+								|| itemCode.startsWith("NEWCATA-")) {
+							if (cataData == null)
+								cataData = CMLib.catalog().sampleCataData("");
+							cataData.setMaskStr(old);
+						}
+						break;
+					case 87: // bite
+						if (I instanceof Food)
+							((Food) I).setBite(CMath.s_int(old));
+						break;
+					case 88: // max uses
+						if (I instanceof Wand)
+							((Wand) I).setMaxUses(CMath.s_int(old));
+						break;
+					case 89: // catacat
+						if (itemCode.startsWith("CATALOG-")
+								|| itemCode.startsWith("NEWCATA-")) {
+							if (cataData == null)
+								cataData = CMLib.catalog().sampleCataData("");
+							cataData.setCatagory(old.toUpperCase().trim());
+						}
+						break;
 					}
-					break;
-				case 80: // layer
-					if(I instanceof Armor)
-						((Armor)I).setClothingLayer(CMath.s_short(old));
-					break;
-				case 81: // see-thru
-					if(I instanceof Armor)
-					{
-						if(old.equals("on"))
-							((Armor)I).setLayerAttributes((short)(((Armor)I).getLayerAttributes()|Armor.LAYERMASK_SEETHROUGH));
-						else
-						if((((Armor)I).getLayerAttributes()&Armor.LAYERMASK_SEETHROUGH)>0)
-							((Armor)I).setLayerAttributes((short)(((Armor)I).getLayerAttributes()-Armor.LAYERMASK_SEETHROUGH));
-					}
-					break;
-				case 82: // multi-wear
-					if(I instanceof Armor)
-					{
-						if(old.equals("on"))
-							((Armor)I).setLayerAttributes((short)(((Armor)I).getLayerAttributes()|Armor.LAYERMASK_MULTIWEAR));
-						else
-						if((((Armor)I).getLayerAttributes()&Armor.LAYERMASK_MULTIWEAR)>0)
-							((Armor)I).setLayerAttributes((short)(((Armor)I).getLayerAttributes()-Armor.LAYERMASK_MULTIWEAR));
-					}
-					break;
-				case 83: // iscataloged
-					break;
-				case 84: // catarate
-					if(itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-					{
-						if(cataData==null) cataData=CMLib.catalog().sampleCataData("");
-						cataData.setRate(CMath.s_pct(old));
-					}
-					break;
-				case 85: // catalive
-					if(itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-					{
-						if(cataData==null) cataData=CMLib.catalog().sampleCataData("");
-						cataData.setWhenLive((old.equalsIgnoreCase("on")));
-					}
-					break;
-				case 86: // catamask
-					if(itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-					{
-						if(cataData==null) cataData=CMLib.catalog().sampleCataData("");
-						cataData.setMaskStr(old);
-					}
-					break;
-				case 87: // bite
-					if(I instanceof Food)
-						((Food)I).setBite(CMath.s_int(old));
-					break;
-				case 88: // max uses
-					if(I instanceof Wand)
-						((Wand)I).setMaxUses(CMath.s_int(old));
-					break;
-				case 89: // catacat
-					if(itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-					{
-						if(cataData==null) cataData=CMLib.catalog().sampleCataData("");
-						cataData.setCatagory(old.toUpperCase().trim());
-					}
-					break;
-				}
 			}
-			if(I.isGeneric()&&(!CMLib.flags().isCataloged(I)))
-			{
-				String error=GrinderExits.dispositions(I,httpReq,parms);
-				if(error.length()>0) return error;
-				error=GrinderAreas.doAffects(I,httpReq,parms);
-				if(error.length()>0) return error;
-				error=GrinderAreas.doBehavs(I,httpReq,parms);
-				if(error.length()>0) return error;
+			if (I.isGeneric() && (!CMLib.flags().isCataloged(I))) {
+				String error = GrinderExits.dispositions(I, httpReq, parms);
+				if (error.length() > 0)
+					return error;
+				error = GrinderAreas.doAffects(I, httpReq, parms);
+				if (error.length() > 0)
+					return error;
+				error = GrinderAreas.doBehavs(I, httpReq, parms);
+				if (error.length() > 0)
+					return error;
 			}
 
 			I.recoverPhyStats();
 			I.text();
-			if(itemCode.startsWith("CATALOG-")||itemCode.startsWith("NEWCATA-"))
-			{
-				Item I2=CMLib.catalog().getCatalogItem(itemCode.substring(8));
-				if((I2!=null)&&(!I.Name().equalsIgnoreCase(I2.Name())))
+			if (itemCode.startsWith("CATALOG-")
+					|| itemCode.startsWith("NEWCATA-")) {
+				Item I2 = CMLib.catalog().getCatalogItem(itemCode.substring(8));
+				if ((I2 != null) && (!I.Name().equalsIgnoreCase(I2.Name())))
 					I.setName(I2.Name());
-				httpReq.addFakeUrlParameter("ITEM",itemCode);
-				if(I2==null)
-				{
-					String catagory=null;
-					if(cataData!=null)
-						catagory=cataData.category();
-					CMLib.catalog().addCatalog(catagory,I);
-					Log.infoOut("GrinderItems",whom.Name()+" created catalog ITEM "+I.Name());
-				}
-				else
-				{
-					if(cataData!=null)
-					{
-						CatalogLibrary.CataData data=CMLib.catalog().getCatalogItemData(I.Name());
+				httpReq.addFakeUrlParameter("ITEM", itemCode);
+				if (I2 == null) {
+					String catagory = null;
+					if (cataData != null)
+						catagory = cataData.category();
+					CMLib.catalog().addCatalog(catagory, I);
+					Log.infoOut("GrinderItems", whom.Name()
+							+ " created catalog ITEM " + I.Name());
+				} else {
+					if (cataData != null) {
+						CatalogLibrary.CataData data = CMLib.catalog()
+								.getCatalogItemData(I.Name());
 						data.build(cataData.data());
 					}
 					CMLib.catalog().updateCatalog(I);
-					Log.infoOut("GrinderItems",whom.Name()+" updated catalog ITEM "+I.Name());
+					Log.infoOut("GrinderItems", whom.Name()
+							+ " updated catalog ITEM " + I.Name());
 				}
 				copyItem.destroy();
-				copyItem=(Item)I.copyOf();
-			}
-			else
-			if(itemCode.equals("NEW"))
-			{
-				if(M==null)
-				{
-					if(R==null)
-					{
+				copyItem = (Item) I.copyOf();
+			} else if (itemCode.equals("NEW")) {
+				if (M == null) {
+					if (R == null) {
 
-					}
-					else
-					{
+					} else {
 						R.addItem(I);
 						R.recoverRoomStats();
 					}
-				}
-				else
-				{
+				} else {
 					M.addItem(I);
 					M.recoverPhyStats();
-					if((mobNum==null)||(!mobNum.startsWith("CATALOG-")))
+					if ((mobNum == null) || (!mobNum.startsWith("CATALOG-")))
 						M.text();
-					if(R!=null) R.recoverRoomStats();
+					if (R != null)
+						R.recoverRoomStats();
 				}
-			}
-			else
-			if(I!=oldI)
-			{
-				ItemPossessor oldOwner=oldI.owner();
-				if(M==null)
-				{
-					if(R==null)
-					{
+			} else if (I != oldI) {
+				ItemPossessor oldOwner = oldI.owner();
+				if (M == null) {
+					if (R == null) {
 
-					}
-					else
-					{
+					} else {
 						R.delItem(oldI);
 						R.addItem(I);
 						R.recoverRoomStats();
-						for(int i=0;i<R.numItems();i++)
-						{
-							Item I2=R.getItem(i);
-							if((I2.container()!=null)
-							&&(I2.container()==oldI))
-								if(I instanceof Container)
-									I2.setContainer((Container)I);
+						for (int i = 0; i < R.numItems(); i++) {
+							Item I2 = R.getItem(i);
+							if ((I2.container() != null)
+									&& (I2.container() == oldI))
+								if (I instanceof Container)
+									I2.setContainer((Container) I);
 								else
 									I2.setContainer(null);
 						}
 					}
-				}
-				else
-				{
+				} else {
 					M.delItem(oldI);
 					M.addItem(I);
 					M.recoverPhyStats();
-					if((mobNum==null)||(!mobNum.startsWith("CATALOG-")))
+					if ((mobNum == null) || (!mobNum.startsWith("CATALOG-")))
 						M.text();
-					if(R!=null) R.recoverRoomStats();
-					for(int i=0;i<M.numItems();i++)
-					{
-						Item I2=M.getItem(i);
-						if((I2.container()!=null)
-						&&(I2.container()==oldI))
-							if(I instanceof Container)
-								I2.setContainer((Container)I);
+					if (R != null)
+						R.recoverRoomStats();
+					for (int i = 0; i < M.numItems(); i++) {
+						Item I2 = M.getItem(i);
+						if ((I2.container() != null)
+								&& (I2.container() == oldI))
+							if (I instanceof Container)
+								I2.setContainer((Container) I);
 							else
 								I2.setContainer(null);
 					}
@@ -721,48 +738,46 @@ public class GrinderItems
 				oldI.setOwner(oldOwner); // necesssary for destroy this to work.
 				oldI.destroy();
 			}
-			if(M==null)
-			{
-				if(R==null)
-				{
-					if((!itemCode.startsWith("CATALOG-"))
-					&&(!itemCode.startsWith("NEWCATA-")))
-					{
+			if (M == null) {
+				if (R == null) {
+					if ((!itemCode.startsWith("CATALOG-"))
+							&& (!itemCode.startsWith("NEWCATA-"))) {
 						RoomData.contributeItems(new XVector<Item>(I));
-						httpReq.addFakeUrlParameter("ITEM",RoomData.getItemCode(RoomData.getItemCache(),I));
+						httpReq.addFakeUrlParameter("ITEM", RoomData
+								.getItemCode(RoomData.getItemCache(), I));
 					}
-				}
-				else
-				{
+				} else {
 					CMLib.database().DBUpdateItems(R);
-					httpReq.addFakeUrlParameter("ITEM",RoomData.getItemCode(R,I));
+					httpReq.addFakeUrlParameter("ITEM",
+							RoomData.getItemCode(R, I));
 					R.startItemRejuv();
 				}
-			}
-			else
-			{
-				if((httpReq.isUrlParameter("BEINGWORN"))
-				&&((httpReq.getUrlParameter("BEINGWORN")).equals("on")))
-				{
+			} else {
+				if ((httpReq.isUrlParameter("BEINGWORN"))
+						&& ((httpReq.getUrlParameter("BEINGWORN")).equals("on"))) {
 					// deprecated back to room/mob, where it belongs
-					//if(I.amWearingAt(Wearable.IN_INVENTORY))
-					//	I.wearEvenIfImpossible(M);
+					// if(I.amWearingAt(Wearable.IN_INVENTORY))
+					// I.wearEvenIfImpossible(M);
 				}
-				//else I.wearAt(Wearable.IN_INVENTORY);
-				if((R!=null)&&(playerM==null))
-				{
+				// else I.wearAt(Wearable.IN_INVENTORY);
+				if ((R != null) && (playerM == null)) {
 					CMLib.database().DBUpdateMOBs(R);
-					httpReq.addFakeUrlParameter("MOB",RoomData.getMOBCode(R,M));
+					httpReq.addFakeUrlParameter("MOB",
+							RoomData.getMOBCode(R, M));
 				}
-				httpReq.addFakeUrlParameter("ITEM",RoomData.getItemCode(M,I));
-				if((mobNum==null)||(mobNum.startsWith("CATALOG-"))||(mobNum.startsWith("NEWCATA-")))
-				{
+				httpReq.addFakeUrlParameter("ITEM", RoomData.getItemCode(M, I));
+				if ((mobNum == null) || (mobNum.startsWith("CATALOG-"))
+						|| (mobNum.startsWith("NEWCATA-"))) {
 					CMLib.catalog().updateCatalog(M);
 					M.text();
 				}
 			}
-			if(!copyItem.sameAs(I))
-				Log.sysOut("Grinder",whom.Name()+" modified item "+copyItem.Name()+((M!=null)?" on mob "+M.Name():"")+((R!=null)?" in room "+R.roomID():"")+".");
+			if (!copyItem.sameAs(I))
+				Log.sysOut("Grinder",
+						whom.Name() + " modified item " + copyItem.Name()
+								+ ((M != null) ? " on mob " + M.Name() : "")
+								+ ((R != null) ? " in room " + R.roomID() : "")
+								+ ".");
 			copyItem.destroy();
 		}
 		return "";

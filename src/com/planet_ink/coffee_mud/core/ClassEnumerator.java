@@ -29,13 +29,13 @@ public class ClassEnumerator {
 				className = pkgname
 						+ fileName.substring(0, fileName.length() - 6);
 			}
-			
-			if (className != null  && !fileName.contains("$")) {
+
+			if (className != null && !fileName.contains("$")) {
 				Class<?> klass = loadClass(className);
-				if (limitor.isAssignableFrom(klass)){
+				if (limitor.isAssignableFrom(klass)) {
 					classes.add(klass);
 				}
-				
+
 			}
 		}
 	}
@@ -55,11 +55,11 @@ public class ClassEnumerator {
 					e);
 		} finally {
 			try {
-				if (jarFile != null){
+				if (jarFile != null) {
 					jarFile.close();
 				}
 			} catch (Exception e) {
-				//swallow
+				// swallow
 			}
 		}
 		Enumeration<JarEntry> entries = jarFile.entries();
@@ -78,7 +78,8 @@ public class ClassEnumerator {
 		}
 	}
 
-	public static void getClassesForPackage(String pkgname, Collection<Class<?>> classes, Class<?> limitor ) {
+	public static void getClassesForPackage(String pkgname,
+			Collection<Class<?>> classes, Class<?> limitor) {
 		String relPath = pkgname.replace('.', '/');
 		URL resource = ClassLoader.getSystemClassLoader().getResource(relPath);
 		if (resource == null) {
@@ -90,7 +91,8 @@ public class ClassEnumerator {
 		if (resource.toString().startsWith("jar:")) {
 			processJarfile(resource, pkgname, classes);
 		} else {
-			processDirectory(new File(resource.getPath()), pkgname, classes , limitor);
+			processDirectory(new File(resource.getPath()), pkgname, classes,
+					limitor);
 		}
 	}
 }

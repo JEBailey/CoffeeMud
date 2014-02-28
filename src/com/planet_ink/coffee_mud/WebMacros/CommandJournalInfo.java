@@ -5,61 +5,71 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class CommandJournalInfo extends StdWebMacro
-{
-	public String name() { return "CommandJournalInfo"; }
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class CommandJournalInfo extends StdWebMacro {
+	public String name() {
+		return "CommandJournalInfo";
+	}
 
-	public boolean isAdminMacro() { return true; }
-	
-	public String runMacro(HTTPRequest httpReq, String parm)
-	{
-		java.util.Map<String,String> parms=parseParms(parm);
-		String last=httpReq.getUrlParameter("COMMANDJOURNAL");
-		StringBuffer str=new StringBuffer("");
-		if(parms.containsKey("ALLFLAGS"))
-		{
-			for(JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags.values())
-				str.append("FLAG_"+flag.name()).append(", ");
-		}
-		else
-		if(last==null) 
+	public boolean isAdminMacro() {
+		return true;
+	}
+
+	public String runMacro(HTTPRequest httpReq, String parm) {
+		java.util.Map<String, String> parms = parseParms(parm);
+		String last = httpReq.getUrlParameter("COMMANDJOURNAL");
+		StringBuffer str = new StringBuffer("");
+		if (parms.containsKey("ALLFLAGS")) {
+			for (JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags
+					.values())
+				str.append("FLAG_" + flag.name()).append(", ");
+		} else if (last == null)
 			return " @break@";
-		if(last.length()>0)
-		{
-			final JournalsLibrary.CommandJournal C=CMLib.journals().getCommandJournal(last);
-			if(C==null) return " @break@";
-			if(parms.containsKey("ID"))
+		if (last.length() > 0) {
+			final JournalsLibrary.CommandJournal C = CMLib.journals()
+					.getCommandJournal(last);
+			if (C == null)
+				return " @break@";
+			if (parms.containsKey("ID"))
 				str.append(C.NAME()).append(", ");
-			if(parms.containsKey("NAME"))
+			if (parms.containsKey("NAME"))
 				str.append(C.NAME()).append(", ");
-			if(parms.containsKey("JOURNALNAME"))
+			if (parms.containsKey("JOURNALNAME"))
 				str.append(C.JOURNAL_NAME()).append(", ");
-			if(parms.containsKey("MASK"))
+			if (parms.containsKey("MASK"))
 				str.append(C.mask()).append(", ");
-			if(parms.containsKey("FLAGSET"))
-				for(JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags.values())
-					httpReq.addFakeUrlParameter("FLAG_"+flag.name(), C.getFlag(flag)!=null?((C.getFlag(flag).length()==0)?"on":C.getFlag(flag)):"");
-			for(JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags.values())
-				if(parms.containsKey("FLAG_"+flag.name().toUpperCase().trim()))
-					str.append(C.getFlag(flag)!=null?((C.getFlag(flag).length()==0)?"on":C.getFlag(flag)):"").append(", ");
+			if (parms.containsKey("FLAGSET"))
+				for (JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags
+						.values())
+					httpReq.addFakeUrlParameter("FLAG_" + flag.name(),
+							C.getFlag(flag) != null ? ((C.getFlag(flag)
+									.length() == 0) ? "on" : C.getFlag(flag))
+									: "");
+			for (JournalsLibrary.CommandJournalFlags flag : JournalsLibrary.CommandJournalFlags
+					.values())
+				if (parms.containsKey("FLAG_"
+						+ flag.name().toUpperCase().trim()))
+					str.append(
+							C.getFlag(flag) != null ? ((C.getFlag(flag)
+									.length() == 0) ? "on" : C.getFlag(flag))
+									: "").append(", ");
 		}
-		String strstr=str.toString();
-		if(strstr.endsWith(", "))
-			strstr=strstr.substring(0,strstr.length()-2);
+		String strstr = str.toString();
+		if (strstr.endsWith(", "))
+			strstr = strstr.substring(0, strstr.length() - 2);
 		return clearWebMacros(strstr);
 	}
 }

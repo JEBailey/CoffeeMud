@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Behaviors;
+
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -20,152 +21,139 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class InstantDeath extends ActiveTicker
-{
-	public String ID(){return "InstantDeath";}
-	public long flags() { return super.flags()|Behavior.FLAG_POTENTIALLYAUTODEATHING; }
-	protected CompiledZapperMask mask=null;
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class InstantDeath extends ActiveTicker {
+	public String ID() {
+		return "InstantDeath";
+	}
 
-	public InstantDeath()
-	{
+	public long flags() {
+		return super.flags() | Behavior.FLAG_POTENTIALLYAUTODEATHING;
+	}
+
+	protected CompiledZapperMask mask = null;
+
+	public InstantDeath() {
 		super();
-		minTicks=1;maxTicks=1;chance=100;
+		minTicks = 1;
+		maxTicks = 1;
+		chance = 100;
 		tickReset();
 	}
 
-	public void setParms(String parms)
-	{
+	public void setParms(String parms) {
 		super.setParms(parms);
-		String maskStr=CMParms.getParmStr(parms,"mask","");
-		mask=null;
-		if((maskStr!=null)&&(maskStr.trim().length()>0))
-			mask=CMLib.masking().getPreCompiledMask(maskStr);
+		String maskStr = CMParms.getParmStr(parms, "mask", "");
+		mask = null;
+		if ((maskStr != null) && (maskStr.trim().length() > 0))
+			mask = CMLib.masking().getPreCompiledMask(maskStr);
 	}
-	
-	boolean activated=false;
 
-	public String accountForYourself()
-	{ 
+	boolean activated = false;
+
+	public String accountForYourself() {
 		return "instant killing";
 	}
 
-	public void killEveryoneHere(MOB spareMe, Room R)
-	{
-		if(R==null) return;
-		Vector V=new Vector();
-		for(int i=0;i<R.numInhabitants();i++)
-		{
-			MOB M=R.fetchInhabitant(i);
-			if((spareMe!=null)&&(spareMe==M))
+	public void killEveryoneHere(MOB spareMe, Room R) {
+		if (R == null)
+			return;
+		Vector V = new Vector();
+		for (int i = 0; i < R.numInhabitants(); i++) {
+			MOB M = R.fetchInhabitant(i);
+			if ((spareMe != null) && (spareMe == M))
 				continue;
-			if((M!=null)
-			&&(!CMSecurity.isAllowed(M,R,CMSecurity.SecFlag.IMMORT))
-			&&((mask==null)||(CMLib.masking().maskCheck(mask, M, false))))
+			if ((M != null)
+					&& (!CMSecurity.isAllowed(M, R, CMSecurity.SecFlag.IMMORT))
+					&& ((mask == null) || (CMLib.masking().maskCheck(mask, M,
+							false))))
 				V.addElement(M);
 		}
-		for(int v=0;v<V.size();v++)
-		{
-			MOB M=(MOB)V.elementAt(v);
-			CMLib.combat().postDeath(null,M,null);
+		for (int v = 0; v < V.size(); v++) {
+			MOB M = (MOB) V.elementAt(v);
+			CMLib.combat().postDeath(null, M, null);
 		}
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		super.tick(ticking,tickID);
-		if(!activated) return true;
-		if(canAct(ticking,tickID))
-		{
-			if(ticking instanceof MOB)
-			{
-				MOB mob=(MOB)ticking;
-				Room room=mob.location();
-				if(room!=null)
-					killEveryoneHere(mob,room);
-			}
-			else
-			if(ticking instanceof Item)
-			{
-				Item item=(Item)ticking;
-				Environmental E=item.owner();
-				if(E==null) return true;
-				Room room=getBehaversRoom(ticking);
-				if(room==null) return true;
-				if((E instanceof MOB)&&((mask==null)||(CMLib.masking().maskCheck(mask, E, false))))
-					CMLib.combat().postDeath(null,(MOB)E,null);
-				else
-				if(E instanceof Room)
-					killEveryoneHere(null,(Room)E);
+	public boolean tick(Tickable ticking, int tickID) {
+		super.tick(ticking, tickID);
+		if (!activated)
+			return true;
+		if (canAct(ticking, tickID)) {
+			if (ticking instanceof MOB) {
+				MOB mob = (MOB) ticking;
+				Room room = mob.location();
+				if (room != null)
+					killEveryoneHere(mob, room);
+			} else if (ticking instanceof Item) {
+				Item item = (Item) ticking;
+				Environmental E = item.owner();
+				if (E == null)
+					return true;
+				Room room = getBehaversRoom(ticking);
+				if (room == null)
+					return true;
+				if ((E instanceof MOB)
+						&& ((mask == null) || (CMLib.masking().maskCheck(mask,
+								E, false))))
+					CMLib.combat().postDeath(null, (MOB) E, null);
+				else if (E instanceof Room)
+					killEveryoneHere(null, (Room) E);
 				room.recoverRoomStats();
-			}
-			else
-			if(ticking instanceof Room)
-				killEveryoneHere(null,(Room)ticking);
-			else
-			if(ticking instanceof Area)
-			{
-				for(Enumeration r=((Area)ticking).getMetroMap();r.hasMoreElements();)
-				{
-					Room R=(Room)r.nextElement();
-					killEveryoneHere(null,R);
+			} else if (ticking instanceof Room)
+				killEveryoneHere(null, (Room) ticking);
+			else if (ticking instanceof Area) {
+				for (Enumeration r = ((Area) ticking).getMetroMap(); r
+						.hasMoreElements();) {
+					Room R = (Room) r.nextElement();
+					killEveryoneHere(null, R);
 				}
 			}
 		}
 		return true;
 	}
 
-	public void executeMsg(Environmental affecting, CMMsg msg)
-	{
-		super.executeMsg(affecting,msg);
-		if(activated) return;
-		if(msg.amITarget(affecting))
-		{
-			if(affecting instanceof MOB)
-			{
-				if((msg.targetMajor(CMMsg.MASK_MALICIOUS))
-				&&(!msg.source().isMonster()))
-					activated=true;
-			}
-			else
-			if((affecting instanceof Food)
-			||(affecting instanceof Drink))
-			{
-				if((msg.targetMinor()==CMMsg.TYP_EAT)
-				||(msg.targetMinor()==CMMsg.TYP_DRINK))
-					activated=true;
-			}
-			else
-			if((affecting instanceof Armor)
-			||(affecting instanceof Weapon))
-			{
-				if((msg.targetMinor()==CMMsg.TYP_WEAR)
-				||(msg.targetMinor()==CMMsg.TYP_HOLD)
-				||(msg.targetMinor()==CMMsg.TYP_WIELD))
-					activated=true;
-			}
-			else
-			if(affecting instanceof Item)
-			{
-				if((msg.targetMinor()==CMMsg.TYP_GET)||(msg.targetMinor()==CMMsg.TYP_PUSH)||(msg.targetMinor()==CMMsg.TYP_PULL))
-					activated=true;
-			}
-			else
-				activated=true;
+	public void executeMsg(Environmental affecting, CMMsg msg) {
+		super.executeMsg(affecting, msg);
+		if (activated)
+			return;
+		if (msg.amITarget(affecting)) {
+			if (affecting instanceof MOB) {
+				if ((msg.targetMajor(CMMsg.MASK_MALICIOUS))
+						&& (!msg.source().isMonster()))
+					activated = true;
+			} else if ((affecting instanceof Food)
+					|| (affecting instanceof Drink)) {
+				if ((msg.targetMinor() == CMMsg.TYP_EAT)
+						|| (msg.targetMinor() == CMMsg.TYP_DRINK))
+					activated = true;
+			} else if ((affecting instanceof Armor)
+					|| (affecting instanceof Weapon)) {
+				if ((msg.targetMinor() == CMMsg.TYP_WEAR)
+						|| (msg.targetMinor() == CMMsg.TYP_HOLD)
+						|| (msg.targetMinor() == CMMsg.TYP_WIELD))
+					activated = true;
+			} else if (affecting instanceof Item) {
+				if ((msg.targetMinor() == CMMsg.TYP_GET)
+						|| (msg.targetMinor() == CMMsg.TYP_PUSH)
+						|| (msg.targetMinor() == CMMsg.TYP_PULL))
+					activated = true;
+			} else
+				activated = true;
 		}
 	}
 }

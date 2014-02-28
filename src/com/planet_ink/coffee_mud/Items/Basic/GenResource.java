@@ -1,27 +1,29 @@
 package com.planet_ink.coffee_mud.Items.Basic;
+
 import com.planet_ink.coffee_mud.Items.interfaces.RawMaterial;
 import com.planet_ink.coffee_mud.core.CMLib;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class GenResource extends GenItem implements RawMaterial
-{
-	public String ID(){	return "GenResource";}
-	public GenResource()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class GenResource extends GenItem implements RawMaterial {
+	public String ID() {
+		return "GenResource";
+	}
+
+	public GenResource() {
 		super();
 		setName("a pile of resource thing");
 		setDisplayText("a pile of resource sits here.");
@@ -31,9 +33,21 @@ public class GenResource extends GenItem implements RawMaterial
 		recoverPhyStats();
 	}
 
-	protected String domainSource=null;
-	public String domainSource(){return domainSource;}
-	public void setDomainSource(String src){domainSource=src;}
-	public boolean rebundle(){return CMLib.materials().rebundle(this);}
-	public void quickDestroy(){ CMLib.materials().quickDestroy(this);}
+	protected String domainSource = null;
+
+	public String domainSource() {
+		return domainSource;
+	}
+
+	public void setDomainSource(String src) {
+		domainSource = src;
+	}
+
+	public boolean rebundle() {
+		return CMLib.materials().rebundle(this);
+	}
+
+	public void quickDestroy() {
+		CMLib.materials().quickDestroy(this);
+	}
 }

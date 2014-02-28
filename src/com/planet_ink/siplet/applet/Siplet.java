@@ -1,4 +1,5 @@
 package com.planet_ink.siplet.applet;
+
 import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -11,282 +12,269 @@ import java.net.Socket;
 import com.planet_ink.siplet.support.TelnetFilter;
 
 /*
-Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class Siplet
-{
-	public final static boolean debugDataOut=false;
-	
-	public final static long serialVersionUID=7;
-	public static final float VERSION_MAJOR=(float)2.1;
-	public static final long  VERSION_MINOR=0;
-	protected StringBuffer buf=new StringBuffer("");
-	protected String lastURL="coffeemud.net";
-	protected int lastPort=23;
-	protected Socket sock=null;
-	protected InputStream rawin=null;
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Siplet {
+	public final static boolean debugDataOut = false;
+
+	public final static long serialVersionUID = 7;
+	public static final float VERSION_MAJOR = (float) 2.1;
+	public static final long VERSION_MINOR = 0;
+	protected StringBuffer buf = new StringBuffer("");
+	protected String lastURL = "coffeemud.net";
+	protected int lastPort = 23;
+	protected Socket sock = null;
+	protected InputStream rawin = null;
 	protected BufferedReader[] in;
 	protected DataOutputStream out;
-	protected boolean connected=false;
-	protected TelnetFilter Telnet=new TelnetFilter(this);
+	protected boolean connected = false;
+	protected TelnetFilter Telnet = new TelnetFilter(this);
 
 	protected StringBuffer buffer;
-	protected int sillyCounter=0;
+	protected int sillyCounter = 0;
 
-	public enum MSPStatus { Disabled, Internal, External }
+	public enum MSPStatus {
+		Disabled, Internal, External
+	}
 
-	public void setFeatures(boolean mxp, MSPStatus msp, boolean mccp)
-	{
+	public void setFeatures(boolean mxp, MSPStatus msp, boolean mccp) {
 		Telnet.setNeverMCCPSupport(!mccp);
 		Telnet.setNeverMXPSupport(!mxp);
 		Telnet.setNeverMSPSupport(msp);
 	}
-	
-	public void init()
-	{
+
+	public void init() {
 		buffer = new StringBuffer();
 	}
 
-	public String info()
-	{
-		return "Siplet V"+VERSION_MAJOR+"."+VERSION_MINOR+" (C)2005-2014 Bo Zimmerman";
+	public String info() {
+		return "Siplet V" + VERSION_MAJOR + "." + VERSION_MINOR
+				+ " (C)2005-2014 Bo Zimmerman";
 	}
 
-	public void start()
-	{
-		if(debugDataOut) System.out.println("starting siplet "+VERSION_MAJOR+"."+VERSION_MINOR+" ");
+	public void start() {
+		if (debugDataOut)
+			System.out.println("starting siplet " + VERSION_MAJOR + "."
+					+ VERSION_MINOR + " ");
 	}
 
-	public void stop()
-	{
-		if(debugDataOut) System.out.println("!stopped siplet!");
+	public void stop() {
+		if (debugDataOut)
+			System.out.println("!stopped siplet!");
 	}
 
-	public void destroy()
-	{
+	public void destroy() {
 	}
-	
-	public Siplet create() { return new Siplet();}
 
-	public void addItem(String newWord)
-	{
-		if(debugDataOut) System.out.println(newWord);
+	public Siplet create() {
+		return new Siplet();
+	}
+
+	public void addItem(String newWord) {
+		if (debugDataOut)
+			System.out.println(newWord);
 		buffer.append(newWord);
-		//repaint();
+		// repaint();
 	}
 
-	public void paint(Graphics g)
-	{
+	public void paint(Graphics g) {
 		// uncomment if we go back to being an applet
-		//g.drawRect(0, 0, getSize().width - 1, getSize().height - 1);
-		//g.drawString(buffer.toString(), 5, 15);
+		// g.drawRect(0, 0, getSize().width - 1, getSize().height - 1);
+		// g.drawString(buffer.toString(), 5, 15);
 	}
 
-	public boolean connectToURL(){ return connectToURL(lastURL,lastPort);}
-	public boolean connectToURL(String url, int port)
-	{
-		connected=false;
-		if(sock!=null)
-			disconnectFromURL();
-		try
-		{
-			lastURL=url;
-			lastPort=port;
-			if(debugDataOut) System.out.println("connecting to "+url+":"+port+" ");
-			sock=new Socket(InetAddress.getByName(url),port);
-			Thread.sleep(100);
-			rawin=sock.getInputStream();
-			in=new BufferedReader[1];
-			in[0]=new BufferedReader(new InputStreamReader(sock.getInputStream(),"iso-8859-1"));
-			out=new DataOutputStream(sock.getOutputStream());
-			Telnet=new TelnetFilter(this);
-			connected=true;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace(System.out);
-			return false;
-		}
-		return true;
+	public boolean connectToURL() {
+		return connectToURL(lastURL, lastPort);
 	}
-	public boolean connectToURL(String url, int port, Socket sock)
-	{
-		connected=false;
-		if(this.sock!=null)
+
+	public boolean connectToURL(String url, int port) {
+		connected = false;
+		if (sock != null)
 			disconnectFromURL();
-		try
-		{
-			lastURL=url;
-			lastPort=port;
-			if(debugDataOut) System.out.println("internal connect to "+url+":"+port+" ");
-			this.sock=sock;
-			rawin=sock.getInputStream();
-			in=new BufferedReader[1];
-			in[0]=new BufferedReader(new InputStreamReader(sock.getInputStream(),"iso-8859-1"));
-			out=new DataOutputStream(sock.getOutputStream());
-			Telnet=new TelnetFilter(this);
-			connected=true;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace(System.out);
-			return false;
-		}
-		return true;
-	}
-	
-	public void disconnectFromURL()
-	{
-		connected=false;
 		try {
-			if(out!=null)
-			{
-				out.write(new byte[]{(byte)255,(byte)253,18}); //iac, iacdo, logout 
+			lastURL = url;
+			lastPort = port;
+			if (debugDataOut)
+				System.out.println("connecting to " + url + ":" + port + " ");
+			sock = new Socket(InetAddress.getByName(url), port);
+			Thread.sleep(100);
+			rawin = sock.getInputStream();
+			in = new BufferedReader[1];
+			in[0] = new BufferedReader(new InputStreamReader(
+					sock.getInputStream(), "iso-8859-1"));
+			out = new DataOutputStream(sock.getOutputStream());
+			Telnet = new TelnetFilter(this);
+			connected = true;
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			return false;
+		}
+		return true;
+	}
+
+	public boolean connectToURL(String url, int port, Socket sock) {
+		connected = false;
+		if (this.sock != null)
+			disconnectFromURL();
+		try {
+			lastURL = url;
+			lastPort = port;
+			if (debugDataOut)
+				System.out.println("internal connect to " + url + ":" + port
+						+ " ");
+			this.sock = sock;
+			rawin = sock.getInputStream();
+			in = new BufferedReader[1];
+			in[0] = new BufferedReader(new InputStreamReader(
+					sock.getInputStream(), "iso-8859-1"));
+			out = new DataOutputStream(sock.getOutputStream());
+			Telnet = new TelnetFilter(this);
+			connected = true;
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			return false;
+		}
+		return true;
+	}
+
+	public void disconnectFromURL() {
+		connected = false;
+		try {
+			if (out != null) {
+				out.write(new byte[] { (byte) 255, (byte) 253, 18 }); // iac,
+																		// iacdo,
+																		// logout
 				out.flush();
 			}
-		} catch(Exception e) { }
+		} catch (Exception e) {
+		}
 		try {
-			if((in!=null)&&(in[0]!=null))
+			if ((in != null) && (in[0] != null))
 				in[0].close();
-		} catch(Exception e) { }
+		} catch (Exception e) {
+		}
 		try {
-			if(out!=null)
+			if (out != null)
 				out.close();
-		} catch(Exception e) { }
+		} catch (Exception e) {
+		}
 		try {
-			if(sock!=null)
+			if (sock != null)
 				sock.close();
-		} catch(Exception e) { }
-		in=null;
-		out=null;
-		sock=null;
+		} catch (Exception e) {
+		}
+		in = null;
+		out = null;
+		sock = null;
 	}
 
-	public void sendData(String data)
-	{
-		if(connected)
-		{
-			try
-			{
-				if(sock.isClosed())
+	public void sendData(String data) {
+		if (connected) {
+			try {
+				if (sock.isClosed())
 					disconnectFromURL();
-				else
-				if(!sock.isConnected())
+				else if (!sock.isConnected())
 					disconnectFromURL();
-				else
-				{
-					byte[] bytes=Telnet.peruseInput(data);
-					if(bytes!=null)
-					{
+				else {
+					byte[] bytes = Telnet.peruseInput(data);
+					if (bytes != null) {
 						out.write(bytes);
-						if((bytes.length==0)||((bytes[bytes.length-1]!=13)&&(bytes[bytes.length-1]!=10)))
+						if ((bytes.length == 0)
+								|| ((bytes[bytes.length - 1] != 13) && (bytes[bytes.length - 1] != 10)))
 							out.writeBytes("\n");
 						out.flush();
 					}
 				}
-			}
-			catch(IOException e)
-			{
+			} catch (IOException e) {
 				disconnectFromURL();
 			}
 		}
 	}
-	public String getJScriptCommands()
-	{ 
+
+	public String getJScriptCommands() {
 		return Telnet.getEnquedJScript();
 	}
 
-	public String getURLData()
-	{
-		synchronized(buf)
-		{
-			String s=Telnet.getEnquedResponses();
-			if(s.length()>0)  sendData(s);
-			StringBuilder data=new StringBuilder("");
-			if(Telnet.MSDPsupport())
+	public String getURLData() {
+		synchronized (buf) {
+			String s = Telnet.getEnquedResponses();
+			if (s.length() > 0)
+				sendData(s);
+			StringBuilder data = new StringBuilder("");
+			if (Telnet.MSDPsupport())
 				data.append(Telnet.getMsdpHtml());
-			if(Telnet.GMCPsupport())
+			if (Telnet.GMCPsupport())
 				data.append(Telnet.getGmcpHtml());
-			int endAt=Telnet.HTMLFilter(buf);
-			if(buf.length()==0) return data.toString();
-			if(endAt<0) endAt=buf.length();
-			if(endAt==0) return data.toString();
-			if(Telnet.isUIonHold()) return data.toString();
-			if(endAt<buf.length())
-			{
-				data.append(buf.substring(0,endAt));
-				buf.delete(0,endAt);
-			}
-			else
-			{
+			int endAt = Telnet.HTMLFilter(buf);
+			if (buf.length() == 0)
+				return data.toString();
+			if (endAt < 0)
+				endAt = buf.length();
+			if (endAt == 0)
+				return data.toString();
+			if (Telnet.isUIonHold())
+				return data.toString();
+			if (endAt < buf.length()) {
+				data.append(buf.substring(0, endAt));
+				buf.delete(0, endAt);
+			} else {
 				data.append(buf.toString());
 				buf.setLength(0);
 			}
-			if(debugDataOut) if(data.length()>0) System.out.println("/DATA="+data.toString());
+			if (debugDataOut)
+				if (data.length() > 0)
+					System.out.println("/DATA=" + data.toString());
 			return data.toString();
 		}
 	}
 
+	public boolean isConnectedToURL() {
+		return connected;
+	}
 
-	public boolean isConnectedToURL(){return connected;}
-
-	public void readURLData()
-	{
-		try
-		{
-			while(connected
-			&&in[0].ready()
-			&&(!sock.isClosed())
-			&&(sock.isConnected()))
-			{
-				try
-				{
-					Telnet.TelnetRead(buf,rawin,in);
-				}
-				catch(java.io.InterruptedIOException e)
-				{
+	public void readURLData() {
+		try {
+			while (connected && in[0].ready() && (!sock.isClosed())
+					&& (sock.isConnected())) {
+				try {
+					Telnet.TelnetRead(buf, rawin, in);
+				} catch (java.io.InterruptedIOException e) {
 					disconnectFromURL();
 					return;
-				}
-				catch(Exception e)
-				{
-					if(e instanceof com.jcraft.jzlib.ZStreamException)
-					{
+				} catch (Exception e) {
+					if (e instanceof com.jcraft.jzlib.ZStreamException) {
 						disconnectFromURL();
-						try{Thread.sleep(100);}catch(Exception e2){}
+						try {
+							Thread.sleep(100);
+						} catch (Exception e2) {
+						}
 						connectToURL();
-					}
-					else
-					{
+					} else {
 						disconnectFromURL();
 						return;
 					}
 				}
 			}
-			if(sock.isClosed())
+			if (sock.isClosed())
 				disconnectFromURL();
-			else
-			if(!sock.isConnected())
+			else if (!sock.isConnected())
 				disconnectFromURL();
-			else
-			if(buf.length()>0)
-				Telnet.TelenetFilter(buf,out,rawin,in);
+			else if (buf.length() > 0)
+				Telnet.TelenetFilter(buf, out, rawin, in);
 
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			disconnectFromURL();
 			return;
 		}

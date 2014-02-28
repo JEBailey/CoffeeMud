@@ -8,87 +8,93 @@ import com.planet_ink.coffee_mud.Libraries.interfaces.AreaGenerationLibrary.Layo
 import com.planet_ink.coffee_mud.core.Directions;
 
 /*
-Copyright 2007-2014 Bo Zimmerman
+ Copyright 2007-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class BoxCitySquareLayout extends BoxCityLayout 
-{
-	public String name() { return "BOXCITYSQUARE";}
-	
-	protected void drawABox(LayoutSet lSet, int width, int height)
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class BoxCitySquareLayout extends BoxCityLayout {
+	public String name() {
+		return "BOXCITYSQUARE";
+	}
+
+	protected void drawABox(LayoutSet lSet, int width, int height) {
 		lSet.drawABox(width, height);
-		int x = 0 + ((width - 0)/2);
-		int y = -(0 + ((height - 0)/2));
-		LayoutNode center = lSet.getNode(x,y);
-		if(center == null)
-		{
-			center = new DefaultLayoutNode(x,y);
-			lSet.use(center,LayoutTypes.square);
+		int x = 0 + ((width - 0) / 2);
+		int y = -(0 + ((height - 0) / 2));
+		LayoutNode center = lSet.getNode(x, y);
+		if (center == null) {
+			center = new DefaultLayoutNode(x, y);
+			lSet.use(center, LayoutTypes.square);
 		}
 		Vector<long[]> square = new Vector<long[]>();
-		square.add(new long[]{x-1,y-1});
-		square.add(new long[]{x,y-1});
-		square.add(new long[]{x+1,y-1});
-		square.add(new long[]{x+1,y});
-		square.add(new long[]{x+1,y+1});
-		square.add(new long[]{x,y+1});
-		square.add(new long[]{x-1,y+1});
-		square.add(new long[]{x-1,y});
-		square.add(new long[]{x-1,y-1});
+		square.add(new long[] { x - 1, y - 1 });
+		square.add(new long[] { x, y - 1 });
+		square.add(new long[] { x + 1, y - 1 });
+		square.add(new long[] { x + 1, y });
+		square.add(new long[] { x + 1, y + 1 });
+		square.add(new long[] { x, y + 1 });
+		square.add(new long[] { x - 1, y + 1 });
+		square.add(new long[] { x - 1, y });
+		square.add(new long[] { x - 1, y - 1 });
 		LayoutNode n;
 		LayoutNode lastNode = center;
-		for(long[] sq : square)
-		{
+		for (long[] sq : square) {
 			n = lSet.getNode(sq);
-			if(n==null)
-			{
+			if (n == null) {
 				n = new DefaultLayoutNode(sq);
-				lSet.use(n,LayoutTypes.square);
-			}
-			else
+				lSet.use(n, LayoutTypes.square);
+			} else
 				n.reType(LayoutTypes.square);
 			lastNode.crossLink(n);
 			lastNode = n;
 		}
 		LayoutNode n2;
-		n = lSet.getNextNode( center, Directions.NORTH);
-		if(n != null) center.crossLink(n);
-		n2 = lSet.getNextNode( n, Directions.NORTH);
-		if((n2 != null)&&(n!=null)) n.crossLink(n2);
-		n = lSet.getNextNode( center, Directions.SOUTH);
-		if(n != null) center.crossLink(n);
-		n2 = lSet.getNextNode( n, Directions.SOUTH);
-		if((n2 != null)&&(n!=null)) n.crossLink(n2);
-		n = lSet.getNextNode( center, Directions.EAST);
-		if(n != null) center.crossLink(n);
-		n2 = lSet.getNextNode( n, Directions.EAST);
-		if((n2 != null)&&(n!=null)) n.crossLink(n2);
-		n = lSet.getNextNode( center, Directions.WEST);
-		if(n != null) center.crossLink(n);
-		n2 = lSet.getNextNode( n, Directions.WEST);
-		if((n2 != null)&&(n!=null)) n.crossLink(n2);
-		for(long[] sq : square) {
+		n = lSet.getNextNode(center, Directions.NORTH);
+		if (n != null)
+			center.crossLink(n);
+		n2 = lSet.getNextNode(n, Directions.NORTH);
+		if ((n2 != null) && (n != null))
+			n.crossLink(n2);
+		n = lSet.getNextNode(center, Directions.SOUTH);
+		if (n != null)
+			center.crossLink(n);
+		n2 = lSet.getNextNode(n, Directions.SOUTH);
+		if ((n2 != null) && (n != null))
+			n.crossLink(n2);
+		n = lSet.getNextNode(center, Directions.EAST);
+		if (n != null)
+			center.crossLink(n);
+		n2 = lSet.getNextNode(n, Directions.EAST);
+		if ((n2 != null) && (n != null))
+			n.crossLink(n2);
+		n = lSet.getNextNode(center, Directions.WEST);
+		if (n != null)
+			center.crossLink(n);
+		n2 = lSet.getNextNode(n, Directions.WEST);
+		if ((n2 != null) && (n != null))
+			n.crossLink(n2);
+		for (long[] sq : square) {
 			n = lSet.getNode(sq);
-			for(int d=0;d<4;d++) {
-				n2 = lSet.getNextNode( n, d);
-				if(n2!=null) {
-					if(n.getLink(d)==n2) continue;
-					if(!n2.isStreetLike()) continue;
-					Enumeration<LayoutNode> nodes=n2.links().elements();
-					LayoutNode p_1=nodes.nextElement();
-					LayoutNode p_2=nodes.nextElement();
+			for (int d = 0; d < 4; d++) {
+				n2 = lSet.getNextNode(n, d);
+				if (n2 != null) {
+					if (n.getLink(d) == n2)
+						continue;
+					if (!n2.isStreetLike())
+						continue;
+					Enumeration<LayoutNode> nodes = n2.links().elements();
+					LayoutNode p_1 = nodes.nextElement();
+					LayoutNode p_2 = nodes.nextElement();
 					n2.deLink();
 					p_1.crossLink(p_2);
 					lSet.unUse(n2);

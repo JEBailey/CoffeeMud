@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Songs;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.MOBS.interfaces.MOB;
@@ -8,58 +9,89 @@ import com.planet_ink.coffee_mud.core.CMStrings;
 import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Song_Comprehension extends Song
-{
-	public String ID() { return "Song_Comprehension"; }
-	public String name(){ return "Comprehension";}
-	public int abstractQuality(){ return Ability.QUALITY_OK_OTHERS;}
-	protected boolean HAS_QUANTITATIVE_ASPECT(){return false;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Song_Comprehension extends Song {
+	public String ID() {
+		return "Song_Comprehension";
+	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
-		if((affected instanceof MOB)
-		&&(!msg.amISource((MOB)affected))
-		&&((msg.sourceMinor()==CMMsg.TYP_SPEAK)
-		   ||(msg.sourceMinor()==CMMsg.TYP_TELL)
-		   ||(CMath.bset(msg.sourceMajor(),CMMsg.MASK_CHANNEL)))
-		&&(msg.tool() !=null)
-		&&(msg.sourceMessage()!=null)
-		&&(msg.tool() instanceof Ability)
-		&&((((Ability)msg.tool()).classificationCode()&Ability.ALL_ACODES)==Ability.ACODE_LANGUAGE)
-		&&(((MOB)affected).fetchEffect(msg.tool().ID())==null))
-		{
-			String str=CMStrings.getSayFromMessage(msg.sourceMessage());
-			if(str!=null)
-			{
-				if(CMath.bset(msg.sourceMajor(),CMMsg.MASK_CHANNEL))
-					msg.addTrailerMsg(CMClass.getMsg(msg.source(),null,null,CMMsg.NO_EFFECT,CMMsg.NO_EFFECT,msg.othersCode(),CMStrings.substituteSayInMessage(msg.othersMessage(),str)+" (translated from "+name()+")"));
-				else
-				if(msg.amITarget(affected)&&(msg.targetMessage()!=null))
-					msg.addTrailerMsg(CMClass.getMsg(msg.source(),affected,null,CMMsg.NO_EFFECT,msg.targetCode(),CMMsg.NO_EFFECT,CMStrings.substituteSayInMessage(msg.targetMessage(),str)+" (translated from "+((Ability)msg.tool()).name()+")"));
-				else
-				if((msg.othersMessage()!=null)&&(msg.othersMessage().indexOf('\'')>0))
-				{
-					String otherMes=msg.othersMessage();
-					if(msg.target()!=null)
-						otherMes=CMLib.coffeeFilter().fullOutFilter(((MOB)affected).session(),(MOB)affected,msg.source(),msg.target(),msg.tool(),otherMes,false);
-					msg.addTrailerMsg(CMClass.getMsg(msg.source(),affected,null,CMMsg.NO_EFFECT,msg.othersCode(),CMMsg.NO_EFFECT,CMStrings.substituteSayInMessage(otherMes,str)+" (translated from "+name()+")"));
+	public String name() {
+		return "Comprehension";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_OTHERS;
+	}
+
+	protected boolean HAS_QUANTITATIVE_ASPECT() {
+		return false;
+	}
+
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+		if ((affected instanceof MOB)
+				&& (!msg.amISource((MOB) affected))
+				&& ((msg.sourceMinor() == CMMsg.TYP_SPEAK)
+						|| (msg.sourceMinor() == CMMsg.TYP_TELL) || (CMath
+							.bset(msg.sourceMajor(), CMMsg.MASK_CHANNEL)))
+				&& (msg.tool() != null)
+				&& (msg.sourceMessage() != null)
+				&& (msg.tool() instanceof Ability)
+				&& ((((Ability) msg.tool()).classificationCode() & Ability.ALL_ACODES) == Ability.ACODE_LANGUAGE)
+				&& (((MOB) affected).fetchEffect(msg.tool().ID()) == null)) {
+			String str = CMStrings.getSayFromMessage(msg.sourceMessage());
+			if (str != null) {
+				if (CMath.bset(msg.sourceMajor(), CMMsg.MASK_CHANNEL))
+					msg.addTrailerMsg(CMClass.getMsg(
+							msg.source(),
+							null,
+							null,
+							CMMsg.NO_EFFECT,
+							CMMsg.NO_EFFECT,
+							msg.othersCode(),
+							CMStrings.substituteSayInMessage(
+									msg.othersMessage(), str)
+									+ " (translated from " + name() + ")"));
+				else if (msg.amITarget(affected)
+						&& (msg.targetMessage() != null))
+					msg.addTrailerMsg(CMClass.getMsg(
+							msg.source(),
+							affected,
+							null,
+							CMMsg.NO_EFFECT,
+							msg.targetCode(),
+							CMMsg.NO_EFFECT,
+							CMStrings.substituteSayInMessage(
+									msg.targetMessage(), str)
+									+ " (translated from "
+									+ ((Ability) msg.tool()).name() + ")"));
+				else if ((msg.othersMessage() != null)
+						&& (msg.othersMessage().indexOf('\'') > 0)) {
+					String otherMes = msg.othersMessage();
+					if (msg.target() != null)
+						otherMes = CMLib.coffeeFilter().fullOutFilter(
+								((MOB) affected).session(), (MOB) affected,
+								msg.source(), msg.target(), msg.tool(),
+								otherMes, false);
+					msg.addTrailerMsg(CMClass.getMsg(msg.source(), affected,
+							null, CMMsg.NO_EFFECT, msg.othersCode(),
+							CMMsg.NO_EFFECT,
+							CMStrings.substituteSayInMessage(otherMes, str)
+									+ " (translated from " + name() + ")"));
 				}
 			}
 		}

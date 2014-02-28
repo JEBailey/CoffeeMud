@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -13,110 +14,120 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_Levitate extends Spell
-{
-	public String ID() { return "Spell_Levitate"; }
-	public String name(){return "Levitate";}
-	public String displayText(){return "(Levitated)";}
-	public int maxRange(){return adjustedMaxInvokerRange(5);}
-	public int abstractQuality(){return Ability.QUALITY_MALICIOUS;}
-	protected int canAffectCode(){return CAN_MOBS|CAN_ITEMS;}
-	public int classificationCode(){return Ability.ACODE_SPELL|Ability.DOMAIN_EVOCATION;}
-	public long flags(){return Ability.FLAG_MOVING;}
+public class Spell_Levitate extends Spell {
+	public String ID() {
+		return "Spell_Levitate";
+	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(!(affected instanceof MOB))
+	public String name() {
+		return "Levitate";
+	}
+
+	public String displayText() {
+		return "(Levitated)";
+	}
+
+	public int maxRange() {
+		return adjustedMaxInvokerRange(5);
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS | CAN_ITEMS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_EVOCATION;
+	}
+
+	public long flags() {
+		return Ability.FLAG_MOVING;
+	}
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (!(affected instanceof MOB))
 			return true;
 
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		// when this spell is on a MOBs Affected list,
 		// it should consistantly prevent the mob
 		// from trying to do ANYTHING except sleep
-		if(msg.amISource(mob))
-		{
-			if((msg.sourceMinor()==CMMsg.TYP_ADVANCE)
-			||(msg.sourceMinor()==CMMsg.TYP_RETREAT)
-			||(msg.sourceMinor()==CMMsg.TYP_LEAVE)
-			||(msg.sourceMinor()==CMMsg.TYP_ENTER)
-			||(msg.sourceMinor()==CMMsg.TYP_RETREAT))
-			{
+		if (msg.amISource(mob)) {
+			if ((msg.sourceMinor() == CMMsg.TYP_ADVANCE)
+					|| (msg.sourceMinor() == CMMsg.TYP_RETREAT)
+					|| (msg.sourceMinor() == CMMsg.TYP_LEAVE)
+					|| (msg.sourceMinor() == CMMsg.TYP_ENTER)
+					|| (msg.sourceMinor() == CMMsg.TYP_RETREAT)) {
 				mob.tell("You can't seem to go anywhere!");
 				return false;
 			}
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_FLYING);
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+		affectableStats.setDisposition(affectableStats.disposition()
+				| PhyStats.IS_FLYING);
 	}
 
-	public void unInvoke()
-	{
+	public void unInvoke() {
 		// undo the affects of this spell
-		if(!(affected instanceof MOB))
-		{
+		if (!(affected instanceof MOB)) {
 			super.unInvoke();
 			return;
 		}
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
-		if(canBeUninvoked())
-		{
-			mob.location().show(mob,null,CMMsg.MSG_OK_ACTION,"<S-NAME> float(s) back down.");
-			CMLib.commands().postStand(mob,true);
+		if (canBeUninvoked()) {
+			mob.location().show(mob, null, CMMsg.MSG_OK_ACTION,
+					"<S-NAME> float(s) back down.");
+			CMLib.commands().postStand(mob, true);
 		}
 	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if((mob.isMonster())&&(mob.isInCombat()))
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if ((mob.isMonster()) && (mob.isInCombat()))
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Physical target=getAnyTarget(mob,commands,givenTarget,Wearable.FILTER_UNWORNONLY);
-		if(target==null) return false;
-		if(target instanceof Item)
-		{
-			if(mob.isMine(target))
-			{
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Physical target = getAnyTarget(mob, commands, givenTarget,
+				Wearable.FILTER_UNWORNONLY);
+		if (target == null)
+			return false;
+		if (target instanceof Item) {
+			if (mob.isMine(target)) {
 				mob.tell("You'd better set it down first!");
 				return false;
 			}
-		}
-		else
-		if(target instanceof MOB)
-		{
-		}
-		else
-		{
-			mob.tell("You can't levitate "+target.name(mob)+"!");
+		} else if (target instanceof MOB) {
+		} else {
+			mob.tell("You can't levitate " + target.name(mob) + "!");
 			return false;
 		}
 
@@ -124,29 +135,36 @@ public class Spell_Levitate extends Spell
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,somanticCastCode(mob,target,auto),auto?"":"^S<S-NAME> wave(s) <S-HIS-HER> arms and cast(s) a spell.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				if(msg.value()<=0)
-				{
-					success=maliciousAffect(mob,target,asLevel,5+super.getXLEVELLevel(mob),-1);
-					if(target instanceof MOB)
-						((MOB)target).location().show((MOB)target,null,CMMsg.MSG_OK_ACTION,"<S-NAME> float(s) straight up!");
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							somanticCastCode(mob, target, auto),
+							auto ? ""
+									: "^S<S-NAME> wave(s) <S-HIS-HER> arms and cast(s) a spell.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				if (msg.value() <= 0) {
+					success = maliciousAffect(mob, target, asLevel,
+							5 + super.getXLEVELLevel(mob), -1);
+					if (target instanceof MOB)
+						((MOB) target).location().show((MOB) target, null,
+								CMMsg.MSG_OK_ACTION,
+								"<S-NAME> float(s) straight up!");
 					else
-						mob.location().showHappens(CMMsg.MSG_OK_ACTION,target.name()+" float(s) straight up!");
+						mob.location().showHappens(CMMsg.MSG_OK_ACTION,
+								target.name() + " float(s) straight up!");
 				}
 			}
-		}
-		else
-			return maliciousFizzle(mob,null,"<S-NAME> incant(s), but the spell fizzles.");
+		} else
+			return maliciousFizzle(mob, null,
+					"<S-NAME> incant(s), but the spell fizzles.");
 		// return whether it worked
 		return success;
 	}

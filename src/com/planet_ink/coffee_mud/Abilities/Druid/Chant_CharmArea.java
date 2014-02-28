@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Druid;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -11,139 +12,151 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 @SuppressWarnings("rawtypes")
-public class Chant_CharmArea extends Chant
-{
-	public String ID() { return "Chant_CharmArea"; }
-	public String name(){ return "Charm Area";}
-	public int classificationCode(){return Ability.ACODE_CHANT|Ability.DOMAIN_ENDURING;}
-	public int abstractQuality(){ return Ability.QUALITY_MALICIOUS;}
-	protected int canAffectCode(){return CAN_ROOMS;}
-	protected int canTargetCode(){return 0;}
+public class Chant_CharmArea extends Chant {
+	public String ID() {
+		return "Chant_CharmArea";
+	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(msg.amITarget(affected)&&(msg.targetMinor()==CMMsg.TYP_LEAVE)
-		   &&(!msg.amISource(invoker))
-		   &&(msg.source().amFollowing()!=invoker))
-		{
-			msg.source().tell("You really don't feel like leaving this place.  It is just too beautiful.");
+	public String name() {
+		return "Charm Area";
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_CHANT | Ability.DOMAIN_ENDURING;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	protected int canAffectCode() {
+		return CAN_ROOMS;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (msg.amITarget(affected) && (msg.targetMinor() == CMMsg.TYP_LEAVE)
+				&& (!msg.amISource(invoker))
+				&& (msg.source().amFollowing() != invoker)) {
+			msg.source()
+					.tell("You really don't feel like leaving this place.  It is just too beautiful.");
 			return false;
 		}
-		if((CMath.bset(msg.sourceMajor(),CMMsg.MASK_MALICIOUS))
-		||(CMath.bset(msg.targetMajor(),CMMsg.MASK_MALICIOUS))
-		||(CMath.bset(msg.othersMajor(),CMMsg.MASK_MALICIOUS)))
-		{
-			if((msg.source()!=null)
-			   &&(msg.target()!=null)
-			   &&(msg.source()!=msg.target()))
-			{
+		if ((CMath.bset(msg.sourceMajor(), CMMsg.MASK_MALICIOUS))
+				|| (CMath.bset(msg.targetMajor(), CMMsg.MASK_MALICIOUS))
+				|| (CMath.bset(msg.othersMajor(), CMMsg.MASK_MALICIOUS))) {
+			if ((msg.source() != null) && (msg.target() != null)
+					&& (msg.source() != msg.target())) {
 				msg.source().tell("You feel too peaceful here.");
-				MOB victim=msg.source().getVictim();
-				if(victim!=null) victim.makePeace();
+				MOB victim = msg.source().getVictim();
+				if (victim != null)
+					victim.makePeace();
 				msg.source().makePeace();
 			}
-			msg.modify(msg.source(),msg.target(),msg.tool(),CMMsg.NO_EFFECT,"",CMMsg.NO_EFFECT,"",CMMsg.NO_EFFECT,"");
+			msg.modify(msg.source(), msg.target(), msg.tool(), CMMsg.NO_EFFECT,
+					"", CMMsg.NO_EFFECT, "", CMMsg.NO_EFFECT, "");
 			return false;
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
-		if(msg.amITarget(affected)
-		&&((msg.targetMinor()==CMMsg.TYP_LOOK)||(msg.targetMinor()==CMMsg.TYP_EXAMINE)))
-		{
-			msg.addTrailerMsg(CMClass.getMsg(msg.source(),null,null,CMMsg.MSG_OK_VISUAL,CMMsg.NO_EFFECT,CMMsg.NO_EFFECT,"There is something charming about this place."));
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+		if (msg.amITarget(affected)
+				&& ((msg.targetMinor() == CMMsg.TYP_LOOK) || (msg.targetMinor() == CMMsg.TYP_EXAMINE))) {
+			msg.addTrailerMsg(CMClass.getMsg(msg.source(), null, null,
+					CMMsg.MSG_OK_VISUAL, CMMsg.NO_EFFECT, CMMsg.NO_EFFECT,
+					"There is something charming about this place."));
 		}
 	}
-	
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(mob.isInCombat())
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (mob.isInCombat())
 				return Ability.QUALITY_INDIFFERENT;
-			Room R=mob.location();
-			if(R!=null)
-			{
-				if((R.domainType()&Room.INDOORS)>0)
+			Room R = mob.location();
+			if (R != null) {
+				if ((R.domainType() & Room.INDOORS) > 0)
 					return Ability.QUALITY_INDIFFERENT;
-				if((R.domainType()==Room.DOMAIN_OUTDOORS_CITY)
-				||(R.domainType()==Room.DOMAIN_OUTDOORS_SPACEPORT)
-				||(R.domainType()==Room.DOMAIN_OUTDOORS_UNDERWATER)
-				||(R.domainType()==Room.DOMAIN_OUTDOORS_AIR)
-				||(R.domainType()==Room.DOMAIN_OUTDOORS_WATERSURFACE))
+				if ((R.domainType() == Room.DOMAIN_OUTDOORS_CITY)
+						|| (R.domainType() == Room.DOMAIN_OUTDOORS_SPACEPORT)
+						|| (R.domainType() == Room.DOMAIN_OUTDOORS_UNDERWATER)
+						|| (R.domainType() == Room.DOMAIN_OUTDOORS_AIR)
+						|| (R.domainType() == Room.DOMAIN_OUTDOORS_WATERSURFACE))
 					return Ability.QUALITY_INDIFFERENT;
-				
+
 			}
-			if(target instanceof MOB)
-			{
+			if (target instanceof MOB) {
 			}
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Room target=mob.location();
-		if(target==null) return false;
-		if(target.fetchEffect(ID())!=null)
-		{
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Room target = mob.location();
+		if (target == null)
+			return false;
+		if (target.fetchEffect(ID()) != null) {
 			mob.tell("This place is already charmed.");
 			return false;
 		}
-		if(((mob.location().domainType()&Room.INDOORS)>0)&&(!auto))
-		{
+		if (((mob.location().domainType() & Room.INDOORS) > 0) && (!auto)) {
 			mob.tell("You must be outdoors for this chant to work.");
 			return false;
 		}
-		if(((mob.location().domainType()==Room.DOMAIN_OUTDOORS_CITY)
-		   ||(mob.location().domainType()==Room.DOMAIN_OUTDOORS_SPACEPORT)
-		   ||(mob.location().domainType()==Room.DOMAIN_OUTDOORS_UNDERWATER)
-		   ||(mob.location().domainType()==Room.DOMAIN_OUTDOORS_AIR)
-		   ||(mob.location().domainType()==Room.DOMAIN_OUTDOORS_WATERSURFACE))
-		&&(!auto))
-		{
+		if (((mob.location().domainType() == Room.DOMAIN_OUTDOORS_CITY)
+				|| (mob.location().domainType() == Room.DOMAIN_OUTDOORS_SPACEPORT)
+				|| (mob.location().domainType() == Room.DOMAIN_OUTDOORS_UNDERWATER)
+				|| (mob.location().domainType() == Room.DOMAIN_OUTDOORS_AIR) || (mob
+				.location().domainType() == Room.DOMAIN_OUTDOORS_WATERSURFACE))
+				&& (!auto)) {
 			mob.tell("This chant does not work here.");
 			return false;
 		}
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"This area seems to twinkle with beauty.":"^S<S-NAME> chant(s), bringing forth the natural beauty of this place.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				beneficialAffect(mob,target,asLevel,0);
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							verbalCastCode(mob, target, auto),
+							auto ? "This area seems to twinkle with beauty."
+									: "^S<S-NAME> chant(s), bringing forth the natural beauty of this place.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				beneficialAffect(mob, target, asLevel, 0);
 			}
-		}
-		else
-			beneficialWordsFizzle(mob,target,"<S-NAME> chant(s), but the magic fades.");
+		} else
+			beneficialWordsFizzle(mob, target,
+					"<S-NAME> chant(s), but the magic fades.");
 
 		// return whether it worked
 		return success;

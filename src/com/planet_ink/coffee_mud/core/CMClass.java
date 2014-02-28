@@ -1369,10 +1369,8 @@ public class CMClass extends ClassLoader {
 			return false;
 		CMClass.lastUpdateTime = System.currentTimeMillis();
 
-
-
 		if (set instanceof List) {
-			if (!loadListToList((List)set, path, classType.ancestorName, quiet)) {
+			if (!loadListToList((List) set, path, classType.ancestorName, quiet)) {
 				return false;
 			}
 			if (set instanceof XVector)
@@ -1382,7 +1380,8 @@ public class CMClass extends ClassLoader {
 			if (set == c().libraries)
 				CMLib.registerLibraries(c().libraries.elements());
 		} else {
-			if (!loadListToMap((Map<String,Object>)set, path, classType.ancestorName, quiet)) {
+			if (!loadListToMap((Map<String, Object>) set, path,
+					classType.ancestorName, quiet)) {
 				return false;
 			}
 		}
@@ -2167,8 +2166,9 @@ public class CMClass extends ClassLoader {
 	 *            classes to respect
 	 * @return true if classes were loaded without errors, false otherwise
 	 */
-	public static final boolean loadObjectListToObj(final Collection collection,
-			final String defaultPath, final String path, final String ancestor) {
+	public static final boolean loadObjectListToObj(
+			final Collection collection, final String defaultPath,
+			final String path, final String ancestor) {
 		if (path.length() > 0) {
 			final boolean success;
 			if (path.equalsIgnoreCase("%default%"))
@@ -2180,7 +2180,7 @@ public class CMClass extends ClassLoader {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Given a java collection type of some sort (hashtable, vector, etc), a
 	 * default path, a requested path, and the name of an interface/ancestor
@@ -2198,8 +2198,9 @@ public class CMClass extends ClassLoader {
 	 *            classes to respect
 	 * @return true if classes were loaded without errors, false otherwise
 	 */
-	public static final boolean loadObjectListToObj(final Map<String,Object> collection,
-			final String defaultPath, final String path, final String ancestor) {
+	public static final boolean loadObjectListToObj(
+			final Map<String, Object> collection, final String defaultPath,
+			final String path, final String ancestor) {
 		if (path.length() > 0) {
 			final boolean success;
 			if (path.equalsIgnoreCase("%default%"))
@@ -2211,7 +2212,7 @@ public class CMClass extends ClassLoader {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Given a java collection type of some sort (hashtable, vector, etc), a
 	 * default path, a requested path, and the name of an interface/ancestor
@@ -2276,7 +2277,7 @@ public class CMClass extends ClassLoader {
 		}
 		return loadListToObj(collection, filePath, ancestorCl, quiet);
 	}
-	
+
 	/**
 	 * Given a java collection type of some sort (hashtable, vector, etc), a
 	 * file path, and the name of an interface/ancestor that classes must
@@ -2294,8 +2295,9 @@ public class CMClass extends ClassLoader {
 	 *            true to not report errors, false otherwise
 	 * @return true if classes were loaded successfully, false otherwise
 	 */
-	public static final boolean loadListToMap(final Map<String,Object> collection,
-			final String filePath, final String ancestor, final boolean quiet) {
+	public static final boolean loadListToMap(
+			final Map<String, Object> collection, final String filePath,
+			final String ancestor, final boolean quiet) {
 		final CMClass loader = new CMClass();
 		Class<?> ancestorCl = null;
 		if (ancestor != null && ancestor.length() != 0) {
@@ -2310,7 +2312,7 @@ public class CMClass extends ClassLoader {
 		}
 		return loadListToMap(collection, filePath, ancestorCl, quiet);
 	}
-	
+
 	/**
 	 * Given a java collection type of some sort (hashtable, vector, etc), a
 	 * file path, and the name of an interface/ancestor that classes must
@@ -2328,8 +2330,9 @@ public class CMClass extends ClassLoader {
 	 *            true to not report errors, false otherwise
 	 * @return true if classes were loaded successfully, false otherwise
 	 */
-	public static final boolean loadListToList(final List<? super Object> collection,
-			final String filePath, final String ancestor, final boolean quiet) {
+	public static final boolean loadListToList(
+			final List<? super Object> collection, final String filePath,
+			final String ancestor, final boolean quiet) {
 		final CMClass loader = new CMClass();
 		Class<?> ancestorCl = null;
 		if (ancestor != null && ancestor.length() != 0) {
@@ -2366,7 +2369,8 @@ public class CMClass extends ClassLoader {
 			final String filePath, final Class<?> ancestorCl,
 			final boolean quiet) {
 		try {
-			ClassEnumerator.getClassesForPackage(filePath, collection, ancestorCl);
+			ClassEnumerator.getClassesForPackage(filePath, collection,
+					ancestorCl);
 		} catch (Exception e) {
 			if (!quiet) {
 				Log.errOut("CMClass", e);
@@ -2394,13 +2398,14 @@ public class CMClass extends ClassLoader {
 	 *            true to not report errors, false otherwise
 	 * @return true if classes were loaded successfully, false otherwise
 	 */
-	public static final boolean loadListToList(final List<? super Object> collection,
-			final String filePath, final Class<?> ancestorCl,
-			final boolean quiet) {
-		try {//really replace with an osgi tracker for CMLibrary
+	public static final boolean loadListToList(
+			final List<? super Object> collection, final String filePath,
+			final Class<?> ancestorCl, final boolean quiet) {
+		try {// really replace with an osgi tracker for CMLibrary
 			List<Class<?>> temp = new ArrayList<Class<?>>();
-			ClassEnumerator.getClassesForPackage(filePath, (Collection)temp, ancestorCl);
-			for (Class<?> klass:temp){
+			ClassEnumerator.getClassesForPackage(filePath, (Collection) temp,
+					ancestorCl);
+			for (Class<?> klass : temp) {
 				collection.add(klass.newInstance());
 			}
 		} catch (Exception e) {
@@ -2430,15 +2435,17 @@ public class CMClass extends ClassLoader {
 	 *            true to not report errors, false otherwise
 	 * @return true if classes were loaded successfully, false otherwise
 	 */
-	public static final boolean loadListToMap(final Map<String,Object> collection,
-			final String filePath, final Class<?> ancestorCl,
-			final boolean quiet) {
-		
-		try {//really replace with an osgi tracker for CMLibrary
+	public static final boolean loadListToMap(
+			final Map<String, Object> collection, final String filePath,
+			final Class<?> ancestorCl, final boolean quiet) {
+
+		try {// really replace with an osgi tracker for CMLibrary
 			List<Class<?>> temp = new ArrayList<Class<?>>();
-			ClassEnumerator.getClassesForPackage(filePath, (Collection)temp, ancestorCl);
-			for (Class<?> klass:temp){
-				collection.put(klass.getSimpleName().toUpperCase(),klass.newInstance());
+			ClassEnumerator.getClassesForPackage(filePath, (Collection) temp,
+					ancestorCl);
+			for (Class<?> klass : temp) {
+				collection.put(klass.getSimpleName().toUpperCase(),
+						klass.newInstance());
 			}
 		} catch (Exception e) {
 			if (!quiet) {

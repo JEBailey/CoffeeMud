@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Behaviors;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -14,91 +15,92 @@ import com.planet_ink.coffee_mud.core.collections.XVector;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class NiceAbilities extends ActiveTicker
-{
-	public String ID(){return "NiceAbilities";}
-	protected int canImproveCode(){return Behavior.CAN_MOBS;}
-	
-	private List<Ability> mySkills=null;
-	private int numAllSkills=-1;
-	
-	public NiceAbilities()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class NiceAbilities extends ActiveTicker {
+	public String ID() {
+		return "NiceAbilities";
+	}
+
+	protected int canImproveCode() {
+		return Behavior.CAN_MOBS;
+	}
+
+	private List<Ability> mySkills = null;
+	private int numAllSkills = -1;
+
+	public NiceAbilities() {
 		super();
-		minTicks=10; maxTicks=20; chance=100;
+		minTicks = 10;
+		maxTicks = 20;
+		chance = 100;
 		tickReset();
 	}
 
-	public String accountForYourself()
-	{ 
+	public String accountForYourself() {
 		return "random benevolent skill using";
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		super.tick(ticking,tickID);
-		if((canAct(ticking,tickID))&&(ticking instanceof MOB))
-		{
-			MOB mob=(MOB)ticking;
-			Room thisRoom=mob.location();
-			if(thisRoom==null) return true;
-
-			double aChance=CMath.div(mob.curState().getMana(),mob.maxState().getMana());
-			if((Math.random()>aChance)||(mob.curState().getMana()<50))
+	public boolean tick(Tickable ticking, int tickID) {
+		super.tick(ticking, tickID);
+		if ((canAct(ticking, tickID)) && (ticking instanceof MOB)) {
+			MOB mob = (MOB) ticking;
+			Room thisRoom = mob.location();
+			if (thisRoom == null)
 				return true;
 
-			if(thisRoom.numPCInhabitants()>0)
-			{
-				final MOB target=thisRoom.fetchRandomInhabitant();
+			double aChance = CMath.div(mob.curState().getMana(), mob.maxState()
+					.getMana());
+			if ((Math.random() > aChance) || (mob.curState().getMana() < 50))
+				return true;
+
+			if (thisRoom.numPCInhabitants() > 0) {
+				final MOB target = thisRoom.fetchRandomInhabitant();
 				MOB followMOB = target;
-				if((target!=null)&&(target.amFollowing()!=null))
-					followMOB=target.amUltimatelyFollowing();
-				if((target!=null)
-				&&(target!=mob)
-				&&(followMOB.getVictim()!=mob)
-				&&(!followMOB.isMonster()))
-				{
-					if((numAllSkills!=mob.numAllAbilities())||(mySkills==null))
-					{
-						numAllSkills=mob.numAbilities();
-						mySkills=new ArrayList<Ability>();
-						for(Enumeration<Ability> e=mob.allAbilities(); e.hasMoreElements();)
-						{
-							Ability tryThisOne=e.nextElement();
-							if((tryThisOne!=null)
-							&&(tryThisOne.abstractQuality()==Ability.QUALITY_BENEFICIAL_OTHERS)
-							&&(((tryThisOne.classificationCode()&Ability.ALL_ACODES)!=Ability.ACODE_PRAYER)
-								||tryThisOne.appropriateToMyFactions(mob)))
-							{
+				if ((target != null) && (target.amFollowing() != null))
+					followMOB = target.amUltimatelyFollowing();
+				if ((target != null) && (target != mob)
+						&& (followMOB.getVictim() != mob)
+						&& (!followMOB.isMonster())) {
+					if ((numAllSkills != mob.numAllAbilities())
+							|| (mySkills == null)) {
+						numAllSkills = mob.numAbilities();
+						mySkills = new ArrayList<Ability>();
+						for (Enumeration<Ability> e = mob.allAbilities(); e
+								.hasMoreElements();) {
+							Ability tryThisOne = e.nextElement();
+							if ((tryThisOne != null)
+									&& (tryThisOne.abstractQuality() == Ability.QUALITY_BENEFICIAL_OTHERS)
+									&& (((tryThisOne.classificationCode() & Ability.ALL_ACODES) != Ability.ACODE_PRAYER) || tryThisOne
+											.appropriateToMyFactions(mob))) {
 								mySkills.add(tryThisOne);
 							}
 						}
 					}
-					if(mySkills.size()>0)
-					{
-						Ability tryThisOne=mySkills.get(CMLib.dice().roll(1, mySkills.size(), -1));
-						if((mob.fetchEffect(tryThisOne.ID())==null)
-						&&(tryThisOne.castingQuality(mob,target)==Ability.QUALITY_BENEFICIAL_OTHERS))
-						{
-							tryThisOne.setProficiency(CMLib.ableMapper().getMaxProficiency(mob,true,tryThisOne.ID()));
-							Vector V=new XVector("$"+target.Name()+"$");
+					if (mySkills.size() > 0) {
+						Ability tryThisOne = mySkills.get(CMLib.dice().roll(1,
+								mySkills.size(), -1));
+						if ((mob.fetchEffect(tryThisOne.ID()) == null)
+								&& (tryThisOne.castingQuality(mob, target) == Ability.QUALITY_BENEFICIAL_OTHERS)) {
+							tryThisOne.setProficiency(CMLib.ableMapper()
+									.getMaxProficiency(mob, true,
+											tryThisOne.ID()));
+							Vector V = new XVector("$" + target.Name() + "$");
 							V.addElement(target.name());
-							tryThisOne.invoke(mob,V,target,false,0);
+							tryThisOne.invoke(mob, V, target, false, 0);
 						}
 					}
 				}

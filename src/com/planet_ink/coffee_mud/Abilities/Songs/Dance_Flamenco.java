@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Songs;
+
 import java.util.HashSet;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -8,41 +9,53 @@ import com.planet_ink.coffee_mud.MOBS.interfaces.MOB;
 import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Dance_Flamenco extends Dance
-{
-	public String ID() { return "Dance_Flamenco"; }
-	public String name(){ return "Flamenco";}
-	public int abstractQuality(){ return Ability.QUALITY_MALICIOUS;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Dance_Flamenco extends Dance {
+	public String ID() {
+		return "Dance_Flamenco";
+	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking,tickID))
+	public String name() {
+		return "Flamenco";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
 
-		MOB mob=(MOB)affected;
-		if(mob==null) return false;
-		if(mob==invoker) return true;
-		if(invoker==null) return false;
+		MOB mob = (MOB) affected;
+		if (mob == null)
+			return false;
+		if (mob == invoker)
+			return true;
+		if (invoker == null)
+			return false;
 
-		int hpLoss=CMLib.dice().roll(adjustedLevel(invoker(),0),8,0)
-				  +CMLib.dice().roll(invoker().getGroupMembers(new HashSet<MOB>()).size()-1,8,0);
-		CMLib.combat().postDamage(invoker,mob,this,hpLoss,CMMsg.MASK_ALWAYS|CMMsg.TYP_CAST_SPELL,Weapon.TYPE_BURSTING,"^SThe flamenco dance <DAMAGE> <T-NAME>!^?");
+		int hpLoss = CMLib.dice().roll(adjustedLevel(invoker(), 0), 8, 0)
+				+ CMLib.dice()
+						.roll(invoker().getGroupMembers(new HashSet<MOB>())
+								.size() - 1, 8, 0);
+		CMLib.combat().postDamage(invoker, mob, this, hpLoss,
+				CMMsg.MASK_ALWAYS | CMMsg.TYP_CAST_SPELL, Weapon.TYPE_BURSTING,
+				"^SThe flamenco dance <DAMAGE> <T-NAME>!^?");
 		return true;
 	}
 

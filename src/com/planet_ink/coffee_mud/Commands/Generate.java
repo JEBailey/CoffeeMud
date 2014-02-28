@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Commands;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -24,266 +25,280 @@ import com.planet_ink.coffee_mud.core.collections.SHashtable;
 import com.planet_ink.coffee_mud.core.exceptions.CMException;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Generate extends StdCommand
-{
-	public Generate(){}
-	private static final SHashtable<String,CMClass.CMObjectType> OBJECT_TYPES=new SHashtable<String,CMClass.CMObjectType>(new Object[][]{
-			{"STRING",CMClass.CMObjectType.LIBRARY},
-			{"AREA",CMClass.CMObjectType.AREA},
-			{"MOB",CMClass.CMObjectType.MOB},
-			{"ROOM",CMClass.CMObjectType.LOCALE},
-			{"ITEM",CMClass.CMObjectType.ITEM},
-	});
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Generate extends StdCommand {
+	public Generate() {
+	}
 
-	private final String[] access={"GENERATE"};
-	public String[] getAccessWords(){return access;}
+	private static final SHashtable<String, CMClass.CMObjectType> OBJECT_TYPES = new SHashtable<String, CMClass.CMObjectType>(
+			new Object[][] { { "STRING", CMClass.CMObjectType.LIBRARY },
+					{ "AREA", CMClass.CMObjectType.AREA },
+					{ "MOB", CMClass.CMObjectType.MOB },
+					{ "ROOM", CMClass.CMObjectType.LOCALE },
+					{ "ITEM", CMClass.CMObjectType.ITEM }, });
 
-	public void createNewPlace(MOB mob, Room oldR, Room R, int direction) 
-	{
-		if(R.roomID().length()==0)
-		{
+	private final String[] access = { "GENERATE" };
+
+	public String[] getAccessWords() {
+		return access;
+	}
+
+	public void createNewPlace(MOB mob, Room oldR, Room R, int direction) {
+		if (R.roomID().length() == 0) {
 			R.setArea(oldR.getArea());
 			R.setRoomID(oldR.getArea().getNewRoomID(oldR, direction));
 		}
-		Exit E=R.getExitInDir(Directions.getOpDirectionCode(direction));
-		if(E==null) E = CMClass.getExit("Open");
+		Exit E = R.getExitInDir(Directions.getOpDirectionCode(direction));
+		if (E == null)
+			E = CMClass.getExit("Open");
 		oldR.setRawExit(direction, E);
-		oldR.rawDoors()[direction]=R;
-		int opDir=Directions.getOpDirectionCode(direction);
-		if(R.getRoomInDir(opDir)!=null)
+		oldR.rawDoors()[direction] = R;
+		int opDir = Directions.getOpDirectionCode(direction);
+		if (R.getRoomInDir(opDir) != null)
 			mob.tell("An error has caused the following exit to be one-way.");
-		else
-		{
+		else {
 			R.setRawExit(opDir, E);
-			R.rawDoors()[opDir]=oldR;
+			R.rawDoors()[opDir] = oldR;
 		}
 		CMLib.database().DBUpdateExits(oldR);
-		String dirName=((R instanceof SpaceShip)||(R.getArea() instanceof SpaceShip))?
-				Directions.getShipDirectionName(direction):Directions.getDirectionName(direction);
-		oldR.showHappens(CMMsg.MSG_OK_VISUAL,"A new place materializes to the "+dirName);
+		String dirName = ((R instanceof SpaceShip) || (R.getArea() instanceof SpaceShip)) ? Directions
+				.getShipDirectionName(direction) : Directions
+				.getDirectionName(direction);
+		oldR.showHappens(CMMsg.MSG_OK_VISUAL,
+				"A new place materializes to the " + dirName);
 	}
-	
+
 	public boolean execute(MOB mob, Vector commands, int metaFlags)
-		throws java.io.IOException
-	{
-		if(commands.size()<3)
-		{
+			throws java.io.IOException {
+		if (commands.size() < 3) {
 			mob.tell("Generate what? Try GENERATE [TYPE] [ID] (FROM [DATA_FILE_PATH]) ([VAR=VALUE]..) [DIRECTION]");
 			return false;
 		}
-		String finalLog = mob.Name()+" called generate command with parms: " + CMParms.combine(commands, 1);
+		String finalLog = mob.Name() + " called generate command with parms: "
+				+ CMParms.combine(commands, 1);
 		CMFile file = null;
-		if((commands.size()>3)&&((String)commands.elementAt(3)).equalsIgnoreCase("FROM"))
-		{
-			file = new CMFile(Resources.buildResourcePath((String)commands.elementAt(4)),mob);	
+		if ((commands.size() > 3)
+				&& ((String) commands.elementAt(3)).equalsIgnoreCase("FROM")) {
+			file = new CMFile(Resources.buildResourcePath((String) commands
+					.elementAt(4)), mob);
 			commands.removeElementAt(3);
 			commands.removeElementAt(3);
-		}
-		else
-			file = new CMFile(Resources.buildResourcePath("randareas/example.xml"),mob);
-		if(!file.canRead())
-		{
-			mob.tell("Random data file '"+file.getCanonicalPath()+"' not found.  Aborting.");
+		} else
+			file = new CMFile(
+					Resources.buildResourcePath("randareas/example.xml"), mob);
+		if (!file.canRead()) {
+			mob.tell("Random data file '" + file.getCanonicalPath()
+					+ "' not found.  Aborting.");
 			return false;
 		}
 		StringBuffer xml = file.textUnformatted();
 		List<XMLLibrary.XMLpiece> xmlRoot = CMLib.xml().parseAllXML(xml);
 		Hashtable definedIDs = new Hashtable();
-		CMLib.percolator().buildDefinedIDSet(xmlRoot,definedIDs);
-		String typeName = (String)commands.elementAt(1);
+		CMLib.percolator().buildDefinedIDSet(xmlRoot, definedIDs);
+		String typeName = (String) commands.elementAt(1);
 		String objectType = typeName.toUpperCase().trim();
-		CMClass.CMObjectType codeI=OBJECT_TYPES.get(objectType);
-		if(codeI==null)
-		{
-			for(Enumeration e=OBJECT_TYPES.keys();e.hasMoreElements();)
-			{
-				String key =(String)e.nextElement(); 
-				if(key.startsWith(typeName.toUpperCase().trim()))
-				{
+		CMClass.CMObjectType codeI = OBJECT_TYPES.get(objectType);
+		if (codeI == null) {
+			for (Enumeration e = OBJECT_TYPES.keys(); e.hasMoreElements();) {
+				String key = (String) e.nextElement();
+				if (key.startsWith(typeName.toUpperCase().trim())) {
 					objectType = key;
-					codeI=OBJECT_TYPES.get(key);
+					codeI = OBJECT_TYPES.get(key);
 				}
 			}
-			if(codeI==null)
-			{
-				mob.tell("'"+typeName+"' is an unknown object type.  Try: "+CMParms.toStringList(OBJECT_TYPES.keys()));
+			if (codeI == null) {
+				mob.tell("'" + typeName + "' is an unknown object type.  Try: "
+						+ CMParms.toStringList(OBJECT_TYPES.keys()));
 				return false;
 			}
 		}
-		int direction=-1;
-		if((codeI==CMClass.CMObjectType.AREA)||(codeI==CMClass.CMObjectType.LOCALE))
-		{
-			String possDir=(String)commands.lastElement();
+		int direction = -1;
+		if ((codeI == CMClass.CMObjectType.AREA)
+				|| (codeI == CMClass.CMObjectType.LOCALE)) {
+			String possDir = (String) commands.lastElement();
 			direction = Directions.getGoodDirectionCode(possDir);
-			if(direction<0)
-			{
+			if (direction < 0) {
 				mob.tell("When creating an area or room, the LAST parameter to this command must be a direction to link to this room by.");
 				return false;
 			}
-			if(mob.location().getRoomInDir(direction)!=null) 
-			{
-				String dirName=((mob.location() instanceof SpaceShip)||(mob.location().getArea() instanceof SpaceShip))?
-						Directions.getShipDirectionName(direction):Directions.getDirectionName(direction);
-				mob.tell("A room already exists in direction "+dirName+". Action aborted.");
+			if (mob.location().getRoomInDir(direction) != null) {
+				String dirName = ((mob.location() instanceof SpaceShip) || (mob
+						.location().getArea() instanceof SpaceShip)) ? Directions
+						.getShipDirectionName(direction) : Directions
+						.getDirectionName(direction);
+				mob.tell("A room already exists in direction " + dirName
+						+ ". Action aborted.");
 				return false;
 			}
 		}
-		String idName = ((String)commands.elementAt(2)).toUpperCase().trim();
-		if((!(definedIDs.get(idName) instanceof XMLLibrary.XMLpiece))
-		||(!((XMLLibrary.XMLpiece)definedIDs.get(idName)).tag.equalsIgnoreCase(objectType)))
-		{
-			mob.tell("The "+objectType+" id '"+idName+"' has not been defined in the data file.");
-			StringBuffer foundIDs=new StringBuffer("");
-			for(Enumeration tkeye=OBJECT_TYPES.keys();tkeye.hasMoreElements();)
-			{
-				String tKey=(String)tkeye.nextElement();
-				foundIDs.append("^H"+tKey+"^N: \n\r");
-				Vector xmlTagsV=new Vector();
-				for(Enumeration keys=definedIDs.keys();keys.hasMoreElements();)
-				{
-					String key=(String)keys.nextElement();
-					if((definedIDs.get(key) instanceof XMLLibrary.XMLpiece)
-					&&(((XMLLibrary.XMLpiece)definedIDs.get(key)).tag.equalsIgnoreCase(tKey)))
+		String idName = ((String) commands.elementAt(2)).toUpperCase().trim();
+		if ((!(definedIDs.get(idName) instanceof XMLLibrary.XMLpiece))
+				|| (!((XMLLibrary.XMLpiece) definedIDs.get(idName)).tag
+						.equalsIgnoreCase(objectType))) {
+			mob.tell("The " + objectType + " id '" + idName
+					+ "' has not been defined in the data file.");
+			StringBuffer foundIDs = new StringBuffer("");
+			for (Enumeration tkeye = OBJECT_TYPES.keys(); tkeye
+					.hasMoreElements();) {
+				String tKey = (String) tkeye.nextElement();
+				foundIDs.append("^H" + tKey + "^N: \n\r");
+				Vector xmlTagsV = new Vector();
+				for (Enumeration keys = definedIDs.keys(); keys
+						.hasMoreElements();) {
+					String key = (String) keys.nextElement();
+					if ((definedIDs.get(key) instanceof XMLLibrary.XMLpiece)
+							&& (((XMLLibrary.XMLpiece) definedIDs.get(key)).tag
+									.equalsIgnoreCase(tKey)))
 						xmlTagsV.addElement(key.toLowerCase());
 				}
-				foundIDs.append(CMParms.toStringList(xmlTagsV)+"\n\r");
+				foundIDs.append(CMParms.toStringList(xmlTagsV) + "\n\r");
 			}
-			mob.tell("Found ids include: \n\r"+foundIDs.toString());
+			mob.tell("Found ids include: \n\r" + foundIDs.toString());
 			return false;
 		}
-		
-		XMLLibrary.XMLpiece piece=(XMLLibrary.XMLpiece)definedIDs.get(idName);
-		definedIDs.putAll(CMParms.parseEQParms(commands,3,commands.size()));
-		try 
-		{
+
+		XMLLibrary.XMLpiece piece = (XMLLibrary.XMLpiece) definedIDs
+				.get(idName);
+		definedIDs.putAll(CMParms.parseEQParms(commands, 3, commands.size()));
+		try {
 			CMLib.percolator().checkRequirements(piece, definedIDs);
-		} 
-		catch(CMException cme) 
-		{
-			mob.tell("Required ids for "+idName+" were missing: "+cme.getMessage());
+		} catch (CMException cme) {
+			mob.tell("Required ids for " + idName + " were missing: "
+					+ cme.getMessage());
 			return false;
 		}
 		Vector V = new Vector();
-		try{
-			switch(codeI)
-			{
-			case LIBRARY:
-			{
-				CMLib.percolator().preDefineReward(null, null, null, piece, definedIDs);
-				CMLib.percolator().defineReward(null, null, null, piece, piece.value,definedIDs);
-				String s=CMLib.percolator().findString("STRING", piece, definedIDs);
-				if(s!=null)
+		try {
+			switch (codeI) {
+			case LIBRARY: {
+				CMLib.percolator().preDefineReward(null, null, null, piece,
+						definedIDs);
+				CMLib.percolator().defineReward(null, null, null, piece,
+						piece.value, definedIDs);
+				String s = CMLib.percolator().findString("STRING", piece,
+						definedIDs);
+				if (s != null)
 					V.addElement(s);
 				break;
 			}
 			case AREA:
-				CMLib.percolator().preDefineReward(null, null, null, piece, definedIDs);
-				CMLib.percolator().defineReward(null, null, null, piece, piece.value,definedIDs);
-				Area A=CMLib.percolator().findArea(piece, definedIDs, direction);
-				if(A!=null)
+				CMLib.percolator().preDefineReward(null, null, null, piece,
+						definedIDs);
+				CMLib.percolator().defineReward(null, null, null, piece,
+						piece.value, definedIDs);
+				Area A = CMLib.percolator().findArea(piece, definedIDs,
+						direction);
+				if (A != null)
 					V.addElement(A);
 				break;
 			case MOB:
-				CMLib.percolator().preDefineReward(null, null, null, piece, definedIDs);
-				CMLib.percolator().defineReward(null, null, null, piece, piece.value,definedIDs);
+				CMLib.percolator().preDefineReward(null, null, null, piece,
+						definedIDs);
+				CMLib.percolator().defineReward(null, null, null, piece,
+						piece.value, definedIDs);
 				V.addAll(CMLib.percolator().findMobs(piece, definedIDs));
 				break;
-			case LOCALE:
-			{
-				Exit[] exits=new Exit[Directions.NUM_DIRECTIONS()];
-				CMLib.percolator().preDefineReward(null, null, null, piece, definedIDs);
-				CMLib.percolator().defineReward(null, null, null, piece, piece.value,definedIDs);
-				Room R=CMLib.percolator().buildRoom(piece, definedIDs, exits, direction);
-				if(R!=null)
+			case LOCALE: {
+				Exit[] exits = new Exit[Directions.NUM_DIRECTIONS()];
+				CMLib.percolator().preDefineReward(null, null, null, piece,
+						definedIDs);
+				CMLib.percolator().defineReward(null, null, null, piece,
+						piece.value, definedIDs);
+				Room R = CMLib.percolator().buildRoom(piece, definedIDs, exits,
+						direction);
+				if (R != null)
 					V.addElement(R);
 				break;
 			}
 			case ITEM:
-				CMLib.percolator().preDefineReward(null, null, null, piece, definedIDs);
-				CMLib.percolator().defineReward(null, null, null, piece, piece.value,definedIDs);
+				CMLib.percolator().preDefineReward(null, null, null, piece,
+						definedIDs);
+				CMLib.percolator().defineReward(null, null, null, piece,
+						piece.value, definedIDs);
 				V.addAll(CMLib.percolator().findItems(piece, definedIDs));
 				break;
 			default:
 				break;
 			}
-		} catch(CMException cex) {
-			mob.tell("Unable to generate: "+cex.getMessage());
-			if(CMSecurity.isDebugging(CMSecurity.DbgFlag.MUDPERCOLATOR))
-				Log.debugOut("Generate",cex);
+		} catch (CMException cex) {
+			mob.tell("Unable to generate: " + cex.getMessage());
+			if (CMSecurity.isDebugging(CMSecurity.DbgFlag.MUDPERCOLATOR))
+				Log.debugOut("Generate", cex);
 			return false;
 		}
-		if(V.size()==0)
+		if (V.size() == 0)
 			mob.tell("Nothing generated.");
 		else
-		for(int v=0;v<V.size();v++)
-			if(V.elementAt(v) instanceof MOB)
-			{
-				((MOB)V.elementAt(v)).bringToLife(mob.location(),true);
-				mob.location().showHappens(CMMsg.MSG_OK_VISUAL,((MOB)V.elementAt(v)).name()+" appears.");
-				Log.sysOut("Generate",mob.Name()+" generated mob "+((MOB)V.elementAt(v)).name());
-			}
-			else
-			if(V.elementAt(v) instanceof Item)
-			{
-				mob.location().addItem((Item)V.elementAt(v));
-				mob.location().showHappens(CMMsg.MSG_OK_VISUAL,((Item)V.elementAt(v)).name()+" appears.");
-				Log.sysOut("Generate",mob.Name()+" generated item "+((Item)V.elementAt(v)).name());
-			}
-			else
-			if(V.elementAt(v) instanceof String)
-				mob.tell((String)V.elementAt(v));
-			else
-			if(V.elementAt(v) instanceof Room)
-			{
-				Room R=(Room)V.elementAt(v);
-				createNewPlace(mob,mob.location(),R,direction);
-				CMLib.database().DBCreateRoom(R);
-				CMLib.database().DBUpdateExits(R);
-				CMLib.database().DBUpdateItems(R);
-				CMLib.database().DBUpdateMOBs(R);
-				Log.sysOut("Generate",mob.Name()+" generated room "+R.roomID());
-			}
-			else
-			if(V.elementAt(v) instanceof Area)
-			{
-				Area A=(Area)V.elementAt(v);
-				CMLib.map().addArea(A);
-				CMLib.database().DBCreateArea(A);
-				Room R=A.getRoom(A.Name()+"#0");
-				if(R==null) R=A.getFilledProperMap().nextElement();
-				createNewPlace(mob,mob.location(),R,direction);
-				mob.tell("Saving remaining rooms for area '"+A.name()+"'...");
-				for(Enumeration e=A.getFilledProperMap();e.hasMoreElements();)
-				{
-					R=(Room)e.nextElement();
+			for (int v = 0; v < V.size(); v++)
+				if (V.elementAt(v) instanceof MOB) {
+					((MOB) V.elementAt(v)).bringToLife(mob.location(), true);
+					mob.location().showHappens(CMMsg.MSG_OK_VISUAL,
+							((MOB) V.elementAt(v)).name() + " appears.");
+					Log.sysOut("Generate", mob.Name() + " generated mob "
+							+ ((MOB) V.elementAt(v)).name());
+				} else if (V.elementAt(v) instanceof Item) {
+					mob.location().addItem((Item) V.elementAt(v));
+					mob.location().showHappens(CMMsg.MSG_OK_VISUAL,
+							((Item) V.elementAt(v)).name() + " appears.");
+					Log.sysOut("Generate", mob.Name() + " generated item "
+							+ ((Item) V.elementAt(v)).name());
+				} else if (V.elementAt(v) instanceof String)
+					mob.tell((String) V.elementAt(v));
+				else if (V.elementAt(v) instanceof Room) {
+					Room R = (Room) V.elementAt(v);
+					createNewPlace(mob, mob.location(), R, direction);
 					CMLib.database().DBCreateRoom(R);
 					CMLib.database().DBUpdateExits(R);
 					CMLib.database().DBUpdateItems(R);
 					CMLib.database().DBUpdateMOBs(R);
+					Log.sysOut("Generate",
+							mob.Name() + " generated room " + R.roomID());
+				} else if (V.elementAt(v) instanceof Area) {
+					Area A = (Area) V.elementAt(v);
+					CMLib.map().addArea(A);
+					CMLib.database().DBCreateArea(A);
+					Room R = A.getRoom(A.Name() + "#0");
+					if (R == null)
+						R = A.getFilledProperMap().nextElement();
+					createNewPlace(mob, mob.location(), R, direction);
+					mob.tell("Saving remaining rooms for area '" + A.name()
+							+ "'...");
+					for (Enumeration e = A.getFilledProperMap(); e
+							.hasMoreElements();) {
+						R = (Room) e.nextElement();
+						CMLib.database().DBCreateRoom(R);
+						CMLib.database().DBUpdateExits(R);
+						CMLib.database().DBUpdateItems(R);
+						CMLib.database().DBUpdateMOBs(R);
+					}
+					mob.tell("Done saving remaining rooms for area '"
+							+ A.name() + "'");
+					Log.sysOut("Generate",
+							mob.Name() + " generated area " + A.name());
 				}
-				mob.tell("Done saving remaining rooms for area '"+A.name()+"'");
-				Log.sysOut("Generate",mob.Name()+" generated area "+A.name());
-			}
-		Log.sysOut("Generate",finalLog);
+		Log.sysOut("Generate", finalLog);
 		return true;
 	}
-	
-	public boolean canBeOrdered(){return false;}
 
-	public boolean securityCheck(MOB mob){return CMSecurity.isAllowedAnywhere(mob,CMSecurity.SecFlag.CMDAREAS);}
+	public boolean canBeOrdered() {
+		return false;
+	}
+
+	public boolean securityCheck(MOB mob) {
+		return CMSecurity.isAllowedAnywhere(mob, CMSecurity.SecFlag.CMDAREAS);
+	}
 }

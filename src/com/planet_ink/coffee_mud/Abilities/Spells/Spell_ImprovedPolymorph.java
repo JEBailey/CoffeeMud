@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -16,160 +17,167 @@ import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_ImprovedPolymorph extends Spell
-{
-	public String ID() { return "Spell_ImprovedPolymorph"; }
-	public String name(){return "Improved Polymorph";}
-	public String displayText(){return "(Improved Polymorph)";}
-	protected int canAffectCode(){return CAN_MOBS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_TRANSMUTATION;}
-	public int abstractQuality(){ return Ability.QUALITY_OK_OTHERS;}
+public class Spell_ImprovedPolymorph extends Spell {
+	public String ID() {
+		return "Spell_ImprovedPolymorph";
+	}
 
-	Race newRace=null;
+	public String name() {
+		return "Improved Polymorph";
+	}
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		if(newRace!=null)
-		{
-			if(affected.name().indexOf(' ')>0)
-				affectableStats.setName("a "+newRace.name()+" called "+affected.name());
+	public String displayText() {
+		return "(Improved Polymorph)";
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_TRANSMUTATION;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_OTHERS;
+	}
+
+	Race newRace = null;
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+		if (newRace != null) {
+			if (affected.name().indexOf(' ') > 0)
+				affectableStats.setName("a " + newRace.name() + " called "
+						+ affected.name());
 			else
-				affectableStats.setName(affected.name()+" the "+newRace.name());
-			int oldAdd=affectableStats.weight()-affected.basePhyStats().weight();
-			newRace.setHeightWeight(affectableStats,'M');
-			if(oldAdd>0) affectableStats.setWeight(affectableStats.weight()+oldAdd);
+				affectableStats.setName(affected.name() + " the "
+						+ newRace.name());
+			int oldAdd = affectableStats.weight()
+					- affected.basePhyStats().weight();
+			newRace.setHeightWeight(affectableStats, 'M');
+			if (oldAdd > 0)
+				affectableStats.setWeight(affectableStats.weight() + oldAdd);
 		}
 	}
-	public void affectCharStats(MOB affected, CharStats affectableStats)
-	{
-		super.affectCharStats(affected,affectableStats);
-		if(newRace!=null)
-		{
-			int oldCat=affected.baseCharStats().ageCategory();
+
+	public void affectCharStats(MOB affected, CharStats affectableStats) {
+		super.affectCharStats(affected, affectableStats);
+		if (newRace != null) {
+			int oldCat = affected.baseCharStats().ageCategory();
 			affectableStats.setMyRace(newRace);
-			if((affected.baseCharStats().getStat(CharStats.STAT_AGE)>0)
-			&&(newRace.getAgingChart()[oldCat]<Short.MAX_VALUE))
-				affectableStats.setStat(CharStats.STAT_AGE,newRace.getAgingChart()[oldCat]);
+			if ((affected.baseCharStats().getStat(CharStats.STAT_AGE) > 0)
+					&& (newRace.getAgingChart()[oldCat] < Short.MAX_VALUE))
+				affectableStats.setStat(CharStats.STAT_AGE,
+						newRace.getAgingChart()[oldCat]);
 		}
 	}
 
-	public void unInvoke()
-	{
+	public void unInvoke() {
 		// undo the affects of this spell
-		if(!(affected instanceof MOB))
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 		super.unInvoke();
-		if(canBeUninvoked())
-			if((mob.location()!=null)&&(!mob.amDead()))
-				mob.location().show(mob,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> morph(s) back to <S-HIS-HER> normal form.");
+		if (canBeUninvoked())
+			if ((mob.location() != null) && (!mob.amDead()))
+				mob.location().show(mob, null, CMMsg.MSG_OK_VISUAL,
+						"<S-NAME> morph(s) back to <S-HIS-HER> normal form.");
 	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(target instanceof MOB)
-			{
-				if((mob.getVictim()==target)&&(target.fetchEffect(ID())==null))
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (target instanceof MOB) {
+				if ((mob.getVictim() == target)
+						&& (target.fetchEffect(ID()) == null))
 					return Ability.QUALITY_MALICIOUS;
 			}
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		if(commands.size()==0)
-		{
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		if (commands.size() == 0) {
 			mob.tell("You need to specify what to turn your target into!");
 			return false;
 		}
-		String race=(String)commands.lastElement();
+		String race = (String) commands.lastElement();
 		commands.removeElement(commands.lastElement());
-		MOB target=this.getTarget(mob,commands,givenTarget);
-		if(target==null) return false;
-		if((target==mob)&&(!auto))
-		{
+		MOB target = this.getTarget(mob, commands, givenTarget);
+		if (target == null)
+			return false;
+		if ((target == mob) && (!auto)) {
 			mob.tell("You cannot hold enough energy to cast this on yourself.");
 			return false;
 		}
-		Race R=CMClass.getRace(race);
-		if((R==null)&&(!auto))
-		{
-			if(mob.isMonster())
-			{
-				R=CMClass.randomRace();
-				for(int i=0;i<10;i++)
-				{
-					if((R!=null)
-					&&(CMProps.isTheme(R.availabilityCode()))
-					&&(R!=mob.charStats().getMyRace()))
+		Race R = CMClass.getRace(race);
+		if ((R == null) && (!auto)) {
+			if (mob.isMonster()) {
+				R = CMClass.randomRace();
+				for (int i = 0; i < 10; i++) {
+					if ((R != null) && (CMProps.isTheme(R.availabilityCode()))
+							&& (R != mob.charStats().getMyRace()))
 						break;
-					R=CMClass.randomRace();
+					R = CMClass.randomRace();
 				}
-			}
-			else
-			{
-				mob.tell("You can't turn "+target.name(mob)+" into a '"+race+"'!");
+			} else {
+				mob.tell("You can't turn " + target.name(mob) + " into a '"
+						+ race + "'!");
 				return false;
 			}
-		}
-		else
-		if(R==null)
-		{
-			R=CMClass.randomRace();
-			for(int i=0;i<10;i++)
-			{
-				if((R!=null)
-				&&(CMProps.isTheme(R.availabilityCode()))
-				&&(R!=mob.charStats().getMyRace()))
+		} else if (R == null) {
+			R = CMClass.randomRace();
+			for (int i = 0; i < 10; i++) {
+				if ((R != null) && (CMProps.isTheme(R.availabilityCode()))
+						&& (R != mob.charStats().getMyRace()))
 					break;
-				R=CMClass.randomRace();
+				R = CMClass.randomRace();
 			}
 		}
 
-		if(target.baseCharStats().getMyRace() != target.charStats().getMyRace())
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> already polymorphed.");
+		if (target.baseCharStats().getMyRace() != target.charStats()
+				.getMyRace()) {
+			mob.tell(target, null, null,
+					"<S-NAME> <S-IS-ARE> already polymorphed.");
 			return false;
 		}
-		
-		if((R!=null)&&(!CMath.bset(R.availabilityCode(),Area.THEME_FANTASY)))
-		{
-			mob.tell("You can't turn "+target.name(mob)+" into a '"+R.name()+"'!");
+
+		if ((R != null)
+				&& (!CMath.bset(R.availabilityCode(), Area.THEME_FANTASY))) {
+			mob.tell("You can't turn " + target.name(mob) + " into a '"
+					+ R.name() + "'!");
 			return false;
 		}
-		
+
 		// the invoke method for spells receives as
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		int targetStatTotal=0;
-		MOB fakeMOB=CMClass.getFactoryMOB();
-		for(int s: CharStats.CODES.BASE())
-		{
-			targetStatTotal+=target.baseCharStats().getStat(s);
-			fakeMOB.baseCharStats().setStat(s,target.baseCharStats().getStat(s));
+		int targetStatTotal = 0;
+		MOB fakeMOB = CMClass.getFactoryMOB();
+		for (int s : CharStats.CODES.BASE()) {
+			targetStatTotal += target.baseCharStats().getStat(s);
+			fakeMOB.baseCharStats().setStat(s,
+					target.baseCharStats().getStat(s));
 		}
 		fakeMOB.baseCharStats().setMyRace(R);
 		fakeMOB.recoverCharStats();
@@ -178,51 +186,67 @@ public class Spell_ImprovedPolymorph extends Spell
 		fakeMOB.recoverCharStats();
 		fakeMOB.recoverPhyStats();
 		fakeMOB.recoverMaxState();
-		int fakeStatTotal=0;
-		for(int s: CharStats.CODES.BASE())
-			fakeStatTotal+=fakeMOB.charStats().getStat(s);
+		int fakeStatTotal = 0;
+		for (int s : CharStats.CODES.BASE())
+			fakeStatTotal += fakeMOB.charStats().getStat(s);
 
-		int statDiff=targetStatTotal-fakeStatTotal;
-		if(CMLib.flags().canMove(fakeMOB)!=CMLib.flags().canMove(target)) statDiff+=100;
-		if(CMLib.flags().canBreatheHere(fakeMOB,target.location())!=CMLib.flags().canBreatheHere(target,target.location())) statDiff+=50;
-		if(CMLib.flags().canSee(fakeMOB)!=CMLib.flags().canSee(target)) statDiff+=25;
-		if(CMLib.flags().canHear(fakeMOB)!=CMLib.flags().canHear(target)) statDiff+=10;
-		if(CMLib.flags().canSpeak(fakeMOB)!=CMLib.flags().canSpeak(target)) statDiff+=25;
-		if(CMLib.flags().canSmell(fakeMOB)!=CMLib.flags().canSmell(target)) statDiff+=5;
+		int statDiff = targetStatTotal - fakeStatTotal;
+		if (CMLib.flags().canMove(fakeMOB) != CMLib.flags().canMove(target))
+			statDiff += 100;
+		if (CMLib.flags().canBreatheHere(fakeMOB, target.location()) != CMLib
+				.flags().canBreatheHere(target, target.location()))
+			statDiff += 50;
+		if (CMLib.flags().canSee(fakeMOB) != CMLib.flags().canSee(target))
+			statDiff += 25;
+		if (CMLib.flags().canHear(fakeMOB) != CMLib.flags().canHear(target))
+			statDiff += 10;
+		if (CMLib.flags().canSpeak(fakeMOB) != CMLib.flags().canSpeak(target))
+			statDiff += 25;
+		if (CMLib.flags().canSmell(fakeMOB) != CMLib.flags().canSmell(target))
+			statDiff += 5;
 		fakeMOB.destroy();
-		
-		if(statDiff<0) statDiff=statDiff*-1;
-		int levelDiff=((mob.phyStats().level()+(2*getXLEVELLevel(mob)))-target.phyStats().level());
-		boolean success=proficiencyCheck(mob,levelDiff-statDiff,auto);
-		if(success&&(!auto)&&(!mob.mayIFight(target))&&(mob!=target)&&(!mob.getGroupMembers(new HashSet<MOB>()).contains(target)))
-		{
-			mob.tell(target.name(mob)+" is a player, so you must be group members, or your playerkill flags must be on for this to work.");
-			success=false;
+
+		if (statDiff < 0)
+			statDiff = statDiff * -1;
+		int levelDiff = ((mob.phyStats().level() + (2 * getXLEVELLevel(mob))) - target
+				.phyStats().level());
+		boolean success = proficiencyCheck(mob, levelDiff - statDiff, auto);
+		if (success && (!auto) && (!mob.mayIFight(target)) && (mob != target)
+				&& (!mob.getGroupMembers(new HashSet<MOB>()).contains(target))) {
+			mob.tell(target.name(mob)
+					+ " is a player, so you must be group members, or your playerkill flags must be on for this to work.");
+			success = false;
 		}
-		
-		if((success)&&((auto)||((levelDiff-statDiff)>-100)))
-		{
+
+		if ((success) && ((auto) || ((levelDiff - statDiff) > -100))) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
-			invoker=mob;
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> form(s) an improved spell around <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				if(msg.value()<=0)
-				{
-					newRace=R;
-					mob.location().show(target,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> become(s) a "+newRace.name()+"!");
-					success=beneficialAffect(mob,target,asLevel,0);
+			invoker = mob;
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							verbalCastCode(mob, target, auto),
+							auto ? ""
+									: "^S<S-NAME> form(s) an improved spell around <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				if (msg.value() <= 0) {
+					newRace = R;
+					mob.location().show(target, null, CMMsg.MSG_OK_VISUAL,
+							"<S-NAME> become(s) a " + newRace.name() + "!");
+					success = beneficialAffect(mob, target, asLevel, 0);
 					target.recoverCharStats();
 					CMLib.utensils().confirmWearability(target);
 				}
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,target,"<S-NAME> form(s) an improved spell around <T-NAMESELF>, but the spell fizzles.");
+		} else
+			return beneficialWordsFizzle(
+					mob,
+					target,
+					"<S-NAME> form(s) an improved spell around <T-NAMESELF>, but the spell fizzles.");
 
 		// return whether it worked
 		return success;

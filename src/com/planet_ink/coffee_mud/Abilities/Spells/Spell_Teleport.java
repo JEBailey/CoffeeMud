@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -16,147 +17,166 @@ import com.planet_ink.coffee_mud.core.collections.XVector;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Spell_Teleport extends Spell
-{
-	public String ID() { return "Spell_Teleport"; }
-	public String name(){return "Teleport";}
-	protected int canTargetCode(){return 0;}
-	public int classificationCode(){return Ability.ACODE_SPELL|Ability.DOMAIN_CONJURATION;}
-	public long flags(){return Ability.FLAG_TRANSPORTING;}
-	public int abstractQuality(){ return Ability.QUALITY_INDIFFERENT;}
-
-	private boolean isBadRoom(final Room room, final MOB mob, final Room newRoom)
-	{
-		return (room==null)
-		||(room==newRoom)
-		||(room.getArea()==newRoom.getArea())
-		||(room==mob.location())
-		||(!CMLib.flags().canAccess(mob,room))
-		||(CMLib.law().getLandTitle(room)!=null);
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Spell_Teleport extends Spell {
+	public String ID() {
+		return "Spell_Teleport";
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
 
-		if((auto||mob.isMonster())&&((commands.size()<1)||(((String)commands.firstElement()).equals(mob.name()))))
-		{
+	public String name() {
+		return "Teleport";
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_CONJURATION;
+	}
+
+	public long flags() {
+		return Ability.FLAG_TRANSPORTING;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	private boolean isBadRoom(final Room room, final MOB mob, final Room newRoom) {
+		return (room == null) || (room == newRoom)
+				|| (room.getArea() == newRoom.getArea())
+				|| (room == mob.location())
+				|| (!CMLib.flags().canAccess(mob, room))
+				|| (CMLib.law().getLandTitle(room) != null);
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+
+		if ((auto || mob.isMonster())
+				&& ((commands.size() < 1) || (((String) commands.firstElement())
+						.equals(mob.name())))) {
 			commands.clear();
-			if((text().length()>0)&&(CMLib.map().findArea(text())!=null))
+			if ((text().length() > 0) && (CMLib.map().findArea(text()) != null))
 				commands.add(text());
 			else
 				commands.addElement(CMLib.map().getRandomArea().Name());
 		}
-		if(commands.size()<1)
-		{
+		if (commands.size() < 1) {
 			mob.tell("Teleport to what area?");
 			return false;
 		}
-		String areaName=CMParms.combine(commands,0).trim().toUpperCase();
-		Area A=CMLib.map().findArea(areaName);
-		Vector candidates=new Vector();
-		if(A!=null) candidates.addAll(new XVector(A.getProperMap()));
-		for(int c=candidates.size()-1;c>=0;c--)
-			if(!CMLib.flags().canAccess(mob,(Room)candidates.elementAt(c)))
+		String areaName = CMParms.combine(commands, 0).trim().toUpperCase();
+		Area A = CMLib.map().findArea(areaName);
+		Vector candidates = new Vector();
+		if (A != null)
+			candidates.addAll(new XVector(A.getProperMap()));
+		for (int c = candidates.size() - 1; c >= 0; c--)
+			if (!CMLib.flags().canAccess(mob, (Room) candidates.elementAt(c)))
 				candidates.removeElementAt(c);
 
-		if(candidates.size()==0)
-		{
-			mob.tell("You don't know of an area called '"+CMParms.combine(commands,0)+"'.");
+		if (candidates.size() == 0) {
+			mob.tell("You don't know of an area called '"
+					+ CMParms.combine(commands, 0) + "'.");
 			return false;
 		}
 
-		if(CMLib.flags().isSitting(mob)||CMLib.flags().isSleeping(mob))
-		{
+		if (CMLib.flags().isSitting(mob) || CMLib.flags().isSleeping(mob)) {
 			mob.tell("You need to stand up!");
 			return false;
 		}
 
-		Room newRoom=null;
-		int tries=0;
-		while((tries<20)&&(newRoom==null))
-		{
-			newRoom=(Room)candidates.elementAt(CMLib.dice().roll(1,candidates.size(),-1));
-			if(((newRoom.roomID().length()==0)&&(CMLib.dice().rollPercentage()>50))
-			||((newRoom.domainType()==Room.DOMAIN_OUTDOORS_AIR)&&(CMLib.dice().rollPercentage()>10)))
-			{
-				newRoom=null;
+		Room newRoom = null;
+		int tries = 0;
+		while ((tries < 20) && (newRoom == null)) {
+			newRoom = (Room) candidates.elementAt(CMLib.dice().roll(1,
+					candidates.size(), -1));
+			if (((newRoom.roomID().length() == 0) && (CMLib.dice()
+					.rollPercentage() > 50))
+					|| ((newRoom.domainType() == Room.DOMAIN_OUTDOORS_AIR) && (CMLib
+							.dice().rollPercentage() > 10))) {
+				newRoom = null;
 				continue;
 			}
-			CMMsg enterMsg=CMClass.getMsg(mob,newRoom,null,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,null);
-			Session session=mob.session();
+			CMMsg enterMsg = CMClass.getMsg(mob, newRoom, null,
+					CMMsg.MSG_ENTER, null, CMMsg.MSG_ENTER, null,
+					CMMsg.MSG_ENTER, null);
+			Session session = mob.session();
 			mob.setSession(null);
-			if(!newRoom.okMessage(mob,enterMsg))
-				newRoom=null;
+			if (!newRoom.okMessage(mob, enterMsg))
+				newRoom = null;
 			mob.setSession(session);
 			tries++;
 		}
 
-		if(newRoom==null)
-		{
+		if (newRoom == null) {
 			mob.tell("Your magic seems unable to take you to that area.");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(!success)
-		{
-			Room room=null;
-			int x=0;
-			while(isBadRoom(room,mob,newRoom) && ((++x)<1000))
-				room=CMLib.map().getRandomRoom();
-			if(isBadRoom(room,mob,newRoom))
-				beneficialWordsFizzle(mob,null,"<S-NAME> attempt(s) to invoke transportation, but fizzle(s) the spell.");
-			newRoom=room;
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (!success) {
+			Room room = null;
+			int x = 0;
+			while (isBadRoom(room, mob, newRoom) && ((++x) < 1000))
+				room = CMLib.map().getRandomRoom();
+			if (isBadRoom(room, mob, newRoom))
+				beneficialWordsFizzle(mob, null,
+						"<S-NAME> attempt(s) to invoke transportation, but fizzle(s) the spell.");
+			newRoom = room;
 		}
 
-		CMMsg msg=CMClass.getMsg(mob,null,this,CMMsg.MASK_MOVE|verbalCastCode(mob,newRoom,auto),"^S<S-NAME> invoke(s) a teleportation spell.^?");
-		if(mob.location().okMessage(mob,msg)&&(newRoom!=null))
-		{
-			mob.location().send(mob,msg);
-			Set<MOB> h=properTargets(mob,givenTarget,false);
-			if(h==null) return false;
+		CMMsg msg = CMClass.getMsg(mob, null, this, CMMsg.MASK_MOVE
+				| verbalCastCode(mob, newRoom, auto),
+				"^S<S-NAME> invoke(s) a teleportation spell.^?");
+		if (mob.location().okMessage(mob, msg) && (newRoom != null)) {
+			mob.location().send(mob, msg);
+			Set<MOB> h = properTargets(mob, givenTarget, false);
+			if (h == null)
+				return false;
 
-			Room thisRoom=mob.location();
-			for(Iterator f=h.iterator();f.hasNext();)
-			{
-				MOB follower=(MOB)f.next();
-				CMMsg enterMsg=CMClass.getMsg(follower,newRoom,this,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,"<S-NAME> appears in a puff of smoke."+CMLib.protocol().msp("appear.wav",10));
-				CMMsg leaveMsg=CMClass.getMsg(follower,thisRoom,this,CMMsg.MSG_LEAVE|CMMsg.MASK_MAGIC,"<S-NAME> disappear(s) in a puff of smoke.");
-				if(thisRoom.okMessage(follower,leaveMsg)&&newRoom.okMessage(follower,enterMsg))
-				{
-					if(follower.isInCombat())
-					{
-						CMLib.commands().postFlee(follower,("NOWHERE"));
+			Room thisRoom = mob.location();
+			for (Iterator f = h.iterator(); f.hasNext();) {
+				MOB follower = (MOB) f.next();
+				CMMsg enterMsg = CMClass.getMsg(follower, newRoom, this,
+						CMMsg.MSG_ENTER, null, CMMsg.MSG_ENTER, null,
+						CMMsg.MSG_ENTER, "<S-NAME> appears in a puff of smoke."
+								+ CMLib.protocol().msp("appear.wav", 10));
+				CMMsg leaveMsg = CMClass.getMsg(follower, thisRoom, this,
+						CMMsg.MSG_LEAVE | CMMsg.MASK_MAGIC,
+						"<S-NAME> disappear(s) in a puff of smoke.");
+				if (thisRoom.okMessage(follower, leaveMsg)
+						&& newRoom.okMessage(follower, enterMsg)) {
+					if (follower.isInCombat()) {
+						CMLib.commands().postFlee(follower, ("NOWHERE"));
 						follower.makePeace();
 					}
-					thisRoom.send(follower,leaveMsg);
-					newRoom.bringMobHere(follower,false);
-					newRoom.send(follower,enterMsg);
+					thisRoom.send(follower, leaveMsg);
+					newRoom.bringMobHere(follower, false);
+					newRoom.send(follower, enterMsg);
 					follower.tell("\n\r\n\r");
-					CMLib.commands().postLook(follower,true);
+					CMLib.commands().postLook(follower, true);
 				}
 			}
 		}
-
-
 
 		// return whether it worked
 		return success;

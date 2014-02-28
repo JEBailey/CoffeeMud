@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -17,135 +18,138 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_SpottersOrders extends Spell
-{
-	public String ID() { return "Spell_SpottersOrders"; }
-	public String name(){return "Spotters Orders";}
-	public String displayText(){return "(Spotting weaknesses of "+text()+")";}
-	public int abstractQuality(){ return Ability.QUALITY_BENEFICIAL_SELF;}
-	protected int canAffectCode(){return CAN_MOBS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_DIVINATION;}
-	protected MOB spottedM=null;
-	protected boolean activated=true;
-	protected List<Triad<MOB,Ability,long[]>> groupMembers=null;
+public class Spell_SpottersOrders extends Spell {
+	public String ID() {
+		return "Spell_SpottersOrders";
+	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(target instanceof MOB)
-		{
-			MOB M=(MOB)target;
-			if(!M.isInCombat())
+	public String name() {
+		return "Spotters Orders";
+	}
+
+	public String displayText() {
+		return "(Spotting weaknesses of " + text() + ")";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_BENEFICIAL_SELF;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_DIVINATION;
+	}
+
+	protected MOB spottedM = null;
+	protected boolean activated = true;
+	protected List<Triad<MOB, Ability, long[]>> groupMembers = null;
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (target instanceof MOB) {
+			MOB M = (MOB) target;
+			if (!M.isInCombat())
 				return Ability.QUALITY_INDIFFERENT;
-			if(M.fetchEffect("Spell_DetectWeaknesses")==null)
+			if (M.fetchEffect("Spell_DetectWeaknesses") == null)
 				return Ability.QUALITY_INDIFFERENT;
-			if((M.amFollowing()==null)&&(M.numFollowers()==0))
+			if ((M.amFollowing() == null) && (M.numFollowers() == 0))
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		
-		if((affected instanceof MOB)&&(activated))
-			affectableStats.setSpeed(affectableStats.speed()-0.5);
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+
+		if ((affected instanceof MOB) && (activated))
+			affectableStats.setSpeed(affectableStats.speed() - 0.5);
 	}
-	
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking, tickID))
+
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
-		if(ticking instanceof MOB)
-		{
-			MOB mob=(MOB)ticking;
-			if((!mob.isInCombat())
-			||((spottedM!=null) && (spottedM.amDead())))
-			{
+		if (ticking instanceof MOB) {
+			MOB mob = (MOB) ticking;
+			if ((!mob.isInCombat())
+					|| ((spottedM != null) && (spottedM.amDead()))) {
 				unInvoke();
 				return false;
 			}
-			MOB victim=mob.getVictim();
-			if((victim!=null)
-			&&((victim==spottedM)||( (spottedM==null) && victim.Name().equalsIgnoreCase(text()))))
-			{
-				if(!activated)
-				{
-					activated=true;
+			MOB victim = mob.getVictim();
+			if ((victim != null)
+					&& ((victim == spottedM) || ((spottedM == null) && victim
+							.Name().equalsIgnoreCase(text())))) {
+				if (!activated) {
+					activated = true;
+					mob.recoverPhyStats();
+				}
+			} else {
+				if (activated) {
+					activated = false;
 					mob.recoverPhyStats();
 				}
 			}
-			else
-			{
-				if(activated)
-				{
-					activated=false;
-					mob.recoverPhyStats();
-				}
-			}
-			if(groupMembers==null)
-			{
-				Set<MOB> grp=mob.getGroupMembers(new TreeSet<MOB>());
-				groupMembers=new LinkedList<Triad<MOB,Ability,long[]>>();
-				for(MOB M : grp)
-				{
-					long[] time=new long[]{System.currentTimeMillis()-1};
-					Triad<MOB,Ability,long[]> P=new Triad<MOB,Ability,long[]>(M,null,time);
+			if (groupMembers == null) {
+				Set<MOB> grp = mob.getGroupMembers(new TreeSet<MOB>());
+				groupMembers = new LinkedList<Triad<MOB, Ability, long[]>>();
+				for (MOB M : grp) {
+					long[] time = new long[] { System.currentTimeMillis() - 1 };
+					Triad<MOB, Ability, long[]> P = new Triad<MOB, Ability, long[]>(
+							M, null, time);
 					groupMembers.add(P);
 				}
 			}
-			for(Triad<MOB,Ability,long[]> P : groupMembers)
-			{
-				boolean ishouldhaveit=activated;
-				if(P.first.location()!=mob.location())
-					ishouldhaveit=false;
-				if(ishouldhaveit)
-				{
-					if(System.currentTimeMillis() > P.third[0])
-					{
-						P.third[0]=System.currentTimeMillis() + (CMLib.dice().roll(1, 4, 0) * CMProps.getTickMillis()) -1;
-						if(mob!=P.first)
-							P.first.tell(mob,spottedM,null,"<S-NAME> telepathically imparts the weaknesses of <T-NAME> to you.");
+			for (Triad<MOB, Ability, long[]> P : groupMembers) {
+				boolean ishouldhaveit = activated;
+				if (P.first.location() != mob.location())
+					ishouldhaveit = false;
+				if (ishouldhaveit) {
+					if (System.currentTimeMillis() > P.third[0]) {
+						P.third[0] = System.currentTimeMillis()
+								+ (CMLib.dice().roll(1, 4, 0) * CMProps
+										.getTickMillis()) - 1;
+						if (mob != P.first)
+							P.first.tell(mob, spottedM, null,
+									"<S-NAME> telepathically imparts the weaknesses of <T-NAME> to you.");
 					}
-					if(P.second==null)
-					{
-						P.second=CMClass.getAbility("Spell_DetectWeaknesses");
-						if(P.second!=null)
-						{
+					if (P.second == null) {
+						P.second = CMClass.getAbility("Spell_DetectWeaknesses");
+						if (P.second != null) {
 							P.second.setMiscText(text());
-							if(P.second instanceof Spell_DetectWeaknesses)
-								((Spell_DetectWeaknesses)P.second).spottedM=spottedM;
-							P.second.setStat("TICKDOWN", Integer.toString(tickDown));
+							if (P.second instanceof Spell_DetectWeaknesses)
+								((Spell_DetectWeaknesses) P.second).spottedM = spottedM;
+							P.second.setStat("TICKDOWN",
+									Integer.toString(tickDown));
 							P.second.setInvoker(mob);
 							P.first.addEffect(P.second);
 							P.second.tick(P.first, Tickable.TICKID_MOB);
 							P.first.recoverPhyStats();
-							if((invoker()!=null)&&(invoker()!=P.first))
-								P.first.tell("You can sense the shared thoughts of "+invoker().Name()+".");
+							if ((invoker() != null) && (invoker() != P.first))
+								P.first.tell("You can sense the shared thoughts of "
+										+ invoker().Name() + ".");
 						}
 					}
-				}
-				else
-				{
-					if(P.second!=null)
-					{
+				} else {
+					if (P.second != null) {
 						P.first.delEffect(P.second);
-						P.second=null;
+						P.second = null;
 						P.first.recoverPhyStats();
 					}
 				}
@@ -154,72 +158,73 @@ public class Spell_SpottersOrders extends Spell
 		return true;
 	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
-		if(canBeUninvoked())
-		{
-			if(groupMembers!=null)
-				for(final Triad<MOB,Ability,long[]> Ms : groupMembers)
-				{
-					final Ability A=Ms.second;
-					if((A!=null)&&(A.invoker()==mob))
+		if (canBeUninvoked()) {
+			if (groupMembers != null)
+				for (final Triad<MOB, Ability, long[]> Ms : groupMembers) {
+					final Ability A = Ms.second;
+					if ((A != null) && (A.invoker() == mob))
 						A.unInvoke();
 				}
-			groupMembers=null;
+			groupMembers = null;
 		}
 		super.unInvoke();
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if((auto)&&(givenTarget!=null)&&(givenTarget instanceof MOB))
-			target=(MOB)givenTarget;
-		if(!target.isInCombat())
-		{
-			mob.tell(target,null,null,"<T-NAME> <T-IS-ARE> not in combat.");
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if ((auto) && (givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
+		if (!target.isInCombat()) {
+			mob.tell(target, null, null, "<T-NAME> <T-IS-ARE> not in combat.");
 			return false;
 		}
 
-		if(target.fetchEffect(this.ID())!=null)
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> already knowledgable about <S-HIS-HER> target.");
+		if (target.fetchEffect(this.ID()) != null) {
+			mob.tell(target, null, null,
+					"<S-NAME> <S-IS-ARE> already knowledgable about <S-HIS-HER> target.");
 			return false;
 		}
-		
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
-			return false;
 
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
 
 		// now see if it worked
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> point(s) at <S-HIS-HER> group members and knowingly cast(s) a spell concerning <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				if(beneficialAffect(mob,target,asLevel,0))
-				{
-					Spell_SpottersOrders A=(Spell_SpottersOrders)target.fetchEffect(ID());
-					MOB victim=target.getVictim();
-					if(A!=null)
-					{
-						A.spottedM=victim;
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							verbalCastCode(mob, target, auto),
+							auto ? ""
+									: "^S<S-NAME> point(s) at <S-HIS-HER> group members and knowingly cast(s) a spell concerning <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				if (beneficialAffect(mob, target, asLevel, 0)) {
+					Spell_SpottersOrders A = (Spell_SpottersOrders) target
+							.fetchEffect(ID());
+					MOB victim = target.getVictim();
+					if (A != null) {
+						A.spottedM = victim;
 						A.setMiscText(victim.Name());
-						mob.location().show(target,victim,CMMsg.MSG_OK_VISUAL,"<S-NAME> attain(s) knowledge of <T-YOUPOSS> weaknesses!");
+						mob.location()
+								.show(target, victim, CMMsg.MSG_OK_VISUAL,
+										"<S-NAME> attain(s) knowledge of <T-YOUPOSS> weaknesses!");
 					}
 				}
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,target,"<S-NAME> point(s) at <S-HIS-HER> group members speak(s) knowingly about <T-NAMESELF>, but nothing more happens.");
-
+		} else
+			return beneficialWordsFizzle(
+					mob,
+					target,
+					"<S-NAME> point(s) at <S-HIS-HER> group members speak(s) knowingly about <T-NAMESELF>, but nothing more happens.");
 
 		// return whether it worked
 		return success;

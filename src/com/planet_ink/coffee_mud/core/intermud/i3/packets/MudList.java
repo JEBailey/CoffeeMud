@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.packets;
+
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
@@ -6,27 +7,25 @@ import java.util.Map;
 import com.planet_ink.coffee_mud.core.intermud.i3.persist.Persistent;
 
 /**
- * Copyright (c) 1996 George Reese
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  	  http://www.apache.org/licenses/LICENSE-2.0
- *
+ * Copyright (c) 1996 George Reese Licensed under the Apache License, Version
+ * 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ * 
  */
-@SuppressWarnings({"unchecked","rawtypes"})
-public class MudList implements Serializable 
-{
-	public static final long serialVersionUID=0;
-	
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class MudList implements Serializable {
+	public static final long serialVersionUID = 0;
+
 	private int id;
-	private Map<String,I3Mud> list;
+	private Map<String, I3Mud> list;
 	private int modified;
 
 	public MudList() {
@@ -50,21 +49,19 @@ public class MudList implements Serializable
 	}
 
 	public void addMud(I3Mud mud) {
-		if(( mud.mud_name == null )||( mud.mud_name.length() == 0 )) 
-		{
+		if ((mud.mud_name == null) || (mud.mud_name.length() == 0)) {
 			return;
 		}
 		{ // temp hack
 			char c = mud.mud_name.charAt(0);
 
-			if( !(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && c != '(' ) {
+			if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && c != '(') {
 				return;
 			}
 		}
-		if( list.containsKey(mud.mud_name) ) {
+		if (list.containsKey(mud.mud_name)) {
 			mud.modified = Persistent.MODIFIED;
-		}
-		else {
+		} else {
 			mud.modified = Persistent.NEW;
 		}
 		list.put(mud.mud_name, mud);
@@ -72,19 +69,19 @@ public class MudList implements Serializable
 	}
 
 	public I3Mud getMud(String mud) {
-		if( !list.containsKey(mud) ) {
+		if (!list.containsKey(mud)) {
 			return null;
 		}
 		I3Mud tmp = list.get(mud);
 
-		if( tmp.modified == Persistent.DELETED ) {
+		if (tmp.modified == Persistent.DELETED) {
 			return null;
 		}
 		return tmp;
 	}
 
 	public void removeMud(I3Mud mud) {
-		if( mud.mud_name == null ) {
+		if (mud.mud_name == null) {
 			return;
 		}
 		mud.modified = Persistent.DELETED;
@@ -99,8 +96,7 @@ public class MudList implements Serializable
 		id = x;
 	}
 
-	public Map<String,I3Mud> getMuds() {
+	public Map<String, I3Mud> getMuds() {
 		return list;
 	}
 }
-

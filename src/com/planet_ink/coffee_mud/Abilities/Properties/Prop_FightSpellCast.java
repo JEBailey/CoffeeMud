@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Properties;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Abilities.interfaces.TriggeredAffect;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
@@ -11,69 +12,77 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Prop_FightSpellCast extends Prop_SpellAdder
-{
-	public String ID() { return "Prop_FightSpellCast"; }
-	public String name(){ return "Casting spells when properly used during combat";}
-	protected int canAffectCode(){return Ability.CAN_ITEMS;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Prop_FightSpellCast extends Prop_SpellAdder {
+	public String ID() {
+		return "Prop_FightSpellCast";
+	}
 
-	public String accountForYourself()
-	{ return spellAccountingsWithMask("Casts "," during combat.");}
+	public String name() {
+		return "Casting spells when properly used during combat";
+	}
 
-	public long flags(){return Ability.FLAG_CASTER;}
+	protected int canAffectCode() {
+		return Ability.CAN_ITEMS;
+	}
 
-	public int triggerMask() { return TriggeredAffect.TRIGGER_HITTING_WITH; }
-	
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{}
-	
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		if(processing) return;
+	public String accountForYourself() {
+		return spellAccountingsWithMask("Casts ", " during combat.");
+	}
 
-		if(!(affected instanceof Item)) return;
-		processing=true;
+	public long flags() {
+		return Ability.FLAG_CASTER;
+	}
 
-		Item myItem=(Item)affected;
+	public int triggerMask() {
+		return TriggeredAffect.TRIGGER_HITTING_WITH;
+	}
 
-		if((myItem!=null)
-		&&(msg.targetMinor()==CMMsg.TYP_DAMAGE)
-		&&((msg.value())>0)
-		&&(!myItem.amWearingAt(Wearable.IN_INVENTORY))
-		&&(myItem.owner() instanceof MOB)
-		&&(msg.target() instanceof MOB))
-		{
-			MOB mob=(MOB)myItem.owner();
-			if((mob.isInCombat())
-			&&(mob.location()!=null)
-			&&(!mob.amDead()))
-			{
-				if((myItem instanceof Weapon)
-				&&(msg.tool()==myItem)
-				&&(myItem.amWearingAt(Wearable.WORN_WIELD))
-				&&(msg.amISource(mob)))
-					addMeIfNeccessary(msg.source(),(MOB)msg.target(),true,0,maxTicks);
-				else
-				if((msg.amITarget(mob))
-				&&(!myItem.amWearingAt(Wearable.WORN_WIELD))
-				&&(!(myItem instanceof Weapon)))
-					addMeIfNeccessary(mob,mob,true,0,maxTicks);
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+	}
+
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		if (processing)
+			return;
+
+		if (!(affected instanceof Item))
+			return;
+		processing = true;
+
+		Item myItem = (Item) affected;
+
+		if ((myItem != null) && (msg.targetMinor() == CMMsg.TYP_DAMAGE)
+				&& ((msg.value()) > 0)
+				&& (!myItem.amWearingAt(Wearable.IN_INVENTORY))
+				&& (myItem.owner() instanceof MOB)
+				&& (msg.target() instanceof MOB)) {
+			MOB mob = (MOB) myItem.owner();
+			if ((mob.isInCombat()) && (mob.location() != null)
+					&& (!mob.amDead())) {
+				if ((myItem instanceof Weapon) && (msg.tool() == myItem)
+						&& (myItem.amWearingAt(Wearable.WORN_WIELD))
+						&& (msg.amISource(mob)))
+					addMeIfNeccessary(msg.source(), (MOB) msg.target(), true,
+							0, maxTicks);
+				else if ((msg.amITarget(mob))
+						&& (!myItem.amWearingAt(Wearable.WORN_WIELD))
+						&& (!(myItem instanceof Weapon)))
+					addMeIfNeccessary(mob, mob, true, 0, maxTicks);
 			}
 		}
-		processing=false;
+		processing = false;
 	}
 }

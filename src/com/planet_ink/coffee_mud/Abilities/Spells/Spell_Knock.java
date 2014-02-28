@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -16,129 +17,147 @@ import com.planet_ink.coffee_mud.core.Directions;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Spell_Knock extends Spell
-{
-	public String ID() { return "Spell_Knock"; }
-	public String name(){return "Knock";}
-	public String displayText(){return "(Knock Spell)";}
-	protected int canTargetCode(){return CAN_ITEMS|CAN_EXITS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_EVOCATION;}
-	public int abstractQuality(){ return Ability.QUALITY_INDIFFERENT;}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Spell_Knock extends Spell {
+	public String ID() {
+		return "Spell_Knock";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Room R=givenTarget==null?mob.location():CMLib.map().roomLocation(givenTarget);
-		if(R==null) R=mob.location();
-		if((auto||mob.isMonster())&&((commands.size()<1)||(((String)commands.firstElement()).equals(mob.name()))))
-		{
+	public String name() {
+		return "Knock";
+	}
+
+	public String displayText() {
+		return "(Knock Spell)";
+	}
+
+	protected int canTargetCode() {
+		return CAN_ITEMS | CAN_EXITS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_EVOCATION;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Room R = givenTarget == null ? mob.location() : CMLib.map()
+				.roomLocation(givenTarget);
+		if (R == null)
+			R = mob.location();
+		if ((auto || mob.isMonster())
+				&& ((commands.size() < 1) || (((String) commands.firstElement())
+						.equals(mob.name())))) {
 			commands.clear();
-			int theDir=-1;
-			for(int d=Directions.NUM_DIRECTIONS()-1;d>=0;d--)
-			{
-				Exit E=R.getExitInDir(d);
-				if((E!=null)
-				&&(!E.isOpen()))
-				{
-					theDir=d;
+			int theDir = -1;
+			for (int d = Directions.NUM_DIRECTIONS() - 1; d >= 0; d--) {
+				Exit E = R.getExitInDir(d);
+				if ((E != null) && (!E.isOpen())) {
+					theDir = d;
 					break;
 				}
 			}
-			if(theDir>=0)
+			if (theDir >= 0)
 				commands.addElement(Directions.getDirectionName(theDir));
 		}
 
-		String whatToOpen=CMParms.combine(commands,0);
-		Physical openThis=givenTarget;
-		int dirCode=Directions.getGoodDirectionCode(whatToOpen);
-		if(dirCode>=0)
-			openThis=R.getExitInDir(dirCode);
-		if(openThis==null)
-			openThis=getTarget(mob,R,givenTarget,commands,Wearable.FILTER_ANY);
-		if(openThis==null) return false;
+		String whatToOpen = CMParms.combine(commands, 0);
+		Physical openThis = givenTarget;
+		int dirCode = Directions.getGoodDirectionCode(whatToOpen);
+		if (dirCode >= 0)
+			openThis = R.getExitInDir(dirCode);
+		if (openThis == null)
+			openThis = getTarget(mob, R, givenTarget, commands,
+					Wearable.FILTER_ANY);
+		if (openThis == null)
+			return false;
 
-		if(openThis instanceof Exit)
-		{
-			if(((Exit)openThis).isOpen())
-			{
+		if (openThis instanceof Exit) {
+			if (((Exit) openThis).isOpen()) {
 				mob.tell("That's already open!");
 				return false;
 			}
-		}
-		else
-		if(openThis instanceof Container)
-		{
-			if(((Container)openThis).isOpen())
-			{
+		} else if (openThis instanceof Container) {
+			if (((Container) openThis).isOpen()) {
 				mob.tell("That's already open!");
 				return false;
 			}
-		}
-		else
-		{
-			mob.tell("You can't cast knock on "+openThis.name()+"!");
+		} else {
+			mob.tell("You can't cast knock on " + openThis.name() + "!");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-
-		int levelDiff=openThis.phyStats().level()-(mob.phyStats().level()+(2*super.getXLEVELLevel(mob)));
-		if(levelDiff<0) levelDiff=0;
-		boolean success=proficiencyCheck(mob,-(levelDiff*25),auto);
-		if(!success)
-			beneficialWordsFizzle(mob,openThis,auto?"Nothing happens to "+openThis.name()+".":"<S-NAME> point(s) at "+openThis.name()+" and shout(s) incoherently, but nothing happens.");
-		else
-		{
-			CMMsg msg=CMClass.getMsg(mob,openThis,this,verbalCastCode(mob,openThis,auto),(auto?openThis.name()+" begin(s) to glow!":"^S<S-NAME> point(s) at <T-NAMESELF>.^?")+CMLib.protocol().msp("knock.wav",10));
-			if(R.okMessage(mob,msg))
-			{
-				R.send(mob,msg);
-				for(int a=0;a<openThis.numEffects();a++)
-				{
-					Ability A=openThis.fetchEffect(a);
-					if((A!=null)&&(A.ID().equalsIgnoreCase("Spell_WizardLock")))
-					{
-						String txt=A.text().trim();
-						int level=(A.invoker()!=null)?A.invoker().phyStats().level():0;
-						if(txt.length()>0)
-						{
-							if(CMath.isInteger(txt))
-								level=CMath.s_int(txt);
-							else
-							{
-								int x=txt.indexOf(' ');
-								if((x>0)&&(CMath.isInteger(txt.substring(0,x))))
-									level=CMath.s_int(txt.substring(0,x));
+		int levelDiff = openThis.phyStats().level()
+				- (mob.phyStats().level() + (2 * super.getXLEVELLevel(mob)));
+		if (levelDiff < 0)
+			levelDiff = 0;
+		boolean success = proficiencyCheck(mob, -(levelDiff * 25), auto);
+		if (!success)
+			beneficialWordsFizzle(mob, openThis, auto ? "Nothing happens to "
+					+ openThis.name() + "." : "<S-NAME> point(s) at "
+					+ openThis.name()
+					+ " and shout(s) incoherently, but nothing happens.");
+		else {
+			CMMsg msg = CMClass.getMsg(mob, openThis, this,
+					verbalCastCode(mob, openThis, auto),
+					(auto ? openThis.name() + " begin(s) to glow!"
+							: "^S<S-NAME> point(s) at <T-NAMESELF>.^?")
+							+ CMLib.protocol().msp("knock.wav", 10));
+			if (R.okMessage(mob, msg)) {
+				R.send(mob, msg);
+				for (int a = 0; a < openThis.numEffects(); a++) {
+					Ability A = openThis.fetchEffect(a);
+					if ((A != null)
+							&& (A.ID().equalsIgnoreCase("Spell_WizardLock"))) {
+						String txt = A.text().trim();
+						int level = (A.invoker() != null) ? A.invoker()
+								.phyStats().level() : 0;
+						if (txt.length() > 0) {
+							if (CMath.isInteger(txt))
+								level = CMath.s_int(txt);
+							else {
+								int x = txt.indexOf(' ');
+								if ((x > 0)
+										&& (CMath
+												.isInteger(txt.substring(0, x))))
+									level = CMath.s_int(txt.substring(0, x));
 							}
 						}
-						if(level<(mob.phyStats().level()+3+(2*getXLEVELLevel(mob))))
-						{
+						if (level < (mob.phyStats().level() + 3 + (2 * getXLEVELLevel(mob)))) {
 							A.unInvoke();
-							R.show(mob,null,openThis,CMMsg.MSG_OK_VISUAL,"A spell around <O-NAME> seems to fade.");
+							R.show(mob, null, openThis, CMMsg.MSG_OK_VISUAL,
+									"A spell around <O-NAME> seems to fade.");
 							break;
 						}
 					}
 				}
-				msg=CMClass.getMsg(mob,openThis,null,CMMsg.MSG_UNLOCK,null);
-				CMLib.utensils().roomAffectFully(msg,R,dirCode);
-				msg=CMClass.getMsg(mob,openThis,null,CMMsg.MSG_OPEN,"<T-NAME> opens.");
-				CMLib.utensils().roomAffectFully(msg,R,dirCode);
+				msg = CMClass.getMsg(mob, openThis, null, CMMsg.MSG_UNLOCK,
+						null);
+				CMLib.utensils().roomAffectFully(msg, R, dirCode);
+				msg = CMClass.getMsg(mob, openThis, null, CMMsg.MSG_OPEN,
+						"<T-NAME> opens.");
+				CMLib.utensils().roomAffectFully(msg, R, dirCode);
 			}
 		}
 

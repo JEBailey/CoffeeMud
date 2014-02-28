@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Druid;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -11,76 +12,100 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 @SuppressWarnings("rawtypes")
-public class Chant_SenseAge extends Chant
-{
-	public String ID() { return "Chant_SenseAge"; }
-	public String name(){ return "Sense Age";}
-	protected int canAffectCode(){return 0;}
-	public int classificationCode(){return Ability.ACODE_CHANT|Ability.DOMAIN_BREEDING;}
-	public int abstractQuality(){return Ability.QUALITY_OK_OTHERS;}
-	protected int overrideMana(){return 5;}
+public class Chant_SenseAge extends Chant {
+	public String ID() {
+		return "Chant_SenseAge";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Physical target=getAnyTarget(mob,commands,givenTarget,Wearable.FILTER_ANY);
-		if(target==null) return false;
+	public String name() {
+		return "Sense Age";
+	}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_CHANT | Ability.DOMAIN_BREEDING;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_OTHERS;
+	}
+
+	protected int overrideMana() {
+		return 5;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Physical target = getAnyTarget(mob, commands, givenTarget,
+				Wearable.FILTER_ANY);
+		if (target == null)
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
+
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> chant(s) over <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				Ability A=target.fetchEffect("Age");
-				if((!(target instanceof MOB))&&(A==null))
-				{
-					mob.tell("You have no way to determining the age of "+target.name(mob)+".");
-					success=false;
-				}
-				else
-				if((target instanceof MOB)&&((A==null)||(A.displayText().length()==0)))
-				{
-					MOB M=(MOB)target;
-					if(M.baseCharStats().getStat(CharStats.STAT_AGE)<=0)
-						mob.tell("You can't determine how old "+target.name(mob)+" is with this magic.");
+			CMMsg msg = CMClass.getMsg(mob, target, this,
+					verbalCastCode(mob, target, auto), auto ? ""
+							: "^S<S-NAME> chant(s) over <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				Ability A = target.fetchEffect("Age");
+				if ((!(target instanceof MOB)) && (A == null)) {
+					mob.tell("You have no way to determining the age of "
+							+ target.name(mob) + ".");
+					success = false;
+				} else if ((target instanceof MOB)
+						&& ((A == null) || (A.displayText().length() == 0))) {
+					MOB M = (MOB) target;
+					if (M.baseCharStats().getStat(CharStats.STAT_AGE) <= 0)
+						mob.tell("You can't determine how old "
+								+ target.name(mob) + " is with this magic.");
 					else
-						mob.tell(target.name(mob)+" is "+CMLib.english().startWithAorAn(M.baseCharStats().ageName().toLowerCase())+" "+M.baseCharStats().raceName()+", aged "+M.baseCharStats().getStat(CharStats.STAT_AGE)+" years.");
-				}
-				else
-				{
-					String s=A.displayText();
-					if(s.startsWith("(")) s=s.substring(1);
-					if(s.endsWith(")")) s=s.substring(0,s.length()-1);
-					mob.tell(target.name(mob)+" is "+s+".");
+						mob.tell(target.name(mob)
+								+ " is "
+								+ CMLib.english().startWithAorAn(
+										M.baseCharStats().ageName()
+												.toLowerCase()) + " "
+								+ M.baseCharStats().raceName() + ", aged "
+								+ M.baseCharStats().getStat(CharStats.STAT_AGE)
+								+ " years.");
+				} else {
+					String s = A.displayText();
+					if (s.startsWith("("))
+						s = s.substring(1);
+					if (s.endsWith(")"))
+						s = s.substring(0, s.length() - 1);
+					mob.tell(target.name(mob) + " is " + s + ".");
 				}
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,target,"<S-NAME> chant(s) over <T-NAMESELF>, but the magic fades.");
+		} else
+			return beneficialWordsFizzle(mob, target,
+					"<S-NAME> chant(s) over <T-NAMESELF>, but the magic fades.");
 
 		// return whether it worked
 		return success;

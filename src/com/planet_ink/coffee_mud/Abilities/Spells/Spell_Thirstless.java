@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -10,103 +11,114 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_Thirstless extends Spell
-{
-	public String ID() { return "Spell_Thirstless"; }
-	public String name(){return "Thirstless";}
-	public String displayText(){return "(Thirstless)";}
-	public int abstractQuality(){ return Ability.QUALITY_BENEFICIAL_OTHERS;}
-	protected int canAffectCode(){return CAN_MOBS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_TRANSMUTATION;}
+public class Spell_Thirstless extends Spell {
+	public String ID() {
+		return "Spell_Thirstless";
+	}
 
-	public void affectCharState(MOB affected, CharState affectableMaxState)
-	{
-		super.affectCharState(affected,affectableMaxState);
+	public String name() {
+		return "Thirstless";
+	}
+
+	public String displayText() {
+		return "(Thirstless)";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_BENEFICIAL_OTHERS;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_TRANSMUTATION;
+	}
+
+	public void affectCharState(MOB affected, CharState affectableMaxState) {
+		super.affectCharState(affected, affectableMaxState);
 		affectableMaxState.setThirst(999999);
 		affected.curState().setThirst(affectableMaxState.getThirst());
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(affected instanceof MOB)
-			((MOB)affected).curState().setThirst(((MOB)affected).maxState().maxThirst(((MOB)affected).baseWeight()));
+	public boolean tick(Tickable ticking, int tickID) {
+		if (affected instanceof MOB)
+			((MOB) affected).curState().setThirst(
+					((MOB) affected).maxState().maxThirst(
+							((MOB) affected).baseWeight()));
 		return super.tick(ticking, tickID);
 	}
 
-
-	public void unInvoke()
-	{
+	public void unInvoke() {
 		// undo the affects of this spell
-		if(!(affected instanceof MOB))
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 		super.unInvoke();
 
-		if(canBeUninvoked())
-		{
+		if (canBeUninvoked()) {
 			mob.tell("You are starting to feel thirstier.");
 			mob.curState().setThirst(0);
 		}
 	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(target instanceof MOB)
-			{
-				if(((MOB)target).isMonster())
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (target instanceof MOB) {
+				if (((MOB) target).isMonster())
 					return Ability.QUALITY_INDIFFERENT;
 			}
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=this.getTarget(mob,commands,givenTarget);
-		if(target==null) return false;
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = this.getTarget(mob, commands, givenTarget);
+		if (target == null)
+			return false;
 
 		// the invoke method for spells receives as
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
 		// now see if it worked
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> cast(s) a spell on <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				beneficialAffect(mob,target,asLevel,0);
+			CMMsg msg = CMClass.getMsg(mob, target, this,
+					verbalCastCode(mob, target, auto), auto ? ""
+							: "^S<S-NAME> cast(s) a spell on <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				beneficialAffect(mob, target, asLevel, 0);
 				target.tell("You feel quenched!");
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,target,"<S-NAME> speak(s) thirstily to <T-NAMESELF>, but nothing more happens.");
+		} else
+			return beneficialWordsFizzle(mob, target,
+					"<S-NAME> speak(s) thirstily to <T-NAMESELF>, but nothing more happens.");
 
 		// return whether it worked
 		return success;

@@ -22,217 +22,234 @@ import com.planet_ink.miniweb.util.MWDataBuffers;
 import com.planet_ink.miniweb.util.MiniWebConfig;
 
 /*
-Copyright 2012-2014 Bo Zimmerman
+ Copyright 2012-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 /**
  * A version of the HTTPReader that handles ssl connections
+ * 
  * @see HTTPReader
  * @author Bo Zimmerman
- *
+ * 
  */
-public class HTTPSReader extends HTTPReader
-{
-	private final SSLEngine	 sslEngine;				// an instance of the sslengine handling this request
-	private final ByteBuffer sslIncomingBuffer;		// translation buffer holding raw incoming data before putting into app buffer
-	private final ByteBuffer sslOutgoingBuffer;		// translation buffer holding ssl outgoing data after pulling from app buffer
-	private final ByteBuffer appSizedBuf;			// When user app outgoing buffer is too large, a small bug breaks it into pieces
-	private boolean		 	 handshakeComplete	= false; // set to true when handshaking is completed
+public class HTTPSReader extends HTTPReader {
+	private final SSLEngine sslEngine; // an instance of the sslengine handling
+										// this request
+	private final ByteBuffer sslIncomingBuffer; // translation buffer holding
+												// raw incoming data before
+												// putting into app buffer
+	private final ByteBuffer sslOutgoingBuffer; // translation buffer holding
+												// ssl outgoing data after
+												// pulling from app buffer
+	private final ByteBuffer appSizedBuf; // When user app outgoing buffer is
+											// too large, a small bug breaks it
+											// into pieces
+	private boolean handshakeComplete = false; // set to true when handshaking
+												// is completed
 
-	
 	/**
-	 * Constructor takes the server managing this request, and the channel to read from and write to,
-	 * and the sslcontext
-	 * @param server the web server managing this handler
-	 * @param chan the channel to read from and write to
-	 * @param sslContext the ssl context is important
+	 * Constructor takes the server managing this request, and the channel to
+	 * read from and write to, and the sslcontext
+	 * 
+	 * @param server
+	 *            the web server managing this handler
+	 * @param chan
+	 *            the channel to read from and write to
+	 * @param sslContext
+	 *            the ssl context is important
 	 * @throws IOException
 	 */
-	public HTTPSReader(MiniWebServer server, SocketChannel chan, SSLContext sslContext) throws IOException
-	{
+	public HTTPSReader(MiniWebServer server, SocketChannel chan,
+			SSLContext sslContext) throws IOException {
 		super(server, chan);
-		sslEngine=sslContext.createSSLEngine();
+		sslEngine = sslContext.createSSLEngine();
 		sslEngine.setUseClientMode(false);
 		sslEngine.beginHandshake();
 		SSLSession session = sslEngine.getSession();
 		int netBufferMax = session.getPacketBufferSize();
-		appSizedBuf=ByteBuffer.allocate(session.getApplicationBufferSize());
-		sslIncomingBuffer=ByteBuffer.allocate(netBufferMax);
-		sslOutgoingBuffer=ByteBuffer.allocate(netBufferMax);
+		appSizedBuf = ByteBuffer.allocate(session.getApplicationBufferSize());
+		sslIncomingBuffer = ByteBuffer.allocate(netBufferMax);
+		sslOutgoingBuffer = ByteBuffer.allocate(netBufferMax);
 	}
-	
+
 	/**
-	 * Constructor takes the server managing this request, and the channel to read from and write to.
-	 * It will generate a generic, useless, ssl context
-	 * @param server the web server managing this handler
-	 * @param chan the channel to read from and write to
+	 * Constructor takes the server managing this request, and the channel to
+	 * read from and write to. It will generate a generic, useless, ssl context
+	 * 
+	 * @param server
+	 *            the web server managing this handler
+	 * @param chan
+	 *            the channel to read from and write to
 	 * @throws IOException
 	 */
-	public HTTPSReader(MiniWebServer server,  SocketChannel chan) throws IOException
-	{
+	public HTTPSReader(MiniWebServer server, SocketChannel chan)
+			throws IOException {
 		this(server, chan, generateNewContext(server.getConfig()));
 	}
 
 	/**
-	 * Returns a descriptive string for whether this is 
-	 * an ssl or http reader
+	 * Returns a descriptive string for whether this is an ssl or http reader
+	 * 
 	 * @return
 	 */
-	protected String getReaderType()
-	{
+	protected String getReaderType() {
 		return "https";
 	}
-	
+
 	/**
-	 * Inspired by: http://docs.oracle.com/javase/1.5.0/docs/guide/security/jsse/samples/sslengine/SSLEngineSimpleDemo.java
-	 * @param config  configuration for ssl context
+	 * Inspired by:
+	 * http://docs.oracle.com/javase/1.5.0/docs/guide/security/jsse/
+	 * samples/sslengine/SSLEngineSimpleDemo.java
+	 * 
+	 * @param config
+	 *            configuration for ssl context
 	 * @return the global ssl context
 	 */
-	public static synchronized final SSLContext generateNewContext(MiniWebConfig config)
-	{
-		try
-		{
-			if((config.getSslKeystorePath()==null)
-			||(config.getSslKeystorePassword()==null)
-			||(config.getSslKeystoreType()==null)
-			||(config.getSslKeyManagerEncoding()==null))
-			{
+	public static synchronized final SSLContext generateNewContext(
+			MiniWebConfig config) {
+		try {
+			if ((config.getSslKeystorePath() == null)
+					|| (config.getSslKeystorePassword() == null)
+					|| (config.getSslKeystoreType() == null)
+					|| (config.getSslKeyManagerEncoding() == null)) {
 				config.getLogger().finer("SSL not configured.");
 				return null;
 			}
 
 			char[] passphrase = config.getSslKeystorePassword().toCharArray();
-			KeyStore keyStore = KeyStore.getInstance(config.getSslKeystoreType());
-			FileManager mgr=config.getFileManager();
-			keyStore.load(mgr.getFileStream(mgr.createFileFromPath(config.getSslKeystorePath())), passphrase);
-	
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance(config.getSslKeyManagerEncoding());
+			KeyStore keyStore = KeyStore.getInstance(config
+					.getSslKeystoreType());
+			FileManager mgr = config.getFileManager();
+			keyStore.load(mgr.getFileStream(mgr.createFileFromPath(config
+					.getSslKeystorePath())), passphrase);
+
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance(config
+					.getSslKeyManagerEncoding());
 			kmf.init(keyStore, passphrase);
-	
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(config.getSslKeyManagerEncoding());
+
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(config
+					.getSslKeyManagerEncoding());
 			tmf.init(keyStore);
-	
+
 			SSLContext mySSLContext = SSLContext.getInstance("SSLv3");
-			mySSLContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+			mySSLContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+					new SecureRandom());
 			return mySSLContext;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			config.getLogger().throwing("", "", e);
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Reads bytes from the local channel into the given buffer, returning
-	 * the number of bytes read.  This code is parsed out here so that it
-	 * can be overridden by HTTPSReader
-	 * @param buffer target buffer for the data read
+	 * Reads bytes from the local channel into the given buffer, returning the
+	 * number of bytes read. This code is parsed out here so that it can be
+	 * overridden by HTTPSReader
+	 * 
+	 * @param buffer
+	 *            target buffer for the data read
 	 * @return the number of bytes read (decoded)
 	 * @throws IOException
 	 */
-	protected int readBytesFromClient(ByteBuffer buffer) throws IOException
-	{
-		try
-		{
-			int bytesRead= chan.read(sslIncomingBuffer);
-			if((bytesRead<=0)&&(sslIncomingBuffer.position()==0))
+	protected int readBytesFromClient(ByteBuffer buffer) throws IOException {
+		try {
+			int bytesRead = chan.read(sslIncomingBuffer);
+			if ((bytesRead <= 0) && (sslIncomingBuffer.position() == 0))
 				return bytesRead;
 			sslIncomingBuffer.flip();
-			SSLEngineResult result = sslEngine.unwrap(sslIncomingBuffer, buffer);
+			SSLEngineResult result = sslEngine
+					.unwrap(sslIncomingBuffer, buffer);
 			sslIncomingBuffer.compact();
-			if(handshakeComplete)
+			if (handshakeComplete)
 				return buffer.position();
-			HandshakeStatus status=sslEngine.getHandshakeStatus();
-			while((status != HandshakeStatus.NOT_HANDSHAKING) && (!this.isCloseable()))
-			{
-				switch(status)
-				{
-				case NEED_TASK:
-				{
-				    Runnable runnable;
-				    while ((runnable = sslEngine.getDelegatedTask()) != null) 
-				    {
+			HandshakeStatus status = sslEngine.getHandshakeStatus();
+			while ((status != HandshakeStatus.NOT_HANDSHAKING)
+					&& (!this.isCloseable())) {
+				switch (status) {
+				case NEED_TASK: {
+					Runnable runnable;
+					while ((runnable = sslEngine.getDelegatedTask()) != null) {
 						runnable.run();
-				    }
-				    status=sslEngine.getHandshakeStatus();
+					}
+					status = sslEngine.getHandshakeStatus();
 					break;
 				}
 				case NEED_UNWRAP:
-					bytesRead= chan.read(sslIncomingBuffer);
-					if(sslIncomingBuffer.position()<=0) 
+					bytesRead = chan.read(sslIncomingBuffer);
+					if (sslIncomingBuffer.position() <= 0)
 						return buffer.position();
 					sslIncomingBuffer.flip();
 					result = sslEngine.unwrap(sslIncomingBuffer, buffer);
 					sslIncomingBuffer.compact();
-					status=sslEngine.getHandshakeStatus();
+					status = sslEngine.getHandshakeStatus();
 					break;
 				case NEED_WRAP:
 					sslOutgoingBuffer.clear();
-					result = sslEngine.wrap(ByteBuffer.wrap(new byte[0]), sslOutgoingBuffer);
-					if(result.bytesProduced() > 0)
-					{
+					result = sslEngine.wrap(ByteBuffer.wrap(new byte[0]),
+							sslOutgoingBuffer);
+					if (result.bytesProduced() > 0) {
 						sslOutgoingBuffer.flip();
 						chan.write(sslOutgoingBuffer);
-						//super.writeBlockingBytesToChannel(sslOutgoingBuffer);
+						// super.writeBlockingBytesToChannel(sslOutgoingBuffer);
 					}
-					status=sslEngine.getHandshakeStatus();
+					status = sslEngine.getHandshakeStatus();
 					break;
 				case FINISHED:
-				    status=HandshakeStatus.NOT_HANDSHAKING;
-				    break;
+					status = HandshakeStatus.NOT_HANDSHAKING;
+					break;
 				case NOT_HANDSHAKING:
 					break;
 				}
 			}
-			config.getLogger().finer(name+" completed ssl handshake");
-			handshakeComplete=true;
+			config.getLogger().finer(name + " completed ssl handshake");
+			handshakeComplete = true;
 			return buffer.position();
-		}
-		catch(SSLException ssle)
-		{
+		} catch (SSLException ssle) {
 			config.getLogger().severe(ssle.getMessage());
 			return -1;
 		}
 	}
-	
+
 	/**
-	 * Reads bytes from the given buffer into the local channel.
-	 * This code is parsed out here so that it can be overridden by HTTPSReader
-	 * @param key the section key for this channel, in case we need to register for write notifies
-	 * @param buffers source buffer for the data write
+	 * Reads bytes from the given buffer into the local channel. This code is
+	 * parsed out here so that it can be overridden by HTTPSReader
+	 * 
+	 * @param key
+	 *            the section key for this channel, in case we need to register
+	 *            for write notifies
+	 * @param buffers
+	 *            source buffer for the data write
 	 * @throws IOException
 	 */
-	public void writeBytesToChannel(final DataBuffers buffers) throws IOException
-	{
-		while(buffers.hasNext())
-		{
-			ByteBuffer buffer=buffers.next();
-			while(buffer.hasRemaining())
-			{
+	public void writeBytesToChannel(final DataBuffers buffers)
+			throws IOException {
+		while (buffers.hasNext()) {
+			ByteBuffer buffer = buffers.next();
+			while (buffer.hasRemaining()) {
 				appSizedBuf.clear();
-				if(buffer.remaining() <= appSizedBuf.remaining())
+				if (buffer.remaining() <= appSizedBuf.remaining())
 					appSizedBuf.put(buffer);
 				else
-				while((buffer.hasRemaining()) && (appSizedBuf.hasRemaining()))
-					appSizedBuf.put(buffer.get());
+					while ((buffer.hasRemaining())
+							&& (appSizedBuf.hasRemaining()))
+						appSizedBuf.put(buffer.get());
 				appSizedBuf.flip();
-				ByteBuffer outBuf=ByteBuffer.allocate(sslOutgoingBuffer.capacity());
+				ByteBuffer outBuf = ByteBuffer.allocate(sslOutgoingBuffer
+						.capacity());
 				sslEngine.wrap(appSizedBuf, outBuf);
-				if(outBuf.position() > 0)
-				{
+				if (outBuf.position() > 0) {
 					outBuf.flip();
 					super.writeBytesToChannel(new MWDataBuffers(outBuf, 0));
 				}
@@ -240,18 +257,15 @@ public class HTTPSReader extends HTTPReader
 		}
 		buffers.close();
 	}
-	
+
 	/**
 	 * Closes the IO channel and marks this handler as closed
 	 */
-	protected void closeChannels()
-	{
-		try
-		{
+	protected void closeChannels() {
+		try {
 			sslEngine.closeInbound();
+		} catch (SSLException e) {
 		}
-		catch (SSLException e)
-		{ }
 		sslEngine.closeOutbound();
 		super.closeChannels();
 	}

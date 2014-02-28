@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.BasicTech;
+
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Items.interfaces.Armor;
 import com.planet_ink.coffee_mud.Items.interfaces.Item;
@@ -16,37 +17,37 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class GenTickerShield extends StdElecItem implements Armor
-{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class GenTickerShield extends StdElecItem implements Armor {
 
-	public String ID(){	return "GenTickerShield";}
-	
-	short layer=0;
-	short layerAttributes=0;
-	String readableText="";
+	public String ID() {
+		return "GenTickerShield";
+	}
 
-	public GenTickerShield()
-	{
+	short layer = 0;
+	short layerAttributes = 0;
+	String readableText = "";
+
+	public GenTickerShield() {
 		super();
 		setName("a personal field generator");
 		basePhyStats.setWeight(2);
 		setDisplayText("a personal field generator sits here.");
 		setDescription("");
-		baseGoldValue=2500;
+		baseGoldValue = 2500;
 		basePhyStats().setLevel(1);
 		recoverPhyStats();
 		setMaterial(RawMaterial.RESOURCE_STEEL);
@@ -55,226 +56,281 @@ public class GenTickerShield extends StdElecItem implements Armor
 		super.setPowerCapacity(100);
 		super.setPowerRemaining(100);
 	}
-	
-	protected String fieldOnStr(MOB viewerM) { return "A field surrounds <O-NAME>."; }
-	
-	protected String fieldDeadStr(MOB viewerM) { return "The around <S-NAME> flickers and dies out as <S-HE-SHE> fade(s) back into view."; }
-	
-	@Override public TechType getTechType() { return TechType.PERSONAL_SHIELD; }
+
+	protected String fieldOnStr(MOB viewerM) {
+		return "A field surrounds <O-NAME>.";
+	}
+
+	protected String fieldDeadStr(MOB viewerM) {
+		return "The around <S-NAME> flickers and dies out as <S-HE-SHE> fade(s) back into view.";
+	}
 
 	@Override
-	public void setOwner(ItemPossessor owner)
-	{
-		final ItemPossessor prevOwner=super.owner;
+	public TechType getTechType() {
+		return TechType.PERSONAL_SHIELD;
+	}
+
+	@Override
+	public void setOwner(ItemPossessor owner) {
+		final ItemPossessor prevOwner = super.owner;
 		super.setOwner(owner);
-		if((prevOwner != owner)&&(owner!=null))
-		{
-			if(!CMLib.threads().isTicking(this, Tickable.TICKID_ELECTRONICS))
-				CMLib.threads().startTickDown(this, Tickable.TICKID_ELECTRONICS, 1);
+		if ((prevOwner != owner) && (owner != null)) {
+			if (!CMLib.threads().isTicking(this, Tickable.TICKID_ELECTRONICS))
+				CMLib.threads().startTickDown(this,
+						Tickable.TICKID_ELECTRONICS, 1);
 		}
 	}
-	
+
 	@Override
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking, tickID))
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
-		if(activated() && (tickID==Tickable.TICKID_ELECTRONICS))
-		{
-			if(!amWearingAt(Item.IN_INVENTORY))
-			setPowerRemaining(powerRemaining()-1);
-			if(powerRemaining()<=0)
-			{
+		if (activated() && (tickID == Tickable.TICKID_ELECTRONICS)) {
+			if (!amWearingAt(Item.IN_INVENTORY))
+				setPowerRemaining(powerRemaining() - 1);
+			if (powerRemaining() <= 0) {
 				setPowerRemaining(0);
-				if(owner() instanceof MOB)
-				{
-					MOB mob=(MOB)owner();
-					CMMsg msg=CMClass.getMsg(mob, this, null,CMMsg.MSG_OK_VISUAL,CMMsg.TYP_DEACTIVATE|CMMsg.MASK_ALWAYS,CMMsg.MSG_OK_VISUAL,fieldDeadStr(mob));
-					if(mob.location()!=null)
+				if (owner() instanceof MOB) {
+					MOB mob = (MOB) owner();
+					CMMsg msg = CMClass.getMsg(mob, this, null,
+							CMMsg.MSG_OK_VISUAL, CMMsg.TYP_DEACTIVATE
+									| CMMsg.MASK_ALWAYS, CMMsg.MSG_OK_VISUAL,
+							fieldDeadStr(mob));
+					if (mob.location() != null)
 						mob.location().send(mob, msg);
-				}
-				else
+				} else
 					activate(false);
 			}
 		}
 		return !amDestroyed();
 	}
-	
-	public boolean okMessage(Environmental myHost, CMMsg msg)
-	{
-		if(!super.okMessage(myHost, msg))
+
+	public boolean okMessage(Environmental myHost, CMMsg msg) {
+		if (!super.okMessage(myHost, msg))
 			return false;
-		if(msg.amITarget(owner()) && (owner() instanceof MOB))
-		{
-			MOB mob=(MOB)owner();
-			switch(msg.targetMinor())
-			{
+		if (msg.amITarget(owner()) && (owner() instanceof MOB)) {
+			MOB mob = (MOB) owner();
+			switch (msg.targetMinor()) {
 			case CMMsg.TYP_REMOVE:
 			case CMMsg.TYP_DROP:
-				if(activated())
-					msg.addTrailerMsg(CMClass.getMsg(mob, this, null,CMMsg.MSG_OK_VISUAL,CMMsg.TYP_DEACTIVATE|CMMsg.MASK_ALWAYS,CMMsg.MSG_OK_VISUAL,fieldDeadStr(msg.source())));
+				if (activated())
+					msg.addTrailerMsg(CMClass.getMsg(mob, this, null,
+							CMMsg.MSG_OK_VISUAL, CMMsg.TYP_DEACTIVATE
+									| CMMsg.MASK_ALWAYS, CMMsg.MSG_OK_VISUAL,
+							fieldDeadStr(msg.source())));
 				break;
 			}
 		}
 		return true;
 	}
-	
-	public void executeMsg(Environmental host, CMMsg msg)
-	{
-		if(msg.amITarget(this))
-		{
-			switch(msg.targetMinor())
-			{
+
+	public void executeMsg(Environmental host, CMMsg msg) {
+		if (msg.amITarget(this)) {
+			switch (msg.targetMinor()) {
 			case CMMsg.TYP_LOOK:
 				super.executeMsg(host, msg);
-				if(CMLib.flags().canBeSeenBy(this, msg.source()))
-				{
-					msg.source().tell(name()+" is currently "+(activated()?"activated":"deactivated")
-							+" and is at "+Math.round(CMath.div(powerRemaining(),powerCapacity())*100.0)+"% power.");
+				if (CMLib.flags().canBeSeenBy(this, msg.source())) {
+					msg.source().tell(
+							name()
+									+ " is currently "
+									+ (activated() ? "activated"
+											: "deactivated")
+									+ " and is at "
+									+ Math.round(CMath.div(powerRemaining(),
+											powerCapacity()) * 100.0)
+									+ "% power.");
 				}
 				return;
-			case CMMsg.TYP_ACTIVATE:
-			{
-				if((msg.source().location()!=null)&&(!CMath.bset(msg.targetMajor(), CMMsg.MASK_CNTRLMSG)))
-					msg.source().location().show(msg.source(), this, owner(), CMMsg.MSG_OK_VISUAL, fieldOnStr(null));
+			case CMMsg.TYP_ACTIVATE: {
+				if ((msg.source().location() != null)
+						&& (!CMath.bset(msg.targetMajor(), CMMsg.MASK_CNTRLMSG)))
+					msg.source()
+							.location()
+							.show(msg.source(), this, owner(),
+									CMMsg.MSG_OK_VISUAL, fieldOnStr(null));
 				this.activate(true);
-				Physical P=owner();
-				if(P!=null)
-				{
+				Physical P = owner();
+				if (P != null) {
 					P.recoverPhyStats();
-					if(P instanceof MOB)
-					{
-						((MOB)P).recoverCharStats();
-						((MOB)P).recoverMaxState();
+					if (P instanceof MOB) {
+						((MOB) P).recoverCharStats();
+						((MOB) P).recoverMaxState();
 					}
 				}
 				break;
 			}
-			case CMMsg.TYP_DEACTIVATE:
-			{
-				if((msg.source().location()!=null)&&(!CMath.bset(msg.targetMajor(), CMMsg.MASK_CNTRLMSG)))
-					msg.source().location().show(msg.source(), this, owner(), CMMsg.MSG_OK_VISUAL, fieldDeadStr(null));
+			case CMMsg.TYP_DEACTIVATE: {
+				if ((msg.source().location() != null)
+						&& (!CMath.bset(msg.targetMajor(), CMMsg.MASK_CNTRLMSG)))
+					msg.source()
+							.location()
+							.show(msg.source(), this, owner(),
+									CMMsg.MSG_OK_VISUAL, fieldDeadStr(null));
 				this.activate(false);
-				Physical P=owner();
-				if(P!=null)
-				{
+				Physical P = owner();
+				if (P != null) {
 					P.recoverPhyStats();
-					if(P instanceof MOB)
-					{
-						((MOB)P).recoverCharStats();
-						((MOB)P).recoverMaxState();
+					if (P instanceof MOB) {
+						((MOB) P).recoverCharStats();
+						((MOB) P).recoverMaxState();
 					}
 				}
 				break;
 			}
 			}
-		}
-		else if(msg.amITarget(owner()) && (owner() instanceof MOB) && (!amWearingAt(Item.IN_INVENTORY)))
-		{
-			switch(msg.targetMinor())
-			{
+		} else if (msg.amITarget(owner()) && (owner() instanceof MOB)
+				&& (!amWearingAt(Item.IN_INVENTORY))) {
+			switch (msg.targetMinor()) {
 			case CMMsg.TYP_LOOK:
 				super.executeMsg(host, msg);
-				if(CMLib.flags().canBeSeenBy(owner(), msg.source()) &&(activated())&&(powerRemaining()>0))
-					msg.source().tell(msg.source(),this,owner(),fieldOnStr(msg.source()));
+				if (CMLib.flags().canBeSeenBy(owner(), msg.source())
+						&& (activated()) && (powerRemaining() > 0))
+					msg.source().tell(msg.source(), this, owner(),
+							fieldOnStr(msg.source()));
 				return;
 			}
 		}
 		super.executeMsg(host, msg);
 	}
-	
 
-	@Override public short getClothingLayer(){return layer;}
-	@Override public void setClothingLayer(short newLayer){layer=newLayer;}
-	@Override public short getLayerAttributes(){return layerAttributes;}
-	@Override public void setLayerAttributes(short newAttributes){layerAttributes=newAttributes;}
+	@Override
+	public short getClothingLayer() {
+		return layer;
+	}
 
-	@Override 
-	public boolean canWear(MOB mob, long where)
-	{
-		if(where==0) return (whereCantWear(mob)==0);
-		if((rawProperLocationBitmap()&where)!=where)
+	@Override
+	public void setClothingLayer(short newLayer) {
+		layer = newLayer;
+	}
+
+	@Override
+	public short getLayerAttributes() {
+		return layerAttributes;
+	}
+
+	@Override
+	public void setLayerAttributes(short newAttributes) {
+		layerAttributes = newAttributes;
+	}
+
+	@Override
+	public boolean canWear(MOB mob, long where) {
+		if (where == 0)
+			return (whereCantWear(mob) == 0);
+		if ((rawProperLocationBitmap() & where) != where)
 			return false;
-		return mob.freeWearPositions(where,getClothingLayer(),getLayerAttributes())>0;
-	}
-	
-	public boolean isGeneric(){return true;}
-
-	public String text()
-	{
-		return CMLib.coffeeMaker().getPropertiesStr(this,false);
+		return mob.freeWearPositions(where, getClothingLayer(),
+				getLayerAttributes()) > 0;
 	}
 
-	public String readableText(){return readableText;}
-	public void setReadableText(String text){readableText=text;}
-	
-	public void setMiscText(String newText)
-	{
-		miscText="";
-		CMLib.coffeeMaker().setPropertiesStr(this,newText,false);
+	public boolean isGeneric() {
+		return true;
+	}
+
+	public String text() {
+		return CMLib.coffeeMaker().getPropertiesStr(this, false);
+	}
+
+	public String readableText() {
+		return readableText;
+	}
+
+	public void setReadableText(String text) {
+		readableText = text;
+	}
+
+	public void setMiscText(String newText) {
+		miscText = "";
+		CMLib.coffeeMaker().setPropertiesStr(this, newText, false);
 		recoverPhyStats();
 	}
 
-	private final static String[] MYCODES={"POWERCAP","ACTIVATED","POWERREM","MANUFACTURER","LAYER","LAYERATTRIB"};
-	public String getStat(String code)
-	{
-		if(CMLib.coffeeMaker().getGenItemCodeNum(code)>=0)
-			return CMLib.coffeeMaker().getGenItemStat(this,code);
-		switch(getCodeNum(code))
-		{
-		case 0: return ""+powerCapacity();
-		case 1: return ""+activated();
-		case 2: return ""+powerRemaining();
-		case 3: return ""+getManufacturerName();
-		case 4: return ""+getClothingLayer();
-		case 5: return ""+getLayerAttributes();
+	private final static String[] MYCODES = { "POWERCAP", "ACTIVATED",
+			"POWERREM", "MANUFACTURER", "LAYER", "LAYERATTRIB" };
+
+	public String getStat(String code) {
+		if (CMLib.coffeeMaker().getGenItemCodeNum(code) >= 0)
+			return CMLib.coffeeMaker().getGenItemStat(this, code);
+		switch (getCodeNum(code)) {
+		case 0:
+			return "" + powerCapacity();
+		case 1:
+			return "" + activated();
+		case 2:
+			return "" + powerRemaining();
+		case 3:
+			return "" + getManufacturerName();
+		case 4:
+			return "" + getClothingLayer();
+		case 5:
+			return "" + getLayerAttributes();
 		default:
-			return CMProps.getStatCodeExtensionValue(getStatCodes(), xtraValues, code);
+			return CMProps.getStatCodeExtensionValue(getStatCodes(),
+					xtraValues, code);
 		}
 	}
-	public void setStat(String code, String val)
-	{
-		if(CMLib.coffeeMaker().getGenItemCodeNum(code)>=0)
-			CMLib.coffeeMaker().setGenItemStat(this,code,val);
+
+	public void setStat(String code, String val) {
+		if (CMLib.coffeeMaker().getGenItemCodeNum(code) >= 0)
+			CMLib.coffeeMaker().setGenItemStat(this, code, val);
 		else
-		switch(getCodeNum(code))
-		{
-		case 0: setPowerCapacity(CMath.s_parseLongExpression(val)); break;
-		case 1: activate(CMath.s_bool(val)); break;
-		case 2: setPowerRemaining(CMath.s_parseLongExpression(val)); break;
-		case 3: setManufacturerName(val); break;
-		case 4: setClothingLayer((short)CMath.s_parseIntExpression(val)); break;
-		case 5: setLayerAttributes((short)CMath.s_parseListLongExpression(Armor.LAYERMASK_DESCS,val)); break;
-		default:
-			CMProps.setStatCodeExtensionValue(getStatCodes(), xtraValues, code, val);
-			break;
-		}
+			switch (getCodeNum(code)) {
+			case 0:
+				setPowerCapacity(CMath.s_parseLongExpression(val));
+				break;
+			case 1:
+				activate(CMath.s_bool(val));
+				break;
+			case 2:
+				setPowerRemaining(CMath.s_parseLongExpression(val));
+				break;
+			case 3:
+				setManufacturerName(val);
+				break;
+			case 4:
+				setClothingLayer((short) CMath.s_parseIntExpression(val));
+				break;
+			case 5:
+				setLayerAttributes((short) CMath.s_parseListLongExpression(
+						Armor.LAYERMASK_DESCS, val));
+				break;
+			default:
+				CMProps.setStatCodeExtensionValue(getStatCodes(), xtraValues,
+						code, val);
+				break;
+			}
 	}
-	protected int getCodeNum(String code){
-		for(int i=0;i<MYCODES.length;i++)
-			if(code.equalsIgnoreCase(MYCODES[i])) return i;
+
+	protected int getCodeNum(String code) {
+		for (int i = 0; i < MYCODES.length; i++)
+			if (code.equalsIgnoreCase(MYCODES[i]))
+				return i;
 		return -1;
 	}
-	private static String[] codes=null;
-	public String[] getStatCodes()
-	{
-		if(codes!=null) return codes;
-		String[] MYCODES=CMProps.getStatCodesList(GenTickerShield.MYCODES,this);
-		String[] superCodes=GenericBuilder.GENITEMCODES;
-		codes=new String[superCodes.length+MYCODES.length];
-		int i=0;
-		for(;i<superCodes.length;i++)
-			codes[i]=superCodes[i];
-		for(int x=0;x<MYCODES.length;i++,x++)
-			codes[i]=MYCODES[x];
+
+	private static String[] codes = null;
+
+	public String[] getStatCodes() {
+		if (codes != null)
+			return codes;
+		String[] MYCODES = CMProps.getStatCodesList(GenTickerShield.MYCODES,
+				this);
+		String[] superCodes = GenericBuilder.GENITEMCODES;
+		codes = new String[superCodes.length + MYCODES.length];
+		int i = 0;
+		for (; i < superCodes.length; i++)
+			codes[i] = superCodes[i];
+		for (int x = 0; x < MYCODES.length; i++, x++)
+			codes[i] = MYCODES[x];
 		return codes;
 	}
-	public boolean sameAs(Environmental E)
-	{
-		if(!(E instanceof GenTickerShield)) return false;
-		String[] theCodes=getStatCodes();
-		for(int i=0;i<theCodes.length;i++)
-			if(!E.getStat(theCodes[i]).equals(getStat(theCodes[i])))
+
+	public boolean sameAs(Environmental E) {
+		if (!(E instanceof GenTickerShield))
+			return false;
+		String[] theCodes = getStatCodes();
+		for (int i = 0; i < theCodes.length; i++)
+			if (!E.getStat(theCodes[i]).equals(getStat(theCodes[i])))
 				return false;
 		return true;
 	}

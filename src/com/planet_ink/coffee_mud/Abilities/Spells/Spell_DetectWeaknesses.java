@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -11,97 +12,104 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_DetectWeaknesses extends Spell
-{
-	public String ID() { return "Spell_DetectWeaknesses"; }
-	public String name(){return "Detect Weaknesses";}
-	public String displayText()
-	{
-		return "(Know weaknesses of "+text()+")";
+public class Spell_DetectWeaknesses extends Spell {
+	public String ID() {
+		return "Spell_DetectWeaknesses";
 	}
-	public int abstractQuality(){ return Ability.QUALITY_BENEFICIAL_SELF;}
-	protected int canAffectCode(){return CAN_MOBS;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_DIVINATION;}
-	protected MOB spottedM=null;
-	protected boolean activated=true;
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(target instanceof MOB)
-		{
-			MOB M=(MOB)target;
-			if(!M.isInCombat())
+	public String name() {
+		return "Detect Weaknesses";
+	}
+
+	public String displayText() {
+		return "(Know weaknesses of " + text() + ")";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_BENEFICIAL_SELF;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_DIVINATION;
+	}
+
+	protected MOB spottedM = null;
+	protected boolean activated = true;
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (target instanceof MOB) {
+			MOB M = (MOB) target;
+			if (!M.isInCombat())
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		
-		if((affected instanceof MOB)&&(activated))
-		{
-			if(invoker==null) invoker=(MOB)affected;
-			final int xlvl=super.getXLEVELLevel(invoker);
-			final float f=(float)0.2*xlvl;
-			affectableStats.setDamage(affectableStats.damage()+(int)Math.round(CMath.div(affectableStats.damage(),4.0-f)));
-			affectableStats.setAttackAdjustment(affectableStats.attackAdjustment()+(int)Math.round(CMath.div(affectableStats.attackAdjustment(),4.0-f)));
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+
+		if ((affected instanceof MOB) && (activated)) {
+			if (invoker == null)
+				invoker = (MOB) affected;
+			final int xlvl = super.getXLEVELLevel(invoker);
+			final float f = (float) 0.2 * xlvl;
+			affectableStats.setDamage(affectableStats.damage()
+					+ (int) Math.round(CMath.div(affectableStats.damage(),
+							4.0 - f)));
+			affectableStats.setAttackAdjustment(affectableStats
+					.attackAdjustment()
+					+ (int) Math.round(CMath.div(
+							affectableStats.attackAdjustment(), 4.0 - f)));
 		}
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking, tickID))
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
-		if(ticking instanceof MOB)
-		{
-			MOB mob=(MOB)ticking;
-			if(invoker()!=null)
-			{
-				if((!invoker().isInCombat())
-				||((spottedM!=null) && (spottedM.amDead())))
-				{
+		if (ticking instanceof MOB) {
+			MOB mob = (MOB) ticking;
+			if (invoker() != null) {
+				if ((!invoker().isInCombat())
+						|| ((spottedM != null) && (spottedM.amDead()))) {
 					unInvoke();
 					return false;
 				}
-				if((invoker()!=mob)
-				&&(invoker().location()!=mob.location()))
-				{
+				if ((invoker() != mob)
+						&& (invoker().location() != mob.location())) {
 					unInvoke();
 					return false;
 				}
 			}
-			MOB victim=mob.getVictim();
-			if((victim!=null)
-			&&((victim==spottedM)||( (spottedM==null) && victim.Name().equalsIgnoreCase(text()))))
-			{
-				if(!activated)
-				{
-					activated=true;
+			MOB victim = mob.getVictim();
+			if ((victim != null)
+					&& ((victim == spottedM) || ((spottedM == null) && victim
+							.Name().equalsIgnoreCase(text())))) {
+				if (!activated) {
+					activated = true;
 					mob.recoverPhyStats();
 				}
-			}
-			else
-			{
-				if(activated)
-				{
-					activated=false;
+			} else {
+				if (activated) {
+					activated = false;
 					mob.recoverPhyStats();
 				}
 			}
@@ -109,64 +117,66 @@ public class Spell_DetectWeaknesses extends Spell
 		return true;
 	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
-		if(canBeUninvoked())
-			if((mob.location()!=null)&&(!mob.amDead()))
-				mob.tell(mob,null,null,"<S-YOUPOSS> knowledge of "+text()+" fades.");
+		if (canBeUninvoked())
+			if ((mob.location() != null) && (!mob.amDead()))
+				mob.tell(mob, null, null, "<S-YOUPOSS> knowledge of " + text()
+						+ " fades.");
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if((auto)&&(givenTarget!=null)&&(givenTarget instanceof MOB))
-			target=(MOB)givenTarget;
-		if(!target.isInCombat())
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> not in combat.");
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if ((auto) && (givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
+		if (!target.isInCombat()) {
+			mob.tell(target, null, null, "<S-NAME> <S-IS-ARE> not in combat.");
 			return false;
 		}
 
-		if(target.fetchEffect(this.ID())!=null)
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> already knowledgable about <S-HIS-HER> target.");
+		if (target.fetchEffect(this.ID()) != null) {
+			mob.tell(target, null, null,
+					"<S-NAME> <S-IS-ARE> already knowledgable about <S-HIS-HER> target.");
 			return false;
 		}
-		
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
-			return false;
 
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
 
 		// now see if it worked
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> knowingly cast(s) a spell concerning <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				if(beneficialAffect(mob,target,asLevel,0))
-				{
-					Spell_DetectWeaknesses A=(Spell_DetectWeaknesses)target.fetchEffect(ID());
-					MOB victim=target.getVictim();
-					if(A!=null)
-					{
-						A.spottedM=victim;
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							verbalCastCode(mob, target, auto),
+							auto ? ""
+									: "^S<S-NAME> knowingly cast(s) a spell concerning <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				if (beneficialAffect(mob, target, asLevel, 0)) {
+					Spell_DetectWeaknesses A = (Spell_DetectWeaknesses) target
+							.fetchEffect(ID());
+					MOB victim = target.getVictim();
+					if (A != null) {
+						A.spottedM = victim;
 						A.setMiscText(victim.Name());
-						mob.location().show(target,victim,CMMsg.MSG_OK_VISUAL,"<S-NAME> attain(s) knowledge of <T-YOUPOSS> weaknesses!");
+						mob.location()
+								.show(target, victim, CMMsg.MSG_OK_VISUAL,
+										"<S-NAME> attain(s) knowledge of <T-YOUPOSS> weaknesses!");
 					}
 				}
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,target,"<S-NAME> speak(s) knowingly about <T-NAMESELF>, but nothing more happens.");
-
+		} else
+			return beneficialWordsFizzle(mob, target,
+					"<S-NAME> speak(s) knowingly about <T-NAMESELF>, but nothing more happens.");
 
 		// return whether it worked
 		return success;

@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Locales;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -7,35 +8,46 @@ import com.planet_ink.coffee_mud.Locales.interfaces.Room;
 import com.planet_ink.coffee_mud.core.interfaces.Places;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class SewerMaze extends StdMaze
-{
-	public String ID(){return "SewerMaze";}
-	public SewerMaze()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class SewerMaze extends StdMaze {
+	public String ID() {
+		return "SewerMaze";
+	}
+
+	public SewerMaze() {
 		super();
-		myID=this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
-		basePhyStats().setDisposition(basePhyStats().disposition()|PhyStats.IS_DARK);
+		myID = this.getClass().getName()
+				.substring(this.getClass().getName().lastIndexOf('.') + 1);
+		basePhyStats().setDisposition(
+				basePhyStats().disposition() | PhyStats.IS_DARK);
 		basePhyStats.setWeight(2);
 		recoverPhyStats();
-		climask=Places.CLIMASK_WET;
+		climask = Places.CLIMASK_WET;
 	}
-	public int domainType(){return Room.DOMAIN_INDOORS_CAVE;}
 
-	public String getGridChildLocaleID(){return "SewerRoom";}
-	public List<Integer> resourceChoices(){return new Vector();}
+	public int domainType() {
+		return Room.DOMAIN_INDOORS_CAVE;
+	}
+
+	public String getGridChildLocaleID() {
+		return "SewerRoom";
+	}
+
+	public List<Integer> resourceChoices() {
+		return new Vector();
+	}
 }

@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.MOBS;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Common.interfaces.CharState;
@@ -12,41 +13,42 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class GenUndead extends GenMob
-{
-	public String ID(){return "GenUndead";}
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class GenUndead extends GenMob {
+	public String ID() {
+		return "GenUndead";
+	}
+
 	protected final Race undeadRace;
-	public GenUndead()
-	{
+
+	public GenUndead() {
 		super();
-		username="a generic undead being";
+		username = "a generic undead being";
 		setDescription("He looks dead to me.");
 		setDisplayText("A generic undead mob stands here.");
-		CMLib.factions().setAlignment(this,Faction.Align.EVIL);
+		CMLib.factions().setAlignment(this, Faction.Align.EVIL);
 		setMoney(10);
 		basePhyStats.setWeight(150);
 		setWimpHitPoint(0);
 
-		undeadRace=CMClass.getRace("Undead");
-		if(undeadRace!=null)
-		{
+		undeadRace = CMClass.getRace("Undead");
+		if (undeadRace != null) {
 			baseCharStats().setMyRace(undeadRace);
-			baseCharStats().getMyRace().startRacing(this,false);
-			baseCharStats().setStat(CharStats.STAT_CHARISMA,2);
+			baseCharStats().getMyRace().startRacing(this, false);
+			baseCharStats().setStat(CharStats.STAT_CHARISMA, 2);
 			recoverCharStats();
 		}
 
@@ -54,7 +56,8 @@ public class GenUndead extends GenMob
 		basePhyStats().setLevel(1);
 		basePhyStats().setArmor(90);
 
-		baseState.setHitPoints(CMLib.dice().roll(basePhyStats().level(),20,basePhyStats().level()));
+		baseState.setHitPoints(CMLib.dice().roll(basePhyStats().level(), 20,
+				basePhyStats().level()));
 
 		recoverMaxState();
 		resetToMaxState();
@@ -62,62 +65,60 @@ public class GenUndead extends GenMob
 		recoverCharStats();
 	}
 
-	public void recoverMaxState(MOB affectedMOB, CharState affectableState)
-	{
+	public void recoverMaxState(MOB affectedMOB, CharState affectableState) {
 		super.recoverMaxState();
-		if((charStats().getMyRace()!=undeadRace)&&(undeadRace!=null))
+		if ((charStats().getMyRace() != undeadRace) && (undeadRace != null))
 			undeadRace.affectCharState(this, maxState);
 	}
-	public void recoverPhyStats()
-	{
+
+	public void recoverPhyStats() {
 		super.recoverPhyStats();
-		if((charStats().getMyRace()!=undeadRace)&&(undeadRace!=null))
+		if ((charStats().getMyRace() != undeadRace) && (undeadRace != null))
 			undeadRace.affectPhyStats(this, phyStats);
 	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
-		if((charStats().getMyRace()!=undeadRace)&&(undeadRace!=null))
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+		if ((charStats().getMyRace() != undeadRace) && (undeadRace != null))
 			undeadRace.executeMsg(this, msg);
 	}
-	
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(!super.okMessage(myHost, msg))
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (!super.okMessage(myHost, msg))
 			return false;
-		if((charStats().getMyRace()!=undeadRace)&&(undeadRace!=null))
+		if ((charStats().getMyRace() != undeadRace) && (undeadRace != null))
 			return undeadRace.okMessage(this, msg);
 		return true;
 	}
 
-	public void recoverCharStats()
-	{
+	public void recoverCharStats() {
 		super.recoverCharStats();
-		if((charStats().getMyRace()!=undeadRace)&&(undeadRace!=null))
+		if ((charStats().getMyRace() != undeadRace) && (undeadRace != null))
 			undeadRace.affectCharStats(this, charStats);
 	}
-	public DeadBody killMeDead(boolean createBody)
-	{
-		DeadBody body=super.killMeDead(createBody);
-		if((createBody)&&(charStats().getMyRace()!=undeadRace)&&(body!=null)&&(undeadRace!=null))
-		{
-			if((name().toUpperCase().indexOf("DRACULA")>=0)
-			||(name().toUpperCase().indexOf("VAMPIRE")>=0))
-				body.addNonUninvokableEffect(CMClass.getAbility("Disease_Vampirism"));
-			else
-			if((name().toUpperCase().indexOf("GHOUL")>=0)
-			||(name().toUpperCase().indexOf("GHAST")>=0))
-				body.addNonUninvokableEffect(CMClass.getAbility("Disease_Cannibalism"));
-			Ability A=CMClass.getAbility("Prop_Smell");
-			if(A!=null)
-			{
+
+	public DeadBody killMeDead(boolean createBody) {
+		DeadBody body = super.killMeDead(createBody);
+		if ((createBody) && (charStats().getMyRace() != undeadRace)
+				&& (body != null) && (undeadRace != null)) {
+			if ((name().toUpperCase().indexOf("DRACULA") >= 0)
+					|| (name().toUpperCase().indexOf("VAMPIRE") >= 0))
+				body.addNonUninvokableEffect(CMClass
+						.getAbility("Disease_Vampirism"));
+			else if ((name().toUpperCase().indexOf("GHOUL") >= 0)
+					|| (name().toUpperCase().indexOf("GHAST") >= 0))
+				body.addNonUninvokableEffect(CMClass
+						.getAbility("Disease_Cannibalism"));
+			Ability A = CMClass.getAbility("Prop_Smell");
+			if (A != null) {
 				body.addNonUninvokableEffect(A);
-				A.setMiscText(body.name()+" SMELLS HORRIBLE!");
+				A.setMiscText(body.name() + " SMELLS HORRIBLE!");
 			}
 		}
 		return body;
 	}
 
-	public boolean isGeneric(){return true;}
+	public boolean isGeneric() {
+		return true;
+	}
 }

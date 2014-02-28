@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Druid;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -11,83 +12,96 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 @SuppressWarnings("rawtypes")
-public class Chant_IllusionaryForest extends Chant
-{
-	public String ID() { return "Chant_IllusionaryForest"; }
-	public String name(){ return "Illusionary Forest";}
-	public String displayText(){return "(Illusionary Fores)";}
-	public int classificationCode(){return Ability.ACODE_CHANT|Ability.DOMAIN_ENDURING;}
-	public int abstractQuality(){ return Ability.QUALITY_MALICIOUS;}
-	protected int canAffectCode(){return CAN_ROOMS;}
-	protected int canTargetCode(){return CAN_ROOMS;}
-	Room newRoom=null;
+public class Chant_IllusionaryForest extends Chant {
+	public String ID() {
+		return "Chant_IllusionaryForest";
+	}
 
-	public void unInvoke()
-	{
+	public String name() {
+		return "Illusionary Forest";
+	}
+
+	public String displayText() {
+		return "(Illusionary Fores)";
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_CHANT | Ability.DOMAIN_ENDURING;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	protected int canAffectCode() {
+		return CAN_ROOMS;
+	}
+
+	protected int canTargetCode() {
+		return CAN_ROOMS;
+	}
+
+	Room newRoom = null;
+
+	public void unInvoke() {
 		// undo the affects of this spell
-		if(affected==null)
+		if (affected == null)
 			return;
-		if(!(affected instanceof Room))
+		if (!(affected instanceof Room))
 			return;
-		Room room=(Room)affected;
-		if(canBeUninvoked())
-			room.showHappens(CMMsg.MSG_OK_VISUAL, "The appearance of this place changes...");
+		Room room = (Room) affected;
+		if (canBeUninvoked())
+			room.showHappens(CMMsg.MSG_OK_VISUAL,
+					"The appearance of this place changes...");
 		super.unInvoke();
 	}
-	
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(mob.isMonster())
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (mob.isMonster())
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if((affected!=null)
-		&&(affected instanceof Room)
-		&&(msg.amITarget(affected))
-		&&(newRoom().fetchEffect(ID())==null)
-		&&((msg.targetMinor()==CMMsg.TYP_LOOK)||(msg.targetMinor()==CMMsg.TYP_EXAMINE)))
-		{
-			CMMsg msg2=CMClass.getMsg(msg.source(),newRoom(),msg.tool(),
-						  msg.sourceCode(),msg.sourceMessage(),
-						  msg.targetCode(),msg.targetMessage(),
-						  msg.othersCode(),msg.othersMessage());
-			if(newRoom().okMessage(myHost,msg2))
-			{
-				newRoom().executeMsg(myHost,msg2);
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if ((affected != null)
+				&& (affected instanceof Room)
+				&& (msg.amITarget(affected))
+				&& (newRoom().fetchEffect(ID()) == null)
+				&& ((msg.targetMinor() == CMMsg.TYP_LOOK) || (msg.targetMinor() == CMMsg.TYP_EXAMINE))) {
+			CMMsg msg2 = CMClass.getMsg(msg.source(), newRoom(), msg.tool(),
+					msg.sourceCode(), msg.sourceMessage(), msg.targetCode(),
+					msg.targetMessage(), msg.othersCode(), msg.othersMessage());
+			if (newRoom().okMessage(myHost, msg2)) {
+				newRoom().executeMsg(myHost, msg2);
 				return false;
 			}
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public Room newRoom()
-	{
-		if(newRoom!=null) return newRoom;
-		newRoom=CMClass.getLocale("Woods");
-		switch(CMLib.dice().roll(1,10,0))
-		{
+	public Room newRoom() {
+		if (newRoom != null)
+			return newRoom;
+		newRoom = CMClass.getLocale("Woods");
+		switch (CMLib.dice().roll(1, 10, 0)) {
 		case 1:
 			newRoom.setDisplayText("Forest glade");
 			newRoom.setDescription("This quaint forest glade is surrounded by tall oak trees.  A gentle breeze tosses leaves up into the air.");
@@ -132,41 +146,40 @@ public class Chant_IllusionaryForest extends Chant
 		return newRoom;
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
 		// the invoke method for spells receives as
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
 		Physical target = mob.location();
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
 			newRoom();
-			CMMsg msg = CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto), auto?"":"^S<S-NAME> chant(s) dramatically!^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				mob.location().showHappens(CMMsg.MSG_OK_VISUAL,"The appearance of this place changes...");
-				if(CMLib.law().doesOwnThisProperty(mob,mob.location()))
-				{
-					mob.location().addNonUninvokableEffect((Ability)copyOf());
+			CMMsg msg = CMClass.getMsg(mob, target, this,
+					verbalCastCode(mob, target, auto), auto ? ""
+							: "^S<S-NAME> chant(s) dramatically!^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				mob.location().showHappens(CMMsg.MSG_OK_VISUAL,
+						"The appearance of this place changes...");
+				if (CMLib.law().doesOwnThisProperty(mob, mob.location())) {
+					mob.location().addNonUninvokableEffect((Ability) copyOf());
 					CMLib.database().DBUpdateRoom(mob.location());
-				}
-				else
-					beneficialAffect(mob,mob.location(),asLevel,0);
+				} else
+					beneficialAffect(mob, mob.location(), asLevel, 0);
 			}
-		}
-		else
-			return beneficialWordsFizzle(mob,null,"<S-NAME> chant(s) dramatically, but the magic fades.");
+		} else
+			return beneficialWordsFizzle(mob, null,
+					"<S-NAME> chant(s) dramatically, but the magic fades.");
 
 		// return whether it worked
 		return success;

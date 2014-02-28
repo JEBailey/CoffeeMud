@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -11,80 +12,103 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_Alarm extends Spell
-{
-	public String ID() { return "Spell_Alarm"; }
-	public String name(){return "Alarm";}
-	protected int canAffectCode(){return CAN_ITEMS;}
-	protected int canTargetCode(){return CAN_ITEMS;}
-	public int abstractQuality(){ return Ability.QUALITY_INDIFFERENT;}
-	public int classificationCode(){	return Ability.ACODE_SPELL | Ability.DOMAIN_ENCHANTMENT;}
-	Room myRoomContainer=null;
-	boolean waitingForLook=false;
+public class Spell_Alarm extends Spell {
+	public String ID() {
+		return "Spell_Alarm";
+	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
+	public String name() {
+		return "Alarm";
+	}
 
-		if((affected==null)||(invoker==null))
-		{
+	protected int canAffectCode() {
+		return CAN_ITEMS;
+	}
+
+	protected int canTargetCode() {
+		return CAN_ITEMS;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_ENCHANTMENT;
+	}
+
+	Room myRoomContainer = null;
+	boolean waitingForLook = false;
+
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+
+		if ((affected == null) || (invoker == null)) {
 			unInvoke();
 			return;
 		}
 
-		if(msg.source()!=null)
-		{
-			myRoomContainer=msg.source().location();
-			if(msg.source()==invoker) return;
+		if (msg.source() != null) {
+			myRoomContainer = msg.source().location();
+			if (msg.source() == invoker)
+				return;
 		}
 
-		if(msg.amITarget(affected))
-		{
-			myRoomContainer.showHappens(CMMsg.MSG_NOISE,"A HORRENDOUS ALARM GOES OFF, WHICH SEEMS TO BE COMING FROM "+affected.name().toUpperCase()+"!!!");
-			invoker.tell("The alarm on your "+affected.name()+" has gone off.");
+		if (msg.amITarget(affected)) {
+			myRoomContainer.showHappens(CMMsg.MSG_NOISE,
+					"A HORRENDOUS ALARM GOES OFF, WHICH SEEMS TO BE COMING FROM "
+							+ affected.name().toUpperCase() + "!!!");
+			invoker.tell("The alarm on your " + affected.name()
+					+ " has gone off.");
 			unInvoke();
 		}
 	}
 
-
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Physical target=getTarget(mob,mob.location(),givenTarget,commands,Wearable.FILTER_UNWORNONLY);
-		if(target==null) return false;
-
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Physical target = getTarget(mob, mob.location(), givenTarget, commands,
+				Wearable.FILTER_UNWORNONLY);
+		if (target == null)
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"<T-NAME> glow(s) faintly for a short time.":"^S<S-NAME> touch(es) <T-NAMESELF> very lightly.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				myRoomContainer=mob.location();
-				beneficialAffect(mob,target,asLevel,0);
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
+
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							verbalCastCode(mob, target, auto),
+							auto ? "<T-NAME> glow(s) faintly for a short time."
+									: "^S<S-NAME> touch(es) <T-NAMESELF> very lightly.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				myRoomContainer = mob.location();
+				beneficialAffect(mob, target, asLevel, 0);
 			}
 
-		}
-		else
-			beneficialWordsFizzle(mob,target,"<S-NAME> speak(s) and touch(es) <T-NAMESELF> very lightly, but the spell fizzles.");
-
+		} else
+			beneficialWordsFizzle(
+					mob,
+					target,
+					"<S-NAME> speak(s) and touch(es) <T-NAMESELF> very lightly, but the spell fizzles.");
 
 		// return whether it worked
 		return success;

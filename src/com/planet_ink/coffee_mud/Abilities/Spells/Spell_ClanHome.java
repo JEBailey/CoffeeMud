@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -14,103 +15,121 @@ import com.planet_ink.coffee_mud.core.collections.Pair;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_ClanHome extends Spell
-{
-	public String ID() { return "Spell_ClanHome"; }
-	public String name(){return "Clan Home";}
-	protected int canTargetCode(){return 0;}
-	public int abstractQuality(){ return Ability.QUALITY_INDIFFERENT;}
-	public int classificationCode(){return Ability.ACODE_SPELL|Ability.DOMAIN_CONJURATION;}
-	public long flags(){return Ability.FLAG_TRANSPORTING|Ability.FLAG_CLANMAGIC;}
-	protected boolean disregardsArmorCheck(MOB mob){return true;}
+public class Spell_ClanHome extends Spell {
+	public String ID() {
+		return "Spell_ClanHome";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		if(!mob.clans().iterator().hasNext())
-		{
+	public String name() {
+		return "Clan Home";
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_CONJURATION;
+	}
+
+	public long flags() {
+		return Ability.FLAG_TRANSPORTING | Ability.FLAG_CLANMAGIC;
+	}
+
+	protected boolean disregardsArmorCheck(MOB mob) {
+		return true;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		if (!mob.clans().iterator().hasNext()) {
 			mob.tell("You aren't even a member of a clan.");
 			return false;
 		}
-		Pair<Clan,Integer> clanPair=CMLib.clans().findPrivilegedClan(mob, Clan.Function.CLAN_BENEFITS);
-		if(clanPair==null)
-		{
+		Pair<Clan, Integer> clanPair = CMLib.clans().findPrivilegedClan(mob,
+				Clan.Function.CLAN_BENEFITS);
+		if (clanPair == null) {
 			mob.tell("You are not authorized to draw from the power of your clan.");
 			return false;
 		}
-		Clan C=clanPair.first;
-		Room clanHomeRoom=null;
-		clanHomeRoom=CMLib.map().getRoom(C.getRecall());
-		if(clanHomeRoom==null)
-		{
+		Clan C = clanPair.first;
+		Room clanHomeRoom = null;
+		clanHomeRoom = CMLib.map().getRoom(C.getRecall());
+		if (clanHomeRoom == null) {
 			mob.tell("Your clan does not have a clan home.");
 			return false;
 		}
-		if(!CMLib.flags().canAccess(mob,clanHomeRoom))
-		{
+		if (!CMLib.flags().canAccess(mob, clanHomeRoom)) {
 			mob.tell("You can't use this magic to get there from here.");
 			return false;
 		}
-		if(!CMLib.law().doesOwnThisProperty(C.clanID(),clanHomeRoom))
-		{
+		if (!CMLib.law().doesOwnThisProperty(C.clanID(), clanHomeRoom)) {
 			mob.tell("Your clan no longer owns that room.");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,null,this,CMMsg.MASK_MOVE|verbalCastCode(mob,mob,auto),"^S<S-NAME> invoke(s) a teleportation spell.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				Set<MOB> h=properTargets(mob,givenTarget,false);
-				if(h==null) return false;
+		if (success) {
+			CMMsg msg = CMClass.getMsg(mob, null, this, CMMsg.MASK_MOVE
+					| verbalCastCode(mob, mob, auto),
+					"^S<S-NAME> invoke(s) a teleportation spell.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				Set<MOB> h = properTargets(mob, givenTarget, false);
+				if (h == null)
+					return false;
 
-				Room thisRoom=mob.location();
-				for(Iterator f=h.iterator();f.hasNext();)
-				{
-					MOB follower=(MOB)f.next();
-					CMMsg enterMsg=CMClass.getMsg(follower,clanHomeRoom,this,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,null,CMMsg.MSG_ENTER,"<S-NAME> appears in a puff of red smoke.");
-					CMMsg leaveMsg=CMClass.getMsg(follower,thisRoom,this,CMMsg.MSG_LEAVE|CMMsg.MASK_MAGIC,"<S-NAME> disappear(s) in a puff of red smoke.");
-					if(thisRoom.okMessage(follower,leaveMsg)&&clanHomeRoom.okMessage(follower,enterMsg))
-					{
-						if(follower.isInCombat())
-						{
-							CMLib.commands().postFlee(follower,("NOWHERE"));
+				Room thisRoom = mob.location();
+				for (Iterator f = h.iterator(); f.hasNext();) {
+					MOB follower = (MOB) f.next();
+					CMMsg enterMsg = CMClass.getMsg(follower, clanHomeRoom,
+							this, CMMsg.MSG_ENTER, null, CMMsg.MSG_ENTER, null,
+							CMMsg.MSG_ENTER,
+							"<S-NAME> appears in a puff of red smoke.");
+					CMMsg leaveMsg = CMClass.getMsg(follower, thisRoom, this,
+							CMMsg.MSG_LEAVE | CMMsg.MASK_MAGIC,
+							"<S-NAME> disappear(s) in a puff of red smoke.");
+					if (thisRoom.okMessage(follower, leaveMsg)
+							&& clanHomeRoom.okMessage(follower, enterMsg)) {
+						if (follower.isInCombat()) {
+							CMLib.commands().postFlee(follower, ("NOWHERE"));
 							follower.makePeace();
 						}
-						thisRoom.send(follower,leaveMsg);
-						clanHomeRoom.bringMobHere(follower,false);
-						clanHomeRoom.send(follower,enterMsg);
+						thisRoom.send(follower, leaveMsg);
+						clanHomeRoom.bringMobHere(follower, false);
+						clanHomeRoom.send(follower, enterMsg);
 						follower.tell("\n\r\n\r");
-						CMLib.commands().postLook(follower,true);
+						CMLib.commands().postLook(follower, true);
 					}
 				}
 			}
 
-		}
-		else
-			beneficialWordsFizzle(mob,null,"<S-NAME> attempt(s) to invoke transportation, but fizzle(s) the spell.");
-
+		} else
+			beneficialWordsFizzle(mob, null,
+					"<S-NAME> attempt(s) to invoke transportation, but fizzle(s) the spell.");
 
 		// return whether it worked
 		return success;

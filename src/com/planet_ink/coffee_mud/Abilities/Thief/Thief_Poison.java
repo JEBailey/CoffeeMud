@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Thief;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -10,69 +11,97 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Thief_Poison extends ThiefSkill
-{
+public class Thief_Poison extends ThiefSkill {
 	// **
 	// This is a deprecated skill provided only
-	// for backwards compatibility.  It has been
+	// for backwards compatibility. It has been
 	// replaced with Thief_UsePoison
 	// **
-	public String ID() { return "Thief_Poison"; }
-	public String name(){ return "Deprecated Poison";}
-	public String displayText(){ return "";}
-	protected int canAffectCode(){return 0;}
-	protected int canTargetCode(){return CAN_MOBS;}
-	public int abstractQuality(){return Ability.QUALITY_MALICIOUS;}
-	private static final String[] triggerStrings = {"DOPOISON"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int usageType(){return USAGE_MOVEMENT|USAGE_MANA;}
+	public String ID() {
+		return "Thief_Poison";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=this.getTarget(mob,commands,givenTarget);
-		if(target==null) return false;
+	public String name() {
+		return "Deprecated Poison";
+	}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+	public String displayText() {
+		return "";
+	}
+
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	protected int canTargetCode() {
+		return CAN_MOBS;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	private static final String[] triggerStrings = { "DOPOISON" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int usageType() {
+		return USAGE_MOVEMENT | USAGE_MANA;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = this.getTarget(mob, commands, givenTarget);
+		if (target == null)
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
 
-		String str=null;
-		if(success)
-		{
-			str=auto?"":"^F^<FIGHT^><S-NAME> attempt(s) to poison <T-NAMESELF>!^</FIGHT^>^?";
-			CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSG_THIEF_ACT,str,CMMsg.MSK_MALICIOUS_MOVE|CMMsg.MSG_THIEF_ACT|(auto?CMMsg.MASK_ALWAYS:0),str,CMMsg.MSG_NOISYMOVEMENT,str);
-			CMMsg msg2=CMClass.getMsg(mob,target,this,CMMsg.MASK_MALICIOUS|CMMsg.TYP_POISON,null,CMMsg.MASK_MALICIOUS|CMMsg.TYP_POISON|(auto?CMMsg.MASK_ALWAYS:0),null,CMMsg.NO_EFFECT,null);
+		boolean success = proficiencyCheck(mob, 0, auto);
+
+		String str = null;
+		if (success) {
+			str = auto ? ""
+					: "^F^<FIGHT^><S-NAME> attempt(s) to poison <T-NAMESELF>!^</FIGHT^>^?";
+			CMMsg msg = CMClass.getMsg(mob, target, this, CMMsg.MSG_THIEF_ACT,
+					str, CMMsg.MSK_MALICIOUS_MOVE | CMMsg.MSG_THIEF_ACT
+							| (auto ? CMMsg.MASK_ALWAYS : 0), str,
+					CMMsg.MSG_NOISYMOVEMENT, str);
+			CMMsg msg2 = CMClass.getMsg(mob, target, this, CMMsg.MASK_MALICIOUS
+					| CMMsg.TYP_POISON, null, CMMsg.MASK_MALICIOUS
+					| CMMsg.TYP_POISON | (auto ? CMMsg.MASK_ALWAYS : 0), null,
+					CMMsg.NO_EFFECT, null);
 			CMLib.color().fixSourceFightColor(msg);
-			final Room R=mob.location();
-			if(R.okMessage(mob,msg) && R.okMessage(mob,msg2))
-			{
-				R.send(mob,msg);
-				R.send(mob,msg2);
-				if((msg.value()<=0) && (msg2.value()<=0))
-				{
-					Ability A=CMClass.getAbility("Poison");
-					A.invoke(mob,target,true,asLevel);
+			final Room R = mob.location();
+			if (R.okMessage(mob, msg) && R.okMessage(mob, msg2)) {
+				R.send(mob, msg);
+				R.send(mob, msg2);
+				if ((msg.value() <= 0) && (msg2.value() <= 0)) {
+					Ability A = CMClass.getAbility("Poison");
+					A.invoke(mob, target, true, asLevel);
 				}
 			}
-		}
-		else
-			return maliciousFizzle(mob,target,"<S-NAME> attempt(s) to poison <T-NAMESELF>, but fail(s).");
+		} else
+			return maliciousFizzle(mob, target,
+					"<S-NAME> attempt(s) to poison <T-NAMESELF>, but fail(s).");
 
 		return success;
 	}

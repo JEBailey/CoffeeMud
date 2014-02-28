@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.persist;
+
 /**
  * com.planet_ink.coffee_mud.core.intermud.i3.persist.Persistent
  * Copyright (c) 1996 George Reese
@@ -10,23 +11,19 @@ package com.planet_ink.coffee_mud.core.intermud.i3.persist;
  * to some data store.
  */
 
-
-
 /**
- * Specified methods which must be implemented by
- * objects wishing to be saved.
+ * Specified methods which must be implemented by objects wishing to be saved.
+ * 
  * @author George Reese (borg@imaginary.com)
  * @version 1.0
  */
 public interface Persistent {
 	/**
-	 * The Persistent has not yet been modified since last
-	 * save or restore.
+	 * The Persistent has not yet been modified since last save or restore.
 	 */
 	static public final int UNMODIFIED = 0;
 	/**
-	 * The Peersistence has been modified since last save
-	 * or restore.
+	 * The Peersistence has been modified since last save or restore.
 	 */
 	static public final int MODIFIED = 1;
 	/**
@@ -39,22 +36,24 @@ public interface Persistent {
 	static public final int DELETED = 3;
 
 	/**
-	 * Prescribes a method for restoration from a data
-	 * store.  An implementation will usually call the
-	 * object's PersistentPeer method to perform the
+	 * Prescribes a method for restoration from a data store. An implementation
+	 * will usually call the object's PersistentPeer method to perform the
 	 * actual save.
-	 * @exception PersistenceException thrown when an error occurs in restoring
+	 * 
+	 * @exception PersistenceException
+	 *                thrown when an error occurs in restoring
 	 * @see com.planet_ink.coffee_mud.core.intermud.i3.persist.PersistentPeer
 	 */
 	public abstract void restore() throws PersistenceException;
 
 	/**
-	 * Prescribes a method for saving this object's data
-	 * to a data store.  An implementation will usually
-	 * check to see if the object has been modified and
-	 * trigger the actual saving mechanism in its
-	 * PersistentPeer implementation.
-	 * @exception PersistentPeer thrown when an error occurs in saving
+	 * Prescribes a method for saving this object's data to a data store. An
+	 * implementation will usually check to see if the object has been modified
+	 * and trigger the actual saving mechanism in its PersistentPeer
+	 * implementation.
+	 * 
+	 * @exception PersistentPeer
+	 *                thrown when an error occurs in saving
 	 * @see com.planet_ink.coffee_mud.core.intermud.i3.persist.PersistentPeer
 	 */
 	public abstract void save() throws PersistenceException;

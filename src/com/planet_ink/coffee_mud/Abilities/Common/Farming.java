@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Common;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -18,299 +19,296 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Farming extends GatheringSkill
-{
-	public String ID() { return "Farming"; }
-	public String name(){ return "Farming";}
-	private static final String[] triggerStrings = {"PLANT","FARM","FARMING"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int classificationCode(){return Ability.ACODE_COMMON_SKILL|Ability.DOMAIN_GATHERINGSKILL;}
-	protected boolean allowedWhileMounted(){return false;}
-	public String supportedResourceString(){return "VEGETATION|COTTON|HEMP|WOODEN";}
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Farming extends GatheringSkill {
+	public String ID() {
+		return "Farming";
+	}
 
-	protected Item found=null;
-	protected Room room=null;
-	protected String foundShortName="";
-	public Farming()
-	{
+	public String name() {
+		return "Farming";
+	}
+
+	private static final String[] triggerStrings = { "PLANT", "FARM", "FARMING" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_COMMON_SKILL | Ability.DOMAIN_GATHERINGSKILL;
+	}
+
+	protected boolean allowedWhileMounted() {
+		return false;
+	}
+
+	public String supportedResourceString() {
+		return "VEGETATION|COTTON|HEMP|WOODEN";
+	}
+
+	protected Item found = null;
+	protected Room room = null;
+	protected String foundShortName = "";
+
+	public Farming() {
 		super();
-		displayText="You are planting...";
-		verb="planting";
+		displayText = "You are planting...";
+		verb = "planting";
 	}
 
-	protected int getDuration(MOB mob, int level)
-	{
-		return getDuration(45,mob,level,15);
+	protected int getDuration(MOB mob, int level) {
+		return getDuration(45, mob, level, 15);
 	}
-	protected int baseYield() { return 1; }
-	
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if((affected!=null)&&(affected instanceof Room))
-		{
-			MOB mob=invoker();
-			if(tickUp==6)
-			{
-				if(found==null)
-				{
-					commonTell(mob,"Your "+foundShortName+" crop has failed.\n\r");
+
+	protected int baseYield() {
+		return 1;
+	}
+
+	public boolean tick(Tickable ticking, int tickID) {
+		if ((affected != null) && (affected instanceof Room)) {
+			MOB mob = invoker();
+			if (tickUp == 6) {
+				if (found == null) {
+					commonTell(mob, "Your " + foundShortName
+							+ " crop has failed.\n\r");
 					unInvoke();
 				}
 			}
 		}
-		return super.tick(ticking,tickID);
+		return super.tick(ticking, tickID);
 	}
 
-	public void unInvoke()
-	{
-		boolean isaborted=aborted;
-		Environmental aff=affected;
-		if(canBeUninvoked())
-		{
-			if((affected!=null)&&(affected==room))
-			{
-				if((found!=null)&&(!isaborted))
-				{
-					int amount=CMLib.dice().roll(1,7,0)*(abilityCode());
-					String s="s";
-					if(amount==1) s="";
-					room.showHappens(CMMsg.MSG_OK_VISUAL,amount+" pound"+s+" of "+foundShortName+" have grown here.");
-					for(int i=0;i<amount;i++)
-					{
-						Item newFound=(Item)found.copyOf();
-						room.addItem(newFound,ItemPossessor.Expire.Player_Drop);
+	public void unInvoke() {
+		boolean isaborted = aborted;
+		Environmental aff = affected;
+		if (canBeUninvoked()) {
+			if ((affected != null) && (affected == room)) {
+				if ((found != null) && (!isaborted)) {
+					int amount = CMLib.dice().roll(1, 7, 0) * (abilityCode());
+					String s = "s";
+					if (amount == 1)
+						s = "";
+					room.showHappens(CMMsg.MSG_OK_VISUAL, amount + " pound" + s
+							+ " of " + foundShortName + " have grown here.");
+					for (int i = 0; i < amount; i++) {
+						Item newFound = (Item) found.copyOf();
+						room.addItem(newFound, ItemPossessor.Expire.Player_Drop);
 					}
 				}
 			}
 		}
 		super.unInvoke();
-		if((canBeUninvoked)
-		   &&(aff!=null)
-		   &&(aff instanceof MOB)
-		   &&(aff!=room)
-		   &&(!isaborted)
-		   &&(room!=null))
-		{
-			Farming F=((Farming)copyOf());
-			F.unInvoked=false;
-			F.tickUp=0;
-			F.tickDown=50;
-			F.startTickDown(invoker,room,50);
+		if ((canBeUninvoked) && (aff != null) && (aff instanceof MOB)
+				&& (aff != room) && (!isaborted) && (room != null)) {
+			Farming F = ((Farming) copyOf());
+			F.unInvoked = false;
+			F.tickUp = 0;
+			F.tickDown = 50;
+			F.startTickDown(invoker, room, 50);
 		}
 	}
 
-	public boolean isPotentialCrop(Room R, int code)
-	{
-		if(R==null) return false;
-		if(R.resourceChoices()==null) return false;
-		for(int i=0;i<R.resourceChoices().size();i++)
-			if(R.resourceChoices().get(i).intValue()==code)
+	public boolean isPotentialCrop(Room R, int code) {
+		if (R == null)
+			return false;
+		if (R.resourceChoices() == null)
+			return false;
+		for (int i = 0; i < R.resourceChoices().size(); i++)
+			if (R.resourceChoices().get(i).intValue() == code)
 				return true;
 		return false;
 	}
 
-	private boolean plantable(MOB mob, Item I2)
-	{
-		if((I2!=null)
-		&&(I2 instanceof RawMaterial)
-		&&(CMLib.flags().canBeSeenBy(I2,mob))
-		&&(I2.container()==null)
-		&&(((I2.material()&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_VEGETATION)
-			||(I2.material()==RawMaterial.RESOURCE_COTTON)
-			||(I2.material()==RawMaterial.RESOURCE_HEMP)
-			||((I2.material()&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_WOODEN)))
+	private boolean plantable(MOB mob, Item I2) {
+		if ((I2 != null)
+				&& (I2 instanceof RawMaterial)
+				&& (CMLib.flags().canBeSeenBy(I2, mob))
+				&& (I2.container() == null)
+				&& (((I2.material() & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_VEGETATION)
+						|| (I2.material() == RawMaterial.RESOURCE_COTTON)
+						|| (I2.material() == RawMaterial.RESOURCE_HEMP) || ((I2
+						.material() & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_WOODEN)))
 			return true;
 		return false;
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		if(super.checkStop(mob, commands))
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		if (super.checkStop(mob, commands))
 			return true;
-		bundling=false;
-		if((!auto)
-		&&(commands.size()>0)
-		&&(((String)commands.firstElement()).equalsIgnoreCase("bundle")))
-		{
-			bundling=true;
-			if(super.invoke(mob,commands,givenTarget,auto,asLevel))
-				return super.bundle(mob,commands);
+		bundling = false;
+		if ((!auto)
+				&& (commands.size() > 0)
+				&& (((String) commands.firstElement())
+						.equalsIgnoreCase("bundle"))) {
+			bundling = true;
+			if (super.invoke(mob, commands, givenTarget, auto, asLevel))
+				return super.bundle(mob, commands);
 			return false;
 		}
-		
-		verb="planting";
-		if((!auto)&&((mob.location().domainType()&Room.INDOORS)>0))
-		{
-			commonTell(mob,"You can't plant anything indoors!");
+
+		verb = "planting";
+		if ((!auto) && ((mob.location().domainType() & Room.INDOORS) > 0)) {
+			commonTell(mob, "You can't plant anything indoors!");
 			return false;
 		}
-		if((!auto)
-		&&(mob.location().domainType()!=Room.DOMAIN_OUTDOORS_HILLS)
-		&&(mob.location().domainType()!=Room.DOMAIN_OUTDOORS_PLAINS)
-		&&(mob.location().domainType()!=Room.DOMAIN_OUTDOORS_SWAMP))
-		{
-			commonTell(mob,"The land is not suitable for farming here.");
+		if ((!auto)
+				&& (mob.location().domainType() != Room.DOMAIN_OUTDOORS_HILLS)
+				&& (mob.location().domainType() != Room.DOMAIN_OUTDOORS_PLAINS)
+				&& (mob.location().domainType() != Room.DOMAIN_OUTDOORS_SWAMP)) {
+			commonTell(mob, "The land is not suitable for farming here.");
 			return false;
 		}
-		if((!auto)&&(mob.location().getArea().getClimateObj().weatherType(mob.location())==Climate.WEATHER_DROUGHT))
-		{
-			commonTell(mob,"The current drought conditions make planting useless.");
+		if ((!auto)
+				&& (mob.location().getArea().getClimateObj()
+						.weatherType(mob.location()) == Climate.WEATHER_DROUGHT)) {
+			commonTell(mob,
+					"The current drought conditions make planting useless.");
 			return false;
 		}
-		if(mob.location().fetchEffect(ID())!=null)
-		{
-			commonTell(mob,"It looks like a crop is already growing here.");
+		if (mob.location().fetchEffect(ID()) != null) {
+			commonTell(mob, "It looks like a crop is already growing here.");
 			return false;
 		}
-		if(mob.isMonster()
-		&&(!auto)
-		&&(!CMLib.flags().isAnimalIntelligence(mob))
-		&&(commands.size()==0))
-		{
-			Item mine=null;
-			for(int i=0;i<mob.location().numItems();i++)
-			{
-				Item I2=mob.location().getItem(i);
-				if(plantable(mob,I2))
-				{ 
-					mine=I2; 
+		if (mob.isMonster() && (!auto)
+				&& (!CMLib.flags().isAnimalIntelligence(mob))
+				&& (commands.size() == 0)) {
+			Item mine = null;
+			for (int i = 0; i < mob.location().numItems(); i++) {
+				Item I2 = mob.location().getItem(i);
+				if (plantable(mob, I2)) {
+					mine = I2;
 					commands.addElement(RawMaterial.CODES.NAME(I2.material()));
 					break;
 				}
 			}
-			if(mine==null)
-			for(int i=0;i<mob.numItems();i++)
-			{
-				Item I2=mob.getItem(i);
-				if(plantable(mob,I2))
-				{
-					commands.addElement(RawMaterial.CODES.NAME(I2.material()));
-					mine=(Item)I2.copyOf();
-					if(mob.location().findItem(null,mob.location().getContextName(I2))==null)
-						mob.location().addItem(mine,ItemPossessor.Expire.Resource);
-					break;
+			if (mine == null)
+				for (int i = 0; i < mob.numItems(); i++) {
+					Item I2 = mob.getItem(i);
+					if (plantable(mob, I2)) {
+						commands.addElement(RawMaterial.CODES.NAME(I2
+								.material()));
+						mine = (Item) I2.copyOf();
+						if (mob.location().findItem(null,
+								mob.location().getContextName(I2)) == null)
+							mob.location().addItem(mine,
+									ItemPossessor.Expire.Resource);
+						break;
+					}
 				}
-			}
-			if(mine==null)
-			{
-				commonTell(mob,"You don't have anything you can plant.");
+			if (mine == null) {
+				commonTell(mob, "You don't have anything you can plant.");
 				return false;
 			}
-		}
-		else
-		if(commands.size()==0)
-		{
-			commonTell(mob,"Grow what?");
+		} else if (commands.size() == 0) {
+			commonTell(mob, "Grow what?");
 			return false;
 		}
-		int code=-1;
-		String what=CMParms.combine(commands,0).toUpperCase();
+		int code = -1;
+		String what = CMParms.combine(commands, 0).toUpperCase();
 		RawMaterial.CODES codes = RawMaterial.CODES.instance();
-		for(int cd : codes.all())
-		{
-			String str=codes.name(cd).toUpperCase();
-			if((str.equals(what))
-			&&(((cd&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_VEGETATION)
-			  ||(cd==RawMaterial.RESOURCE_COTTON)
-			  ||(cd==RawMaterial.RESOURCE_HEMP)
-			  ||((cd&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_WOODEN)))
-			{
-				code=cd;
-				foundShortName=CMStrings.capitalizeAndLower(str);
+		for (int cd : codes.all()) {
+			String str = codes.name(cd).toUpperCase();
+			if ((str.equals(what))
+					&& (((cd & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_VEGETATION)
+							|| (cd == RawMaterial.RESOURCE_COTTON)
+							|| (cd == RawMaterial.RESOURCE_HEMP) || ((cd & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_WOODEN))) {
+				code = cd;
+				foundShortName = CMStrings.capitalizeAndLower(str);
 				break;
 			}
 		}
-		if(code<0)
-			for(int cd : codes.all())
-			{
-				String str=codes.name(cd).toUpperCase();
-				if((str.toUpperCase().startsWith(what)||(what.startsWith(str)))
-				&&(((cd&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_VEGETATION)
-				  ||(cd==RawMaterial.RESOURCE_COTTON)
-				  ||(cd==RawMaterial.RESOURCE_HEMP)
-				  ||((cd&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_WOODEN)))
-				{
-					code=cd;
-					foundShortName=CMStrings.capitalizeAndLower(str);
+		if (code < 0)
+			for (int cd : codes.all()) {
+				String str = codes.name(cd).toUpperCase();
+				if ((str.toUpperCase().startsWith(what) || (what
+						.startsWith(str)))
+						&& (((cd & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_VEGETATION)
+								|| (cd == RawMaterial.RESOURCE_COTTON)
+								|| (cd == RawMaterial.RESOURCE_HEMP) || ((cd & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_WOODEN))) {
+					code = cd;
+					foundShortName = CMStrings.capitalizeAndLower(str);
 					break;
 				}
 			}
-		if(code<0)
-		{
-			commonTell(mob,"You've never heard of '"+CMParms.combine(commands,0)+"'.");
+		if (code < 0) {
+			commonTell(mob,
+					"You've never heard of '" + CMParms.combine(commands, 0)
+							+ "'.");
 			return false;
 		}
 
-		Item mine=null;
-		for(int i=0;i<mob.location().numItems();i++)
-		{
-			Item I=mob.location().getItem(i);
-			if(plantable(mob,I)&&(I.material()==code))
-			{ mine=I; break;}
+		Item mine = null;
+		for (int i = 0; i < mob.location().numItems(); i++) {
+			Item I = mob.location().getItem(i);
+			if (plantable(mob, I) && (I.material() == code)) {
+				mine = I;
+				break;
+			}
 		}
-		if(mine==null)
-		{
-			commonTell(mob,"You'll need to have some "+foundShortName+" to seed from on the ground first.");
+		if (mine == null) {
+			commonTell(mob, "You'll need to have some " + foundShortName
+					+ " to seed from on the ground first.");
 			return false;
 		}
-		String mineName=mine.name();
-		mine=(Item)CMLib.materials().unbundle(mine,-1,null);
-		if(mine==null)
-		{
-			commonTell(mob,"'"+mineName+"' is not suitable for use as a seed crop.");
+		String mineName = mine.name();
+		mine = (Item) CMLib.materials().unbundle(mine, -1, null);
+		if (mine == null) {
+			commonTell(mob, "'" + mineName
+					+ "' is not suitable for use as a seed crop.");
 			return false;
 		}
-		if(!(isPotentialCrop(mob.location(),code)))
-		{
-			commonTell(mob,"'"+mineName+"' does not seem to be taking root here.");
+		if (!(isPotentialCrop(mob.location(), code))) {
+			commonTell(mob, "'" + mineName
+					+ "' does not seem to be taking root here.");
 			return false;
 		}
-		
-		found=null;
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+
+		found = null;
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		if((proficiencyCheck(mob,0,auto))&&(isPotentialCrop(mob.location(),code)))
-		{
-			found=(Item)CMLib.materials().makeResource(code,Integer.toString(mob.location().domainType()),false,null);
-			if((found!=null)
-			&&(found.material()==RawMaterial.RESOURCE_HERBS)
-			&&(mine.material()==found.material()))
-			{
+		if ((proficiencyCheck(mob, 0, auto))
+				&& (isPotentialCrop(mob.location(), code))) {
+			found = (Item) CMLib.materials().makeResource(code,
+					Integer.toString(mob.location().domainType()), false, null);
+			if ((found != null)
+					&& (found.material() == RawMaterial.RESOURCE_HERBS)
+					&& (mine.material() == found.material())) {
 				found.setName(mine.name());
 				found.setDisplayText(mine.displayText());
 				found.setDescription(mine.description());
 				found.text();
 			}
 		}
-		
+
 		mine.destroy();
-		int duration=getDuration(mob,1);
-		CMMsg msg=CMClass.getMsg(mob,found,this,getActivityMessageType(),"<S-NAME> start(s) planting "+foundShortName+".");
-		verb="planting "+foundShortName;
-		displayText="You are planting "+foundShortName;
-		room=mob.location();
-		if(mob.location().okMessage(mob,msg))
-		{
-			mob.location().send(mob,msg);
-			found=(Item)msg.target();
-			beneficialAffect(mob,mob,asLevel,duration);
+		int duration = getDuration(mob, 1);
+		CMMsg msg = CMClass.getMsg(mob, found, this, getActivityMessageType(),
+				"<S-NAME> start(s) planting " + foundShortName + ".");
+		verb = "planting " + foundShortName;
+		displayText = "You are planting " + foundShortName;
+		room = mob.location();
+		if (mob.location().okMessage(mob, msg)) {
+			mob.location().send(mob, msg);
+			found = (Item) msg.target();
+			beneficialAffect(mob, mob, asLevel, duration);
 		}
 		return true;
 	}

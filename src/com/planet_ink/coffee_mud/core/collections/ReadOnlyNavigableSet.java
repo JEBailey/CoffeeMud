@@ -1,32 +1,33 @@
 package com.planet_ink.coffee_mud.core.collections;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.SortedSet;
+
 /*
-Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class ReadOnlyNavigableSet<K> implements NavigableSet<K> 
-{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class ReadOnlyNavigableSet<K> implements NavigableSet<K> {
 	private NavigableSet<K> set;
-	public ReadOnlyNavigableSet(NavigableSet<K> s)
-	{
-		set=s;
+
+	public ReadOnlyNavigableSet(NavigableSet<K> s) {
+		set = s;
 	}
-	
+
 	@Override
 	public K ceiling(K arg0) {
 		return set.ceiling(arg0);
@@ -84,12 +85,12 @@ public class ReadOnlyNavigableSet<K> implements NavigableSet<K>
 
 	@Override
 	public SortedSet<K> subSet(K arg0, K arg1) {
-		return new ReadOnlySortedSet<K>(set.subSet(arg0,arg1));
+		return new ReadOnlySortedSet<K>(set.subSet(arg0, arg1));
 	}
 
 	@Override
 	public NavigableSet<K> subSet(K arg0, boolean arg1, K arg2, boolean arg3) {
-		return new ReadOnlyNavigableSet<K>(set.subSet(arg0,arg1,arg2,arg3));
+		return new ReadOnlyNavigableSet<K>(set.subSet(arg0, arg1, arg2, arg3));
 	}
 
 	@Override
@@ -99,7 +100,7 @@ public class ReadOnlyNavigableSet<K> implements NavigableSet<K>
 
 	@Override
 	public NavigableSet<K> tailSet(K arg0, boolean arg1) {
-		return new ReadOnlyNavigableSet<K>(set.tailSet(arg0,arg1));
+		return new ReadOnlyNavigableSet<K>(set.tailSet(arg0, arg1));
 	}
 
 	@Override

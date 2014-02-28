@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.MiscMagic;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Items.interfaces.Item;
@@ -11,86 +12,80 @@ import com.planet_ink.coffee_mud.core.interfaces.Decayable;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Ingredients extends BagOfEndlessness
-{
-	public String ID(){	return "Ingredients";}
-	boolean alreadyFilled=false;
-	public Ingredients()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Ingredients extends BagOfEndlessness {
+	public String ID() {
+		return "Ingredients";
+	}
+
+	boolean alreadyFilled = false;
+
+	public Ingredients() {
 		super();
 		setName("an ingredients bag");
-		secretIdentity="The Archon's Secret Ingredient Bag";
+		secretIdentity = "The Archon's Secret Ingredient Bag";
 		recoverPhyStats();
 	}
 
-	protected Item makeResource(String name, int type)
-	{
-		Item I=null;
-		if(((type&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_FLESH)
-		||((type&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_VEGETATION))
-			I=CMClass.getItem("GenFoodResource");
+	protected Item makeResource(String name, int type) {
+		Item I = null;
+		if (((type & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_FLESH)
+				|| ((type & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_VEGETATION))
+			I = CMClass.getItem("GenFoodResource");
+		else if ((type & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_LIQUID)
+			I = CMClass.getItem("GenLiquidResource");
 		else
-		if((type&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_LIQUID)
-			I=CMClass.getItem("GenLiquidResource");
-		else
-			I=CMClass.getItem("GenResource");
+			I = CMClass.getItem("GenResource");
 		I.setName(name);
-		I.setDisplayText(name+" has been left here.");
-		I.setDescription("It looks like "+name);
+		I.setDisplayText(name + " has been left here.");
+		I.setDescription("It looks like " + name);
 		I.setMaterial(type);
 		I.setBaseValue(RawMaterial.CODES.VALUE(type));
 		I.basePhyStats().setWeight(1);
 		CMLib.materials().addEffectsToResource(I);
 		I.recoverPhyStats();
 		I.setContainer(this);
-		if(I instanceof Decayable)
-		{
-			((Decayable)I).setDecayTime(0);
-			Ability A=I.fetchEffect("Poison_Rotten");
-			if(A!=null) I.delEffect(A);
+		if (I instanceof Decayable) {
+			((Decayable) I).setDecayTime(0);
+			Ability A = I.fetchEffect("Poison_Rotten");
+			if (A != null)
+				I.delEffect(A);
 		}
-		if(owner() instanceof Room)
-			((Room)owner()).addItem(I);
-		else
-		if(owner() instanceof MOB)
-			((MOB)owner()).addItem(I);
+		if (owner() instanceof Room)
+			((Room) owner()).addItem(I);
+		else if (owner() instanceof MOB)
+			((MOB) owner()).addItem(I);
 		return I;
 	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		if((!alreadyFilled)&&(owner()!=null))
-		{
-			alreadyFilled=true;
-			if(getContents().size()==0)
-			for(int rsc : RawMaterial.CODES.ALL())
-				makeResource(RawMaterial.CODES.NAME(rsc).toLowerCase(),rsc);
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		if ((!alreadyFilled) && (owner() != null)) {
+			alreadyFilled = true;
+			if (getContents().size() == 0)
+				for (int rsc : RawMaterial.CODES.ALL())
+					makeResource(RawMaterial.CODES.NAME(rsc).toLowerCase(), rsc);
+		} else if (msg.amITarget(this) && (msg.tool() instanceof Decayable)
+				&& (msg.tool() instanceof Item)
+				&& (((Item) msg.tool()).container() == this)
+				&& (((Item) msg.tool()).owner() != null)) {
+			((Decayable) msg.tool()).setDecayTime(0);
+			Ability A = ((Item) msg.tool()).fetchEffect("Poison_Rotten");
+			if (A != null)
+				((Item) msg.tool()).delEffect(A);
 		}
-		else
-		if(msg.amITarget(this)
-		&&(msg.tool() instanceof Decayable)
-		&&(msg.tool() instanceof Item)
-		&&(((Item)msg.tool()).container()==this)
-		&&(((Item)msg.tool()).owner() !=null))
-		{
-			((Decayable)msg.tool()).setDecayTime(0);
-			Ability A=((Item)msg.tool()).fetchEffect("Poison_Rotten");
-			if(A!=null) ((Item)msg.tool()).delEffect(A);
-		}
-		super.executeMsg(myHost,msg);
+		super.executeMsg(myHost, msg);
 	}
 }

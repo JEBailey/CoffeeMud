@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.ClanItems;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -25,341 +26,343 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.ItemPossessor;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class StdClanItem extends StdItem implements ClanItem
-{
-	public String ID(){	return "StdClanItem";}
-	protected String myClan="";
-	protected int ciType=0;
-	public int ciType(){return ciType;}
-	public void setCIType(int type){ ciType=type;}
-	private long lastClanCheck=System.currentTimeMillis();
-	private Environmental riteOwner=null;
-	public Environmental rightfulOwner(){return riteOwner;}
-	public void setRightfulOwner(Environmental E){riteOwner=E;}
-	
-	public StdClanItem()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class StdClanItem extends StdItem implements ClanItem {
+	public String ID() {
+		return "StdClanItem";
+	}
+
+	protected String myClan = "";
+	protected int ciType = 0;
+
+	public int ciType() {
+		return ciType;
+	}
+
+	public void setCIType(int type) {
+		ciType = type;
+	}
+
+	private long lastClanCheck = System.currentTimeMillis();
+	private Environmental riteOwner = null;
+
+	public Environmental rightfulOwner() {
+		return riteOwner;
+	}
+
+	public void setRightfulOwner(Environmental E) {
+		riteOwner = E;
+	}
+
+	public StdClanItem() {
 		super();
 
 		setName("a clan item");
 		basePhyStats.setWeight(1);
 		setDisplayText("an item belonging to a clan is here.");
 		setDescription("");
-		secretIdentity="";
-		baseGoldValue=1;
-		material=RawMaterial.RESOURCE_OAK;
+		secretIdentity = "";
+		baseGoldValue = 1;
+		material = RawMaterial.RESOURCE_OAK;
 		recoverPhyStats();
 	}
 
-	public String clanID(){return myClan;}
-	public void setClanID(String ID){myClan=ID;}
+	public String clanID() {
+		return myClan;
+	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
-		if((System.currentTimeMillis()-lastClanCheck)>TimeManager.MILI_HOUR/2)
-		{
-			if((clanID().length()>0)&&(owner() instanceof MOB)&&(!amDestroyed()))
-			{
-				if((CMLib.clans().getClan(clanID())==null)
-				||((ciType()!=ClanItem.CI_PROPAGANDA)&&(((MOB)owner()).getClanRole(clanID())==null)))
-				{
-					Room R=CMLib.map().roomLocation(this);
+	public void setClanID(String ID) {
+		myClan = ID;
+	}
+
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+		if ((System.currentTimeMillis() - lastClanCheck) > TimeManager.MILI_HOUR / 2) {
+			if ((clanID().length() > 0) && (owner() instanceof MOB)
+					&& (!amDestroyed())) {
+				if ((CMLib.clans().getClan(clanID()) == null)
+						|| ((ciType() != ClanItem.CI_PROPAGANDA) && (((MOB) owner())
+								.getClanRole(clanID()) == null))) {
+					Room R = CMLib.map().roomLocation(this);
 					setRightfulOwner(null);
 					unWear();
 					removeFromOwnerContainer();
-					if(owner()!=R) R.moveItemTo(this,ItemPossessor.Expire.Player_Drop);
-					if(R!=null)
-						R.showHappens(CMMsg.MSG_OK_VISUAL,name()+" is dropped!");
+					if (owner() != R)
+						R.moveItemTo(this, ItemPossessor.Expire.Player_Drop);
+					if (R != null)
+						R.showHappens(CMMsg.MSG_OK_VISUAL, name()
+								+ " is dropped!");
 				}
 			}
-			lastClanCheck=System.currentTimeMillis();
+			lastClanCheck = System.currentTimeMillis();
 		}
 	}
-	
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(StdClanItem.stdOkMessage(this,msg))
-			return super.okMessage(myHost,msg);
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (StdClanItem.stdOkMessage(this, msg))
+			return super.okMessage(myHost, msg);
 		return false;
 	}
-	
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!StdClanItem.standardTick(this,tickID))
+
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!StdClanItem.standardTick(this, tickID))
 			return false;
-		return super.tick(ticking,tickID);
+		return super.tick(ticking, tickID);
 	}
 
-	public static boolean wearingAClanItem(MOB mob)
-	{
-		if(mob==null) return false;
-		Item I=null;
-		for(int i=0;i<mob.numItems();i++)
-		{
-			I=mob.getItem(i);
-			if((I!=null)
-			&&(I instanceof ClanItem)
-			&&(!I.amWearingAt(Wearable.IN_INVENTORY)))
+	public static boolean wearingAClanItem(MOB mob) {
+		if (mob == null)
+			return false;
+		Item I = null;
+		for (int i = 0; i < mob.numItems(); i++) {
+			I = mob.getItem(i);
+			if ((I != null) && (I instanceof ClanItem)
+					&& (!I.amWearingAt(Wearable.IN_INVENTORY)))
 				return true;
 		}
 		return false;
 	}
-	
-	public static boolean standardTick(Tickable ticking, int tickID)
-	{
-		if(tickID!=Tickable.TICKID_CLANITEM)
+
+	public static boolean standardTick(Tickable ticking, int tickID) {
+		if (tickID != Tickable.TICKID_CLANITEM)
 			return true;
-		if((!(ticking instanceof ClanItem))
-		||(((ClanItem)ticking).clanID().length()==0)
-		||(((Item)ticking).amDestroyed()))
+		if ((!(ticking instanceof ClanItem))
+				|| (((ClanItem) ticking).clanID().length() == 0)
+				|| (((Item) ticking).amDestroyed()))
 			return true;
-		ClanItem CI=(ClanItem)ticking;
-		if(CI.owner() instanceof MOB)
-		{
-			MOB M=((MOB)((Item)ticking).owner());
-			if((CI.ciType()!=ClanItem.CI_PROPAGANDA)&&(M.getClanRole(CI.clanID())==null))
-			{
-				if(M.location()!=null)
-				{
+		ClanItem CI = (ClanItem) ticking;
+		if (CI.owner() instanceof MOB) {
+			MOB M = ((MOB) ((Item) ticking).owner());
+			if ((CI.ciType() != ClanItem.CI_PROPAGANDA)
+					&& (M.getClanRole(CI.clanID()) == null)) {
+				if (M.location() != null) {
 					CI.unWear();
 					CI.removeFromOwnerContainer();
 					CI.setRightfulOwner(null);
-					if(CI.owner()!=M.location())
-						M.location().moveItemTo(CI,ItemPossessor.Expire.Player_Drop);
-					M.location().show(M,CI,CMMsg.MSG_OK_VISUAL,"<S-NAME> drop(s) <T-NAME>.");
+					if (CI.owner() != M.location())
+						M.location().moveItemTo(CI,
+								ItemPossessor.Expire.Player_Drop);
+					M.location().show(M, CI, CMMsg.MSG_OK_VISUAL,
+							"<S-NAME> drop(s) <T-NAME>.");
 					return false;
 				}
-			}
-			else
-			if((CI.amWearingAt(Wearable.IN_INVENTORY))
-			&&(M.isMonster())
-			&&(!wearingAClanItem(M))
-			&&(CMLib.flags().isInTheGame(M,true)))
-			{
+			} else if ((CI.amWearingAt(Wearable.IN_INVENTORY))
+					&& (M.isMonster()) && (!wearingAClanItem(M))
+					&& (CMLib.flags().isInTheGame(M, true))) {
 				CI.setContainer(null);
 				CI.wearAt(CI.rawProperLocationBitmap());
 			}
-		}
-		else
-		if((CI.owner() instanceof Room)
-		&&(CI.rightfulOwner() instanceof MOB))
-		{
-			if(CI.container() instanceof DeadBody)
+		} else if ((CI.owner() instanceof Room)
+				&& (CI.rightfulOwner() instanceof MOB)) {
+			if (CI.container() instanceof DeadBody)
 				CI.setContainer(null);
-			MOB M=(MOB)CI.rightfulOwner();
-			if(M.amDestroyed())
+			MOB M = (MOB) CI.rightfulOwner();
+			if (M.amDestroyed())
 				CI.setRightfulOwner(null);
-			else
-			if(!M.amDead())
+			else if (!M.amDead())
 				M.moveItemTo(CI);
 		}
 		return true;
 	}
 
-	protected static List<List<String>> loadList(StringBuffer str)
-	{
-		List<List<String>> V=new Vector();
-		if(str==null) return V;
-		List<String> V2=new Vector();
-		boolean oneComma=false;
-		int start=0;
-		int longestList=0;
-		for(int i=0;i<str.length();i++)
-		{
-			if(str.charAt(i)=='\t')
-			{
-				V2.add(str.substring(start,i));
-				start=i+1;
-				oneComma=true;
-			}
-			else
-			if((str.charAt(i)=='\n')||(str.charAt(i)=='\r'))
-			{
-				if(oneComma)
-				{
-					V2.add(str.substring(start,i));
-					if(V2.size()>longestList) longestList=V2.size();
+	protected static List<List<String>> loadList(StringBuffer str) {
+		List<List<String>> V = new Vector();
+		if (str == null)
+			return V;
+		List<String> V2 = new Vector();
+		boolean oneComma = false;
+		int start = 0;
+		int longestList = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) == '\t') {
+				V2.add(str.substring(start, i));
+				start = i + 1;
+				oneComma = true;
+			} else if ((str.charAt(i) == '\n') || (str.charAt(i) == '\r')) {
+				if (oneComma) {
+					V2.add(str.substring(start, i));
+					if (V2.size() > longestList)
+						longestList = V2.size();
 					V.add(V2);
-					V2=new Vector();
+					V2 = new Vector();
 				}
-				start=i+1;
-				oneComma=false;
+				start = i + 1;
+				oneComma = false;
 			}
 		}
-		if(V2.size()>1)
-		{
-			if(oneComma)
-				V2.add(str.substring(start,str.length()));
-			if(V2.size()>longestList) longestList=V2.size();
+		if (V2.size() > 1) {
+			if (oneComma)
+				V2.add(str.substring(start, str.length()));
+			if (V2.size() > longestList)
+				longestList = V2.size();
 			V.add(V2);
 		}
-		for(int v=0;v<V.size();v++)
-		{
-			V2=V.get(v);
-			while(V2.size()<longestList)
+		for (int v = 0; v < V.size(); v++) {
+			V2 = V.get(v);
+			while (V2.size() < longestList)
 				V2.add("");
 		}
 		return V;
 	}
 
-	public static synchronized List<List<String>> loadRecipes()
-	{
-		List<List<String>> V=(List<List<String>>)Resources.getResource("PARSED: clancraft.txt");
-		if(V==null)
-		{
-			StringBuffer str=new CMFile(Resources.buildResourcePath("skills")+"clancraft.txt",null,CMFile.FLAG_LOGERRORS).text();
-			V=loadList(str);
-			if(V.size()==0)
-				Log.errOut("StdClanItem","Recipes not found!");
-			Resources.submitResource("PARSED: clancrtaft.txt",V);
+	public static synchronized List<List<String>> loadRecipes() {
+		List<List<String>> V = (List<List<String>>) Resources
+				.getResource("PARSED: clancraft.txt");
+		if (V == null) {
+			StringBuffer str = new CMFile(Resources.buildResourcePath("skills")
+					+ "clancraft.txt", null, CMFile.FLAG_LOGERRORS).text();
+			V = loadList(str);
+			if (V.size() == 0)
+				Log.errOut("StdClanItem", "Recipes not found!");
+			Resources.submitResource("PARSED: clancrtaft.txt", V);
 		}
 		return V;
 	}
 
-	public static boolean stdOkMessageMOBS(MOB giver, MOB targetMOB, Item myHost)
-	{
-		if((targetMOB != null)&&(targetMOB.isMonster()))
-		{
-			Item alreadyHasOne=null;
-			for(int i=0;i<targetMOB.numItems();i++)
-			{
-				Item I=targetMOB.getItem(i);
-				if((I!=null)
-				&&(I instanceof ClanItem)
-				&&((((ClanItem)myHost).ciType()!=ClanItem.CI_PROPAGANDA)||(((ClanItem)I).ciType()==ClanItem.CI_PROPAGANDA)))
-				{ alreadyHasOne=I; break;}
+	public static boolean stdOkMessageMOBS(MOB giver, MOB targetMOB, Item myHost) {
+		if ((targetMOB != null) && (targetMOB.isMonster())) {
+			Item alreadyHasOne = null;
+			for (int i = 0; i < targetMOB.numItems(); i++) {
+				Item I = targetMOB.getItem(i);
+				if ((I != null)
+						&& (I instanceof ClanItem)
+						&& ((((ClanItem) myHost).ciType() != ClanItem.CI_PROPAGANDA) || (((ClanItem) I)
+								.ciType() == ClanItem.CI_PROPAGANDA))) {
+					alreadyHasOne = I;
+					break;
+				}
 			}
-			if(alreadyHasOne!=null)
-			{
-				if(giver!=null)
-					giver.tell(targetMOB.name()+" already has "+alreadyHasOne.name()+", and cannot have another Clan Item.");
+			if (alreadyHasOne != null) {
+				if (giver != null)
+					giver.tell(targetMOB.name() + " already has "
+							+ alreadyHasOne.name()
+							+ ", and cannot have another Clan Item.");
 				else
-					targetMOB.location().show(targetMOB,null,myHost,CMMsg.MSG_OK_VISUAL,"<S-NAME> can't seem to find the room for <O-NAME>.");
+					targetMOB
+							.location()
+							.show(targetMOB, null, myHost, CMMsg.MSG_OK_VISUAL,
+									"<S-NAME> can't seem to find the room for <O-NAME>.");
 				return false;
 			}
-			if((((ClanItem)myHost).ciType()==ClanItem.CI_BANNER)
-			&&(!CMLib.flags().isMobile(targetMOB)))
-			{
-				if(giver!=null)
+			if ((((ClanItem) myHost).ciType() == ClanItem.CI_BANNER)
+					&& (!CMLib.flags().isMobile(targetMOB))) {
+				if (giver != null)
 					giver.tell("This item should only be given to those who roam the area.");
 				else
-					targetMOB.location().show(targetMOB,null,myHost,CMMsg.MSG_OK_VISUAL,"<S-NAME> do(es)n't seem mobile enough to take <O-NAME>.");
+					targetMOB
+							.location()
+							.show(targetMOB, null, myHost, CMMsg.MSG_OK_VISUAL,
+									"<S-NAME> do(es)n't seem mobile enough to take <O-NAME>.");
 				return false;
 			}
-			Room startRoom=targetMOB.getStartRoom();
-			if((startRoom!=null)
-			&&(startRoom.getArea()!=null)
-			&&(targetMOB.location()!=null)
-			&&(startRoom.getArea()!=targetMOB.location().getArea()))
-			{
-				LegalBehavior theLaw=CMLib.law().getLegalBehavior(startRoom.getArea());
-				if((theLaw!=null)
-				&&(theLaw.rulingOrganization()!=null)
-				&&(targetMOB.getClanRole(theLaw.rulingOrganization())!=null))
-				{
-					if(giver!=null)
+			Room startRoom = targetMOB.getStartRoom();
+			if ((startRoom != null) && (startRoom.getArea() != null)
+					&& (targetMOB.location() != null)
+					&& (startRoom.getArea() != targetMOB.location().getArea())) {
+				LegalBehavior theLaw = CMLib.law().getLegalBehavior(
+						startRoom.getArea());
+				if ((theLaw != null)
+						&& (theLaw.rulingOrganization() != null)
+						&& (targetMOB.getClanRole(theLaw.rulingOrganization()) != null)) {
+					if (giver != null)
 						giver.tell("You can only give a clan item to a conquered mob within the conquered area.");
 					else
-						targetMOB.location().show(targetMOB,null,myHost,CMMsg.MSG_OK_VISUAL,"<S-NAME> can't seem to take <O-NAME> here.");
+						targetMOB.location().show(targetMOB, null, myHost,
+								CMMsg.MSG_OK_VISUAL,
+								"<S-NAME> can't seem to take <O-NAME> here.");
 					return false;
 				}
 			}
 		}
 		return true;
 	}
-	
-	public static boolean stdOkMessage(Environmental myHost, CMMsg msg)
-	{
-		if(((msg.tool()==myHost)||(msg.tool()==((ClanItem)myHost).ultimateContainer(null)))
-		&&(msg.targetMinor()==CMMsg.TYP_GIVE)
-		&&(msg.target()!=null)
-		&&(msg.target() instanceof MOB)
-		&&(myHost instanceof ClanItem)
-		&&(((ClanItem)myHost).clanID().length()>0))
-		{
-			MOB targetMOB=(MOB)msg.target();
-			if((targetMOB.getClanRole(((ClanItem)myHost).clanID())==null)
-			&&(((ClanItem)myHost).ciType()!=ClanItem.CI_PROPAGANDA))
-			{
-				msg.source().tell("You cannot give this item to "+targetMOB.name()+".");
+
+	public static boolean stdOkMessage(Environmental myHost, CMMsg msg) {
+		if (((msg.tool() == myHost) || (msg.tool() == ((ClanItem) myHost)
+				.ultimateContainer(null)))
+				&& (msg.targetMinor() == CMMsg.TYP_GIVE)
+				&& (msg.target() != null)
+				&& (msg.target() instanceof MOB)
+				&& (myHost instanceof ClanItem)
+				&& (((ClanItem) myHost).clanID().length() > 0)) {
+			MOB targetMOB = (MOB) msg.target();
+			if ((targetMOB.getClanRole(((ClanItem) myHost).clanID()) == null)
+					&& (((ClanItem) myHost).ciType() != ClanItem.CI_PROPAGANDA)) {
+				msg.source().tell(
+						"You cannot give this item to " + targetMOB.name()
+								+ ".");
 				return false;
-			}
-			else
-			if(!stdOkMessageMOBS(msg.source(),targetMOB,(Item)myHost))
+			} else if (!stdOkMessageMOBS(msg.source(), targetMOB, (Item) myHost))
 				return false;
-		}
-		else
-		if((msg.amITarget(myHost)||(msg.target()==((ClanItem)myHost).ultimateContainer(null)))
-		&&(((ClanItem)myHost).clanID().length()>0))
-		{
-			if((msg.targetMinor()==CMMsg.TYP_GET)
-			||(msg.targetMinor()==CMMsg.TYP_PUSH)
-			||(msg.targetMinor()==CMMsg.TYP_PULL)
-			||(msg.targetMinor()==CMMsg.TYP_CAST_SPELL))
-			{
-				if(CMLib.clans().findRivalrousClan(msg.source())==null)
-				{
-					msg.source().tell("You must belong to an elligible clan to do that to a clan item.");
+		} else if ((msg.amITarget(myHost) || (msg.target() == ((ClanItem) myHost)
+				.ultimateContainer(null)))
+				&& (((ClanItem) myHost).clanID().length() > 0)) {
+			if ((msg.targetMinor() == CMMsg.TYP_GET)
+					|| (msg.targetMinor() == CMMsg.TYP_PUSH)
+					|| (msg.targetMinor() == CMMsg.TYP_PULL)
+					|| (msg.targetMinor() == CMMsg.TYP_CAST_SPELL)) {
+				if (CMLib.clans().findRivalrousClan(msg.source()) == null) {
+					msg.source()
+							.tell("You must belong to an elligible clan to do that to a clan item.");
 					return false;
-				}
-				else
-				{
-					Clan itemC=CMLib.clans().getClan(((ClanItem)myHost).clanID());
-					if(itemC==null)
-					{
-						msg.source().tell("This ancient relic from a lost clan fades out of existence.");
-						((ClanItem)myHost).destroy();
+				} else {
+					Clan itemC = CMLib.clans().getClan(
+							((ClanItem) myHost).clanID());
+					if (itemC == null) {
+						msg.source()
+								.tell("This ancient relic from a lost clan fades out of existence.");
+						((ClanItem) myHost).destroy();
 						return false;
 					}
-					if((msg.targetMinor()!=CMMsg.TYP_CAST_SPELL)
-					&&(!stdOkMessageMOBS(null,msg.source(),(Item)myHost)))
+					if ((msg.targetMinor() != CMMsg.TYP_CAST_SPELL)
+							&& (!stdOkMessageMOBS(null, msg.source(),
+									(Item) myHost)))
 						return false;
-					else
-					if((msg.source().getClanRole(itemC.clanID())==null)
-					&&(((ClanItem)myHost).ciType()!=ClanItem.CI_PROPAGANDA))
-					{
-						int relation=-1;
-						for(Pair<Clan,Integer> p : CMLib.clans().findRivalrousClans(msg.source()))
-						{
-							relation=itemC.getClanRelations(p.first.clanID());
-							if(relation==Clan.REL_WAR)
+					else if ((msg.source().getClanRole(itemC.clanID()) == null)
+							&& (((ClanItem) myHost).ciType() != ClanItem.CI_PROPAGANDA)) {
+						int relation = -1;
+						for (Pair<Clan, Integer> p : CMLib.clans()
+								.findRivalrousClans(msg.source())) {
+							relation = itemC.getClanRelations(p.first.clanID());
+							if (relation == Clan.REL_WAR)
 								break;
 						}
-						if(relation!=Clan.REL_WAR)
-						{
-							msg.source().tell("You must be at war with this clan to take one of their items.");
+						if (relation != Clan.REL_WAR) {
+							msg.source()
+									.tell("You must be at war with this clan to take one of their items.");
 							return false;
 						}
-						Room room=msg.source().location();
-						if((room!=null)&&(room.getArea()!=null))
-						{
-							LegalBehavior theLaw=CMLib.law().getLegalBehavior(room.getArea());
-							if((theLaw!=null)&&(theLaw.rulingOrganization()!=null)&&(theLaw.rulingOrganization().equals(itemC.clanID())))
-							{
-								msg.source().tell("You'll need to conquer this area to do that.");
+						Room room = msg.source().location();
+						if ((room != null) && (room.getArea() != null)) {
+							LegalBehavior theLaw = CMLib.law()
+									.getLegalBehavior(room.getArea());
+							if ((theLaw != null)
+									&& (theLaw.rulingOrganization() != null)
+									&& (theLaw.rulingOrganization()
+											.equals(itemC.clanID()))) {
+								msg.source()
+										.tell("You'll need to conquer this area to do that.");
 								return false;
 							}
-							if((theLaw!=null)&&(!theLaw.isFullyControlled()))
-							{
-								msg.source().tell("Your clan does not yet fully control the area.");
+							if ((theLaw != null)
+									&& (!theLaw.isFullyControlled())) {
+								msg.source()
+										.tell("Your clan does not yet fully control the area.");
 								return false;
 							}
 						}
@@ -370,45 +373,46 @@ public class StdClanItem extends StdItem implements ClanItem
 		return true;
 	}
 
-	public static boolean stdExecuteMsg(Environmental myHost, CMMsg msg)
-	{
-		if((msg.amITarget(myHost))
-		&&((msg.targetMinor()==CMMsg.TYP_GET)||(msg.targetMinor()==CMMsg.TYP_PUSH)||(msg.targetMinor()==CMMsg.TYP_PULL))
-		&&(((ClanItem)myHost).clanID().length()>0)
-		&&(((ClanItem)myHost).ciType()!=ClanItem.CI_PROPAGANDA))
-		{
-			MOB M=msg.source();
-			if(M.getClanRole(((ClanItem)myHost).clanID())!=null)
-			{
-				if(M.isMonster())
-					((ClanItem)myHost).setRightfulOwner(M);
+	public static boolean stdExecuteMsg(Environmental myHost, CMMsg msg) {
+		if ((msg.amITarget(myHost))
+				&& ((msg.targetMinor() == CMMsg.TYP_GET)
+						|| (msg.targetMinor() == CMMsg.TYP_PUSH) || (msg
+						.targetMinor() == CMMsg.TYP_PULL))
+				&& (((ClanItem) myHost).clanID().length() > 0)
+				&& (((ClanItem) myHost).ciType() != ClanItem.CI_PROPAGANDA)) {
+			MOB M = msg.source();
+			if (M.getClanRole(((ClanItem) myHost).clanID()) != null) {
+				if (M.isMonster())
+					((ClanItem) myHost).setRightfulOwner(M);
 				else
-					((ClanItem)myHost).setRightfulOwner(null);
-			}
-			else
-			{
-				if(M.location()!=null)
-					M.location().show(M,myHost,CMMsg.MSG_OK_ACTION,"<T-NAME> is destroyed by <S-YOUPOSS> touch!");
-				for(Pair<Clan,Integer> clanP : CMLib.clans().findRivalrousClans(M))
-				{
-					Clan C=clanP.first;
-					List<List<String>> recipes=loadRecipes();
-					for(int v=0;v<recipes.size();v++)
-					{
-						List<String> V=recipes.get(v);
-						if((V.size()>3)&&(CMath.s_int(V.get(3))==((ClanItem)myHost).ciType()))
-						{
-							int exp=CMath.s_int(V.get(6))/2;
-							if(exp>0)
-							{
-								C.setExp(C.getExp()+exp);
-								M.tell(CMStrings.capitalizeFirstLetter(C.getName())+" gains "+exp+" experience points for this capture.");
+					((ClanItem) myHost).setRightfulOwner(null);
+			} else {
+				if (M.location() != null)
+					M.location().show(M, myHost, CMMsg.MSG_OK_ACTION,
+							"<T-NAME> is destroyed by <S-YOUPOSS> touch!");
+				for (Pair<Clan, Integer> clanP : CMLib.clans()
+						.findRivalrousClans(M)) {
+					Clan C = clanP.first;
+					List<List<String>> recipes = loadRecipes();
+					for (int v = 0; v < recipes.size(); v++) {
+						List<String> V = recipes.get(v);
+						if ((V.size() > 3)
+								&& (CMath.s_int(V.get(3)) == ((ClanItem) myHost)
+										.ciType())) {
+							int exp = CMath.s_int(V.get(6)) / 2;
+							if (exp > 0) {
+								C.setExp(C.getExp() + exp);
+								M.tell(CMStrings.capitalizeFirstLetter(C
+										.getName())
+										+ " gains "
+										+ exp
+										+ " experience points for this capture.");
 							}
 							break;
 						}
 					}
 				}
-				((Item)myHost).destroy();
+				((Item) myHost).destroy();
 				return false;
 			}
 		}

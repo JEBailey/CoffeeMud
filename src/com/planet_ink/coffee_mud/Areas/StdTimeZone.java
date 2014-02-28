@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Areas;
+
 import java.util.Enumeration;
 
 import com.planet_ink.coffee_mud.Areas.interfaces.Area;
@@ -7,50 +8,52 @@ import com.planet_ink.coffee_mud.core.CMClass;
 import com.planet_ink.coffee_mud.core.interfaces.CMObject;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class StdTimeZone extends StdArea
-{
-	public String ID(){	return "StdTimeZone";}
-
-	public StdTimeZone()
-	{
-		super();
-
-		myClock = (TimeClock)CMClass.getCommon("DefaultTimeClock");
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class StdTimeZone extends StdArea {
+	public String ID() {
+		return "StdTimeZone";
 	}
 
-	public CMObject copyOf()
-	{
-		CMObject O=super.copyOf();
-		if(O instanceof Area) ((Area)O).setTimeObj((TimeClock)CMClass.getCommon("DefaultTimeClock"));
+	public StdTimeZone() {
+		super();
+
+		myClock = (TimeClock) CMClass.getCommon("DefaultTimeClock");
+	}
+
+	public CMObject copyOf() {
+		CMObject O = super.copyOf();
+		if (O instanceof Area)
+			((Area) O).setTimeObj((TimeClock) CMClass
+					.getCommon("DefaultTimeClock"));
 		return O;
 	}
 
-	public TimeClock getTimeObj(){return myClock;}
-	public void setName(String newName)
-	{
+	public TimeClock getTimeObj() {
+		return myClock;
+	}
+
+	public void setName(String newName) {
 		super.setName(newName);
 		myClock.setLoadName(newName);
 	}
 
-	public void addChild(Area area) 
-	{
+	public void addChild(Area area) {
 		super.addChild(area);
 		area.setTimeObj(getTimeObj());
-		for(Enumeration<Area> cA=area.getChildren();cA.hasMoreElements();)
+		for (Enumeration<Area> cA = area.getChildren(); cA.hasMoreElements();)
 			cA.nextElement().setTimeObj(getTimeObj());
 	}
 }

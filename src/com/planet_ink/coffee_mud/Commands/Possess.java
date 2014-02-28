@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Commands;
+
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,58 +17,60 @@ import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Possess extends StdCommand
-{
-	public Possess(){}
+public class Possess extends StdCommand {
+	public Possess() {
+	}
 
-	private final String[] access={"POSSESS","POSS"};
-	public String[] getAccessWords(){return access;}
+	private final String[] access = { "POSSESS", "POSS" };
 
-	public MOB getTarget(MOB mob, Vector commands, boolean quiet)
-	{
-		String targetName=CMParms.combine(commands,0);
-		MOB target=null;
-		if(targetName.length()>0)
-		{
-			target=mob.location().fetchInhabitant(targetName);
-			if(target==null)
-			{
-				Environmental t=mob.location().fetchFromRoomFavorItems(null,targetName);
-				if((t!=null)&&(!(t instanceof MOB)))
-				{
-					if(!quiet)
-						mob.tell(mob,t,null,"You can't do that to <T-NAMESELF>.");
+	public String[] getAccessWords() {
+		return access;
+	}
+
+	public MOB getTarget(MOB mob, Vector commands, boolean quiet) {
+		String targetName = CMParms.combine(commands, 0);
+		MOB target = null;
+		if (targetName.length() > 0) {
+			target = mob.location().fetchInhabitant(targetName);
+			if (target == null) {
+				Environmental t = mob.location().fetchFromRoomFavorItems(null,
+						targetName);
+				if ((t != null) && (!(t instanceof MOB))) {
+					if (!quiet)
+						mob.tell(mob, t, null,
+								"You can't do that to <T-NAMESELF>.");
 					return null;
 				}
 			}
 		}
 
-		if(target!=null)
-			targetName=target.name();
+		if (target != null)
+			targetName = target.name();
 
-		if((target==null)||((!CMLib.flags().canBeSeenBy(target,mob))&&((!CMLib.flags().canBeHeardMovingBy(target,mob))||(!target.isInCombat()))))
-		{
-			if(!quiet)
-			{
-				if(targetName.trim().length()==0)
+		if ((target == null)
+				|| ((!CMLib.flags().canBeSeenBy(target, mob)) && ((!CMLib
+						.flags().canBeHeardMovingBy(target, mob)) || (!target
+						.isInCombat())))) {
+			if (!quiet) {
+				if (targetName.trim().length() == 0)
 					mob.tell("You don't see them here.");
 				else
-					mob.tell("You don't see '"+targetName+"' here.");
+					mob.tell("You don't see '" + targetName + "' here.");
 			}
 			return null;
 		}
@@ -76,81 +79,82 @@ public class Possess extends StdCommand
 	}
 
 	public boolean execute(MOB mob, Vector commands, int metaFlags)
-		throws java.io.IOException
-	{
-		if(mob.soulMate()!=null)
-		{
+			throws java.io.IOException {
+		if (mob.soulMate() != null) {
 			mob.tell("You are already possessing someone.  Quit back to your body first!");
 			return false;
 		}
 		commands.removeElementAt(0);
-		String MOBname=CMParms.combine(commands,0);
-		MOB target=getTarget(mob,commands,true);
-		if((target==null)||(!target.isMonster()))
-			target=mob.location().fetchInhabitant(MOBname);
-		if((target==null)||(!target.isMonster()))
-		{
-			Enumeration<Room> r=mob.location().getArea().getProperMap();
-			for(;r.hasMoreElements();)
-			{
-				Room R=r.nextElement();
-				MOB mob2=R.fetchInhabitant(MOBname);
-				if((mob2!=null)&&(mob2.isMonster()))
-				{
-					target=mob2;
+		String MOBname = CMParms.combine(commands, 0);
+		MOB target = getTarget(mob, commands, true);
+		if ((target == null) || (!target.isMonster()))
+			target = mob.location().fetchInhabitant(MOBname);
+		if ((target == null) || (!target.isMonster())) {
+			Enumeration<Room> r = mob.location().getArea().getProperMap();
+			for (; r.hasMoreElements();) {
+				Room R = r.nextElement();
+				MOB mob2 = R.fetchInhabitant(MOBname);
+				if ((mob2 != null) && (mob2.isMonster())) {
+					target = mob2;
 					break;
 				}
 			}
 		}
-		if((target==null)||(!target.isMonster()))
-		{
-			try
-			{
-				List<MOB> inhabs=CMLib.map().findInhabitants(CMLib.map().rooms(), mob,MOBname,100);
-				for(MOB mob2 : inhabs)
-					if((mob2.isMonster())&&(CMSecurity.isAllowed(mob,mob2.location(),CMSecurity.SecFlag.POSSESS)))
-					{
-						target=mob2;
+		if ((target == null) || (!target.isMonster())) {
+			try {
+				List<MOB> inhabs = CMLib.map().findInhabitants(
+						CMLib.map().rooms(), mob, MOBname, 100);
+				for (MOB mob2 : inhabs)
+					if ((mob2.isMonster())
+							&& (CMSecurity.isAllowed(mob, mob2.location(),
+									CMSecurity.SecFlag.POSSESS))) {
+						target = mob2;
 						break;
 					}
-			}catch(NoSuchElementException e){}
+			} catch (NoSuchElementException e) {
+			}
 		}
-		if((target==null)||(!target.isMonster())||(!CMLib.flags().isInTheGame(target,true)))
-		{
-			mob.tell("You can't possess '"+MOBname+"' right now.");
+		if ((target == null) || (!target.isMonster())
+				|| (!CMLib.flags().isInTheGame(target, true))) {
+			mob.tell("You can't possess '" + MOBname + "' right now.");
 			return false;
 		}
-		if(!CMSecurity.isAllowed(mob,target.location(),CMSecurity.SecFlag.POSSESS))
-		{
-			mob.tell("You can not possess "+target.Name()+".");
+		if (!CMSecurity.isAllowed(mob, target.location(),
+				CMSecurity.SecFlag.POSSESS)) {
+			mob.tell("You can not possess " + target.Name() + ".");
 			return false;
 		}
 
-		if((!CMSecurity.isASysOp(mob))&&(CMSecurity.isASysOp(target)))
-		{
-			mob.tell("You may not possess '"+MOBname+"'.");
+		if ((!CMSecurity.isASysOp(mob)) && (CMSecurity.isASysOp(target))) {
+			mob.tell("You may not possess '" + MOBname + "'.");
 			return false;
 		}
-		CMMsg msg=CMClass.getMsg(mob,target,null, CMMsg.MSG_POSSESS, "<S-NAME> get(s) a far away look, then seem(s) to fall limp.");
-		final Room room=mob.location();
-		if((room==null)||(room.okMessage(mob, msg)))
-		{
-			if(room!=null) room.send(mob, msg);
-			Session s=mob.session();
+		CMMsg msg = CMClass.getMsg(mob, target, null, CMMsg.MSG_POSSESS,
+				"<S-NAME> get(s) a far away look, then seem(s) to fall limp.");
+		final Room room = mob.location();
+		if ((room == null) || (room.okMessage(mob, msg))) {
+			if (room != null)
+				room.send(mob, msg);
+			Session s = mob.session();
 			s.setMob(target);
 			target.setSession(s);
 			target.setSoulMate(mob);
 			mob.setSession(null);
-			CMLib.commands().postLook(target,true);
+			CMLib.commands().postLook(target, true);
 			target.tell("^HYour spirit has changed bodies"
-							+(CMath.bset(mob.getBitmap(),MOB.ATT_SYSOPMSGS)?" and SECURITY mode is ON":"")
-							+", use QUIT to return to yours.");
+					+ (CMath.bset(mob.getBitmap(), MOB.ATT_SYSOPMSGS) ? " and SECURITY mode is ON"
+							: "") + ", use QUIT to return to yours.");
 		}
 		return false;
 	}
-	
-	public boolean canBeOrdered(){return true;}
-	public boolean securityCheck(MOB mob){return CMSecurity.isAllowed(mob,mob.location(),CMSecurity.SecFlag.POSSESS);}
 
-	
+	public boolean canBeOrdered() {
+		return true;
+	}
+
+	public boolean securityCheck(MOB mob) {
+		return CMSecurity.isAllowed(mob, mob.location(),
+				CMSecurity.SecFlag.POSSESS);
+	}
+
 }

@@ -1,7 +1,9 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.server;
+
 import com.planet_ink.coffee_mud.core.Log;
 import com.planet_ink.coffee_mud.core.intermud.i3.packets.ImudServices;
 import com.planet_ink.coffee_mud.core.intermud.i3.packets.ShutdownPacket;
+
 /*
  * com.planet_ink.coffee_mud.core.intermud.i3.server.Server
  * Copyright (c) 1996 George Reese
@@ -20,10 +22,10 @@ import com.planet_ink.coffee_mud.core.intermud.i3.packets.ShutdownPacket;
  * The mudlib interface to the server.
  */
 /**
- * The Server class is the mudlib's interface to the
- * Imaginary Mud Server.  It is responsible with knowing all
- * internal information about the server.
- * Last Update: 960921
+ * The Server class is the mudlib's interface to the Imaginary Mud Server. It is
+ * responsible with knowing all internal information about the server. Last
+ * Update: 960921
+ * 
  * @author George Reese
  * @version 1.0
  */
@@ -32,45 +34,47 @@ public class I3Server {
 	static private boolean started = false;
 
 	/**
-	 * Creates a server thread if one has not yet been
-	 * created.
-	 * @exception DatabaseException thrown if the database is unreachable
-	 * for some reason
-	 * @exception ServerSecurityException thrown if an attempt to call start()
-	 * is made once the server is running.
-	 * @param mud the name of the mud being started
+	 * Creates a server thread if one has not yet been created.
+	 * 
+	 * @exception DatabaseException
+	 *                thrown if the database is unreachable for some reason
+	 * @exception ServerSecurityException
+	 *                thrown if an attempt to call start() is made once the
+	 *                server is running.
+	 * @param mud
+	 *            the name of the mud being started
 	 */
-	static public void start(String mud, 
-							 int port,
-							 ImudServices imud) 
-	{
-		try
-		{
-			if( started ) {
-				throw new ServerSecurityException("Illegal attempt to start Server.");
+	static public void start(String mud, int port, ImudServices imud) {
+		try {
+			if (started) {
+				throw new ServerSecurityException(
+						"Illegal attempt to start Server.");
 			}
 			started = true;
 			serverClient = new ServerThread(mud, port, imud);
 			Log.sysOut("I3Server", "InterMud3 Core (c)1996 George Reese");
 			serverClient.start();
-		}
-		catch(Exception e)
-		{
-			serverClient=null;
-			Log.errOut("I3Server",e);
+		} catch (Exception e) {
+			serverClient = null;
+			Log.errOut("I3Server", e);
 		}
 	}
 
 	/**
 	 * Returns a distinct copy of the class identified.
-	 * @exception ObjectLoadException thrown when a problem occurs loading the object
-	 * @param file the name of the class being loaded
+	 * 
+	 * @exception ObjectLoadException
+	 *                thrown when a problem occurs loading the object
+	 * @param file
+	 *            the name of the class being loaded
 	 */
-	static public ServerObject copyObject(String file) throws ObjectLoadException {
+	static public ServerObject copyObject(String file)
+			throws ObjectLoadException {
 		return serverClient.copyObject(file);
 	}
 
-	static public ServerObject findObject(String file) throws ObjectLoadException {
+	static public ServerObject findObject(String file)
+			throws ObjectLoadException {
 		return serverClient.findObject(file);
 	}
 
@@ -86,21 +90,21 @@ public class I3Server {
 		return serverClient.getPort();
 	}
 
-	static public void shutdown()
-	{
-		try{
-			try
-			{
-				ShutdownPacket shutdown=new ShutdownPacket();
+	static public void shutdown() {
+		try {
+			try {
+				ShutdownPacket shutdown = new ShutdownPacket();
 				shutdown.send();
-			}catch(Exception e){}
-		serverClient.shutdown();
-		started=false;
-		}catch(Exception e){}
+			} catch (Exception e) {
+			}
+			serverClient.shutdown();
+			started = false;
+		} catch (Exception e) {
+		}
 	}
-	
+
 	static public void removeObject(ServerObject ob) {
-		if( !ob.getDestructed() ) {
+		if (!ob.getDestructed()) {
 			return;
 		}
 		serverClient.removeObject(ob);

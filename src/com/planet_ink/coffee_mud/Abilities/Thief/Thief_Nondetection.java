@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Thief;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Common.interfaces.PhyStats;
@@ -9,96 +10,107 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Thief_Nondetection extends ThiefSkill
-{
-	public String ID() { return "Thief_Nondetection"; }
-	public String name(){ return "Nondetection";}
-	public String displayText()
-	{ 
-		if(active)
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Thief_Nondetection extends ThiefSkill {
+	public String ID() {
+		return "Thief_Nondetection";
+	}
+
+	public String name() {
+		return "Nondetection";
+	}
+
+	public String displayText() {
+		if (active)
 			return "(Nondetectable)";
 		return "";
 	}
-	protected int canAffectCode(){return CAN_MOBS;}
-	protected int canTargetCode(){return 0;}
-	public int abstractQuality(){return Ability.QUALITY_OK_SELF;}
-	public int classificationCode(){return Ability.ACODE_THIEF_SKILL|Ability.DOMAIN_STEALTHY;}
-	public boolean isAutoInvoked(){return true;}
-	public boolean canBeUninvoked(){return false;}
-	public boolean active=false;
 
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(!(affected instanceof MOB))
-			return super.okMessage(myHost,msg);
+	protected int canTargetCode() {
+		return 0;
+	}
 
-		MOB mob=(MOB)affected;
-		if((!CMLib.flags().isHidden(mob))&&(active))
-		{
-			active=false;
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_SELF;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_THIEF_SKILL | Ability.DOMAIN_STEALTHY;
+	}
+
+	public boolean isAutoInvoked() {
+		return true;
+	}
+
+	public boolean canBeUninvoked() {
+		return false;
+	}
+
+	public boolean active = false;
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (!(affected instanceof MOB))
+			return super.okMessage(myHost, msg);
+
+		MOB mob = (MOB) affected;
+		if ((!CMLib.flags().isHidden(mob)) && (active)) {
+			active = false;
 			mob.recoverPhyStats();
-		}
-		else
-		if(msg.amISource(mob))
-		{
-			if(((msg.sourceMajor(CMMsg.MASK_SOUND)
-				 ||(msg.sourceMinor()==CMMsg.TYP_SPEAK)
-				 ||(msg.sourceMinor()==CMMsg.TYP_ENTER)
-				 ||(msg.sourceMinor()==CMMsg.TYP_LEAVE)
-				 ||(msg.sourceMinor()==CMMsg.TYP_RECALL)))
-			 &&(active)
-			 &&(!msg.sourceMajor(CMMsg.MASK_ALWAYS))
-			 &&(msg.sourceMinor()!=CMMsg.TYP_LOOK)
-			 &&(msg.sourceMinor()!=CMMsg.TYP_EXAMINE)
-			 &&(msg.sourceMajor()>0))
-			{
-				active=false;
+		} else if (msg.amISource(mob)) {
+			if (((msg.sourceMajor(CMMsg.MASK_SOUND)
+					|| (msg.sourceMinor() == CMMsg.TYP_SPEAK)
+					|| (msg.sourceMinor() == CMMsg.TYP_ENTER)
+					|| (msg.sourceMinor() == CMMsg.TYP_LEAVE) || (msg
+					.sourceMinor() == CMMsg.TYP_RECALL)))
+					&& (active)
+					&& (!msg.sourceMajor(CMMsg.MASK_ALWAYS))
+					&& (msg.sourceMinor() != CMMsg.TYP_LOOK)
+					&& (msg.sourceMinor() != CMMsg.TYP_EXAMINE)
+					&& (msg.sourceMajor() > 0)) {
+				active = false;
 				mob.recoverPhyStats();
 			}
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		if(active&&((affected.basePhyStats().disposition()&PhyStats.IS_HIDDEN)==0))
-			affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_NOT_SEEN);
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+		if (active
+				&& ((affected.basePhyStats().disposition() & PhyStats.IS_HIDDEN) == 0))
+			affectableStats.setDisposition(affectableStats.disposition()
+					| PhyStats.IS_NOT_SEEN);
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking,tickID)) return false;
-		if((affected!=null)&&(affected instanceof MOB))
-		{
-			if(CMLib.flags().isHidden(affected))
-			{
-				if(!active)
-				{
-					active=true;
-					helpProficiency((MOB)affected, 0);
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
+			return false;
+		if ((affected != null) && (affected instanceof MOB)) {
+			if (CMLib.flags().isHidden(affected)) {
+				if (!active) {
+					active = true;
+					helpProficiency((MOB) affected, 0);
 					affected.recoverPhyStats();
 				}
-			}
-			else
-			if(active)
-			{
-				active=false;
+			} else if (active) {
+				active = false;
 				affected.recoverPhyStats();
 			}
 		}

@@ -1,64 +1,63 @@
 package com.planet_ink.coffee_mud.core.collections;
+
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
 /*
-Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class ChameleonList<K> implements List<K>, SizedIterable<K> 
-{
-	private volatile List<K> 		list;
-	private volatile Signaler<K>	signaler;
-	
-	public static abstract class Signaler<K>
-	{
-		protected WeakReference<List<K>> 	oldReferenceListRef;
-		
-		public Signaler(final List<K> referenceList)
-		{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class ChameleonList<K> implements List<K>, SizedIterable<K> {
+	private volatile List<K> list;
+	private volatile Signaler<K> signaler;
+
+	public static abstract class Signaler<K> {
+		protected WeakReference<List<K>> oldReferenceListRef;
+
+		public Signaler(final List<K> referenceList) {
 			oldReferenceListRef = new WeakReference<List<K>>(referenceList);
 		}
-		
+
 		public abstract void rebuild(final ChameleonList<K> me);
-		
+
 		public abstract boolean isDeprecated();
-		
-		public final synchronized void possiblyChangeMe(final ChameleonList<K> me)
-		{
-			if(!isDeprecated()) return;
+
+		public final synchronized void possiblyChangeMe(
+				final ChameleonList<K> me) {
+			if (!isDeprecated())
+				return;
 			rebuild(me);
 		}
 	}
-	
-	public ChameleonList(final List<K> l, final Signaler<K> signaler)
-	{
-		list=l;
+
+	public ChameleonList(final List<K> l, final Signaler<K> signaler) {
+		list = l;
 		this.signaler = signaler;
 	}
-	
-	
-	public void changeMeInto(final ChameleonList<K> fromList)
-	{
-		this.list=fromList.list;
-		this.signaler=fromList.signaler;
+
+	public void changeMeInto(final ChameleonList<K> fromList) {
+		this.list = fromList.list;
+		this.signaler = fromList.signaler;
 	}
 
-	public Signaler<K> getSignaler() { return signaler;}
-	
+	public Signaler<K> getSignaler() {
+		return signaler;
+	}
+
 	@Override
 	public boolean add(K arg0) {
 		throw new java.lang.IllegalArgumentException();
@@ -172,7 +171,7 @@ public class ChameleonList<K> implements List<K>, SizedIterable<K>
 	@Override
 	public List<K> subList(int arg0, int arg1) {
 		signaler.possiblyChangeMe(this);
-		return new ReadOnlyList<K>(list.subList(arg0,arg1));
+		return new ReadOnlyList<K>(list.subList(arg0, arg1));
 	}
 
 	@Override

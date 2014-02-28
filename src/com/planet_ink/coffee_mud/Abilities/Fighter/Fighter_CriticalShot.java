@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Fighter;
+
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
 import com.planet_ink.coffee_mud.Common.interfaces.CharStats;
@@ -10,57 +11,87 @@ import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
-public class Fighter_CriticalShot extends FighterSkill
-{
-	public String ID() { return "Fighter_CriticalShot"; }
-	public String name(){ return "Critical Shot";}
-	public String displayText(){ return "";}
-	public int abstractQuality(){return Ability.QUALITY_BENEFICIAL_SELF;}
-	protected int canAffectCode(){return Ability.CAN_MOBS;}
-	protected int canTargetCode(){return 0;}
-	public boolean isAutoInvoked(){return true;}
-	public boolean canBeUninvoked(){return false;}
-	public int classificationCode(){ return Ability.ACODE_SKILL|Ability.DOMAIN_MARTIALLORE;}
+public class Fighter_CriticalShot extends FighterSkill {
+	public String ID() {
+		return "Fighter_CriticalShot";
+	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(!super.okMessage(myHost,msg))
+	public String name() {
+		return "Critical Shot";
+	}
+
+	public String displayText() {
+		return "";
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_BENEFICIAL_SELF;
+	}
+
+	protected int canAffectCode() {
+		return Ability.CAN_MOBS;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public boolean isAutoInvoked() {
+		return true;
+	}
+
+	public boolean canBeUninvoked() {
+		return false;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SKILL | Ability.DOMAIN_MARTIALLORE;
+	}
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (!super.okMessage(myHost, msg))
 			return false;
 
-		if(!(affected instanceof MOB))
+		if (!(affected instanceof MOB))
 			return true;
 
-		MOB mob=(MOB)affected;
-		if(msg.amISource(mob)
-		&&(CMLib.flags().aliveAwakeMobile(mob,true))
-		&&(msg.targetMinor()==CMMsg.TYP_DAMAGE)
-		&&(msg.target()!=null)
-		&&(mob.getVictim()==msg.target())
-		&&(msg.tool()!=null)
-		&&(msg.tool() instanceof Weapon)
-		&&((((Weapon)msg.tool()).weaponClassification()==Weapon.CLASS_RANGED)
-			||(((Weapon)msg.tool()).weaponClassification()==Weapon.CLASS_THROWN))
-		&&((mob.rangeToTarget()>0)||((((Weapon)msg.tool()).phyStats().sensesMask()&PhyStats.SENSE_ITEMNOMINRANGE)==PhyStats.SENSE_ITEMNOMINRANGE))
-		&&((mob.fetchAbility(ID())==null)||proficiencyCheck(null,(-75)+mob.charStats().getStat(CharStats.STAT_DEXTERITY)+(2*getXLEVELLevel(mob)),false)))
-		{
-			double pctRecovery=(CMath.div(proficiency(),100.0)*Math.random());
-			int bonus=(int)Math.round(CMath.mul((msg.value()),pctRecovery));
-			msg.setValue(msg.value()+bonus);
+		MOB mob = (MOB) affected;
+		if (msg.amISource(mob)
+				&& (CMLib.flags().aliveAwakeMobile(mob, true))
+				&& (msg.targetMinor() == CMMsg.TYP_DAMAGE)
+				&& (msg.target() != null)
+				&& (mob.getVictim() == msg.target())
+				&& (msg.tool() != null)
+				&& (msg.tool() instanceof Weapon)
+				&& ((((Weapon) msg.tool()).weaponClassification() == Weapon.CLASS_RANGED) || (((Weapon) msg
+						.tool()).weaponClassification() == Weapon.CLASS_THROWN))
+				&& ((mob.rangeToTarget() > 0) || ((((Weapon) msg.tool())
+						.phyStats().sensesMask() & PhyStats.SENSE_ITEMNOMINRANGE) == PhyStats.SENSE_ITEMNOMINRANGE))
+				&& ((mob.fetchAbility(ID()) == null) || proficiencyCheck(
+						null,
+						(-75)
+								+ mob.charStats().getStat(
+										CharStats.STAT_DEXTERITY)
+								+ (2 * getXLEVELLevel(mob)), false))) {
+			double pctRecovery = (CMath.div(proficiency(), 100.0) * Math
+					.random());
+			int bonus = (int) Math.round(CMath.mul((msg.value()), pctRecovery));
+			msg.setValue(msg.value() + bonus);
 			helpProficiency(mob, 0);
 		}
 		return true;

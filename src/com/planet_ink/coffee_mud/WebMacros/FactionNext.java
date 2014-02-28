@@ -7,51 +7,54 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class FactionNext extends StdWebMacro
-{
-	public String name() { return "FactionNext"; }
-	public boolean isAdminMacro()   {return true;}
+public class FactionNext extends StdWebMacro {
+	public String name() {
+		return "FactionNext";
+	}
 
-	public String runMacro(HTTPRequest httpReq, String parm)
-	{
-		java.util.Map<String,String> parms=parseParms(parm);
-		String last=httpReq.getUrlParameter("FACTION");
-		if(parms.containsKey("RESET"))
-		{   
-			if(last!=null) httpReq.removeUrlParameter("FACTION");
+	public boolean isAdminMacro() {
+		return true;
+	}
+
+	public String runMacro(HTTPRequest httpReq, String parm) {
+		java.util.Map<String, String> parms = parseParms(parm);
+		String last = httpReq.getUrlParameter("FACTION");
+		if (parms.containsKey("RESET")) {
+			if (last != null)
+				httpReq.removeUrlParameter("FACTION");
 			return "";
 		}
-		String lastID="";
+		String lastID = "";
 		Faction F;
 		String factionID;
-		for(Enumeration q=CMLib.factions().factions();q.hasMoreElements();)
-		{
-			F=(Faction)q.nextElement();
-			factionID=F.factionID().toUpperCase().trim();
-			if((last==null)||((last.length()>0)&&(last.equals(lastID))&&(!factionID.equalsIgnoreCase(lastID))))
-			{
-				httpReq.addFakeUrlParameter("FACTION",factionID);
+		for (Enumeration q = CMLib.factions().factions(); q.hasMoreElements();) {
+			F = (Faction) q.nextElement();
+			factionID = F.factionID().toUpperCase().trim();
+			if ((last == null)
+					|| ((last.length() > 0) && (last.equals(lastID)) && (!factionID
+							.equalsIgnoreCase(lastID)))) {
+				httpReq.addFakeUrlParameter("FACTION", factionID);
 				return "";
 			}
-			lastID=factionID;
+			lastID = factionID;
 		}
-		httpReq.addFakeUrlParameter("FACTION","");
-		if(parms.containsKey("EMPTYOK"))
+		httpReq.addFakeUrlParameter("FACTION", "");
+		if (parms.containsKey("EMPTYOK"))
 			return "<!--EMPTY-->";
 		return " @break@";
 	}

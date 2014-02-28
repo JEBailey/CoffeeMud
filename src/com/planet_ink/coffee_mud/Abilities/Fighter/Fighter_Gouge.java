@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Fighter;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -15,163 +16,193 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Fighter_Gouge extends MonkSkill
-{
-	boolean doneTicking=false;
-	public String ID() { return "Fighter_Gouge"; }
-	public String name(){ return "Gouge";}
-	public String displayText(){ return "(Gouged Eyes)";}
-	protected int canAffectCode(){return CAN_MOBS;}
-	protected int canTargetCode(){return CAN_MOBS;}
-	public int abstractQuality(){return Ability.QUALITY_MALICIOUS;}
-	private static final String[] triggerStrings = {"GOUGE"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int classificationCode(){return Ability.ACODE_SKILL|Ability.DOMAIN_DIRTYFIGHTING;}
-	protected int overrideMana(){return 100;}
-	public int usageType(){return USAGE_MOVEMENT;}
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Fighter_Gouge extends MonkSkill {
+	boolean doneTicking = false;
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
-		if(!doneTicking)
-			affectableStats.setSensesMask(affectableStats.sensesMask()|PhyStats.CAN_NOT_SEE);
+	public String ID() {
+		return "Fighter_Gouge";
 	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if(!(affected instanceof MOB))
+	public String name() {
+		return "Gouge";
+	}
+
+	public String displayText() {
+		return "(Gouged Eyes)";
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	protected int canTargetCode() {
+		return CAN_MOBS;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	private static final String[] triggerStrings = { "GOUGE" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SKILL | Ability.DOMAIN_DIRTYFIGHTING;
+	}
+
+	protected int overrideMana() {
+		return 100;
+	}
+
+	public int usageType() {
+		return USAGE_MOVEMENT;
+	}
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
+		if (!doneTicking)
+			affectableStats.setSensesMask(affectableStats.sensesMask()
+					| PhyStats.CAN_NOT_SEE);
+	}
+
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if (!(affected instanceof MOB))
 			return true;
 
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
-		if((doneTicking)&&(msg.amISource(mob)))
+		if ((doneTicking) && (msg.amISource(mob)))
 			unInvoke();
 		return true;
 	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
 
-		if(canBeUninvoked())
+		if (canBeUninvoked())
 			mob.tell("Your eyes feel better.");
 	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if((mob!=null)&&(target!=null))
-		{
-			if(mob.isInCombat()&&(mob.rangeToTarget()>0))
+	public int castingQuality(MOB mob, Physical target) {
+		if ((mob != null) && (target != null)) {
+			if (mob.isInCombat() && (mob.rangeToTarget() > 0))
 				return Ability.QUALITY_INDIFFERENT;
-			if(((mob.charStats().getBodyPart(Race.BODY_HAND)<=0))
-			||((mob.charStats().getMyRace().bodyMask()[Race.BODY_HAND]<=0)
-			   &&(mob.charStats().getBodyPart(Race.BODY_FOOT)<=0)))
+			if (((mob.charStats().getBodyPart(Race.BODY_HAND) <= 0))
+					|| ((mob.charStats().getMyRace().bodyMask()[Race.BODY_HAND] <= 0) && (mob
+							.charStats().getBodyPart(Race.BODY_FOOT) <= 0)))
 				return Ability.QUALITY_INDIFFERENT;
-			if((target instanceof MOB)&&(((MOB)target).charStats().getBodyPart(Race.BODY_EYE)<=0))
+			if ((target instanceof MOB)
+					&& (((MOB) target).charStats().getBodyPart(Race.BODY_EYE) <= 0))
 				return Ability.QUALITY_INDIFFERENT;
-			if((target instanceof MOB)&&(!CMLib.flags().canSee((MOB)target)))
+			if ((target instanceof MOB)
+					&& (!CMLib.flags().canSee((MOB) target)))
 				return Ability.QUALITY_INDIFFERENT;
-			if(anyWeapons(mob))
+			if (anyWeapons(mob))
 				return Ability.QUALITY_INDIFFERENT;
-			if(target.fetchEffect(ID())!=null)
+			if (target.fetchEffect(ID()) != null)
 				return Ability.QUALITY_INDIFFERENT;
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
-	
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=this.getTarget(mob,commands,givenTarget);
-		if(target==null) return false;
 
-		if((!auto)
-		&&((mob.charStats().getBodyPart(Race.BODY_HAND)<=0))
-		||((mob.charStats().getMyRace().bodyMask()[Race.BODY_HAND]<=0)
-		   &&(mob.charStats().getBodyPart(Race.BODY_FOOT)<=0)))
-		{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = this.getTarget(mob, commands, givenTarget);
+		if (target == null)
+			return false;
+
+		if ((!auto)
+				&& ((mob.charStats().getBodyPart(Race.BODY_HAND) <= 0))
+				|| ((mob.charStats().getMyRace().bodyMask()[Race.BODY_HAND] <= 0) && (mob
+						.charStats().getBodyPart(Race.BODY_FOOT) <= 0))) {
 			mob.tell("You need hands to gouge.");
 			return false;
 		}
 
-		if((!auto)&&(target.charStats().getBodyPart(Race.BODY_EYE)<=0))
-		{
-			mob.tell(target.name(mob)+" has no eyes!");
+		if ((!auto) && (target.charStats().getBodyPart(Race.BODY_EYE) <= 0)) {
+			mob.tell(target.name(mob) + " has no eyes!");
 			return false;
 		}
 
-		if((!auto)&&(anyWeapons(mob)))
-		{
+		if ((!auto) && (anyWeapons(mob))) {
 			mob.tell("Your hands must be free to gouge.");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		boolean hit=(auto)||CMLib.combat().rollToHit(mob,target);
-		if((success)&&(hit))
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSK_MALICIOUS_MOVE|CMMsg.TYP_JUSTICE|(auto?CMMsg.MASK_ALWAYS:0),auto?"":"^F^<FIGHT^><S-NAME> gouge(s) at <T-YOUPOSS> eyes!^</FIGHT^>^?");
+		boolean success = proficiencyCheck(mob, 0, auto);
+		boolean hit = (auto) || CMLib.combat().rollToHit(mob, target);
+		if ((success) && (hit)) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							CMMsg.MSK_MALICIOUS_MOVE | CMMsg.TYP_JUSTICE
+									| (auto ? CMMsg.MASK_ALWAYS : 0),
+							auto ? ""
+									: "^F^<FIGHT^><S-NAME> gouge(s) at <T-YOUPOSS> eyes!^</FIGHT^>^?");
 			CMLib.color().fixSourceFightColor(msg);
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				mob.location().show(target,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> <S-IS-ARE> blinded!");
-				maliciousAffect(mob,target,asLevel,5,-1);
-				Amputator A=(Amputator)target.fetchEffect("Amputation");
-				if(A==null) A=(Amputator)CMClass.getAbility("Amputation");
-				List<String> remainingLimbList=A.remainingLimbNameSet(target);
-				String gone=null;
-				for(int i=0;i<remainingLimbList.size();i++)
-					if(remainingLimbList.get(i).toUpperCase().endsWith("EYE"))
-					{
-						gone=remainingLimbList.get(i);
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				mob.location().show(target, null, CMMsg.MSG_OK_VISUAL,
+						"<S-NAME> <S-IS-ARE> blinded!");
+				maliciousAffect(mob, target, asLevel, 5, -1);
+				Amputator A = (Amputator) target.fetchEffect("Amputation");
+				if (A == null)
+					A = (Amputator) CMClass.getAbility("Amputation");
+				List<String> remainingLimbList = A.remainingLimbNameSet(target);
+				String gone = null;
+				for (int i = 0; i < remainingLimbList.size(); i++)
+					if (remainingLimbList.get(i).toUpperCase().endsWith("EYE")) {
+						gone = remainingLimbList.get(i);
 						break;
 					}
-				if(gone!=null)
-				{
-					Ability A2=CMClass.getAbility("Injury");
-					if(A2!=null)
-					{
-						A2.setMiscText(mob.Name()+"/"+gone);
-						CMMsg msg2=CMClass.getMsg(mob,target,this,CMMsg.MSG_DAMAGE,"<DAMAGE> <T-NAME>.");
-						msg2.setValue(target.maxState().getHitPoints()/(20-getXLEVELLevel(mob)));
-						if(!A2.invoke(mob,new XVector(msg2),target,true,0))
-						{
-							A2=target.fetchEffect("Injury");
-							if( A2 != null )
-							{
-							  A2.setMiscText(mob.Name()+"/"+gone);
-							  A2.okMessage(target,msg2);
+				if (gone != null) {
+					Ability A2 = CMClass.getAbility("Injury");
+					if (A2 != null) {
+						A2.setMiscText(mob.Name() + "/" + gone);
+						CMMsg msg2 = CMClass.getMsg(mob, target, this,
+								CMMsg.MSG_DAMAGE, "<DAMAGE> <T-NAME>.");
+						msg2.setValue(target.maxState().getHitPoints()
+								/ (20 - getXLEVELLevel(mob)));
+						if (!A2.invoke(mob, new XVector(msg2), target, true, 0)) {
+							A2 = target.fetchEffect("Injury");
+							if (A2 != null) {
+								A2.setMiscText(mob.Name() + "/" + gone);
+								A2.okMessage(target, msg2);
 							}
 						}
 					}
 				}
 			}
-		}
-		else
-			return maliciousFizzle(mob,target,"<S-NAME> attempt(s) to gouge <T-YOUPOSS> eyes, but fail(s).");
+		} else
+			return maliciousFizzle(mob, target,
+					"<S-NAME> attempt(s) to gouge <T-YOUPOSS> eyes, but fail(s).");
 		return success;
 	}
 }

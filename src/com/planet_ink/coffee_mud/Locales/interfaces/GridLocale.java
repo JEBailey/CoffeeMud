@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Locales.interfaces;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -6,43 +7,56 @@ import com.planet_ink.coffee_mud.Areas.interfaces.GridZones;
 import com.planet_ink.coffee_mud.Libraries.interfaces.WorldMap;
 import com.planet_ink.coffee_mud.core.collections.Converter;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public interface GridLocale extends Room, GridZones
-{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public interface GridLocale extends Room, GridZones {
 	public String getGridChildLocaleID();
+
 	public Room prepareGridLocale(Room fromRoom, Room toRoom, int direction);
+
 	public void buildGrid();
+
 	public void clearGrid(Room bringBackHere);
+
 	public List<Room> getAllRooms();
+
 	public Iterator<Room> getExistingRooms();
+
 	public Iterator<WorldMap.CrossExit> outerExits();
+
 	public void addOuterExit(WorldMap.CrossExit x);
+
 	public void delOuterExit(WorldMap.CrossExit x);
-	public static class ThinGridEntry
-	{
+
+	public static class ThinGridEntry {
 		public Room room;
 		public XYVector xy;
-		public ThinGridEntry(Room R, int x, int y)
-		{ room=R; xy=new XYVector(x,y);}
+
+		public ThinGridEntry(Room R, int x, int y) {
+			room = R;
+			xy = new XYVector(x, y);
+		}
 	}
-	public static class ThinGridEntryConverter implements Converter<ThinGridEntry,Room>
-	{
+
+	public static class ThinGridEntryConverter implements
+			Converter<ThinGridEntry, Room> {
 		public static ThinGridEntryConverter INSTANCE = new ThinGridEntryConverter();
-		public Room convert(ThinGridEntry obj) { return obj.room;}
+
+		public Room convert(ThinGridEntry obj) {
+			return obj.room;
+		}
 	}
 }

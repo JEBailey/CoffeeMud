@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Thief;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -12,115 +13,133 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Thief_DampenAuras extends ThiefSkill
-{
-	public String ID() { return "Thief_DampenAuras"; }
-	public String name(){ return "Dampen Auras";}
-	public String displayText(){return "(Dampened Auras)";}
-	protected int canAffectCode(){return CAN_MOBS;}
-	protected int canTargetCode(){return 0;}
-	public int abstractQuality(){return Ability.QUALITY_INDIFFERENT;}
-	private static final String[] triggerStrings = {"DAMPENAURAS"};
-	public String[] triggerStrings(){return triggerStrings;}
-	
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(unInvoked) return false;
-		return super.tick(ticking,tickID);
+public class Thief_DampenAuras extends ThiefSkill {
+	public String ID() {
+		return "Thief_DampenAuras";
 	}
-	
-	public void affectPhyStats(Physical host, PhyStats stats)
-	{
-		super.affectPhyStats(host,stats);
-		if(unInvoked) 
+
+	public String name() {
+		return "Dampen Auras";
+	}
+
+	public String displayText() {
+		return "(Dampened Auras)";
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	private static final String[] triggerStrings = { "DAMPENAURAS" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public boolean tick(Tickable ticking, int tickID) {
+		if (unInvoked)
+			return false;
+		return super.tick(ticking, tickID);
+	}
+
+	public void affectPhyStats(Physical host, PhyStats stats) {
+		super.affectPhyStats(host, stats);
+		if (unInvoked)
 			host.delEffect(this);
 		else
 			stats.addAmbiance("-MOST");
 	}
-	
-	public void executeMsg(Environmental host, CMMsg msg)
-	{
-		super.executeMsg(host,msg);
-		if(super.canBeUninvoked())
-		{
-			if((affected!=null)
-			&&(affected instanceof MOB)
-			&&(msg.amISource((MOB)affected))
-			&&(msg.sourceMinor()==CMMsg.TYP_QUIT))
+
+	public void executeMsg(Environmental host, CMMsg msg) {
+		super.executeMsg(host, msg);
+		if (super.canBeUninvoked()) {
+			if ((affected != null) && (affected instanceof MOB)
+					&& (msg.amISource((MOB) affected))
+					&& (msg.sourceMinor() == CMMsg.TYP_QUIT))
 				unInvoke();
-			else
-			if(msg.sourceMinor()==CMMsg.TYP_SHUTDOWN)
+			else if (msg.sourceMinor() == CMMsg.TYP_SHUTDOWN)
 				unInvoke();
 		}
 	}
-	
-	public void unInvoke()
-	{
-		Environmental E=affected;
+
+	public void unInvoke() {
+		Environmental E = affected;
 		super.unInvoke();
-		if((E instanceof MOB)&&(!((MOB)E).amDead()))
-			((MOB)E).tell("You noticed the aura dampening is wearing away on "+E.name()+".");
+		if ((E instanceof MOB) && (!((MOB) E).amDead()))
+			((MOB) E).tell("You noticed the aura dampening is wearing away on "
+					+ E.name() + ".");
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if((auto)&&(givenTarget!=null)&&(givenTarget instanceof MOB))
-			target=(MOB)givenTarget;
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if ((auto) && (givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
 
-		if(target.fetchEffect(this.ID())!=null)
-		{
-			mob.tell(target,null,null,"<S-NAME> can't dampen <S-YOUPOSS> auras again so soon.");
+		if (target.fetchEffect(this.ID()) != null) {
+			mob.tell(target, null, null,
+					"<S-NAME> can't dampen <S-YOUPOSS> auras again so soon.");
 			return false;
 		}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		CMMsg msg=CMClass.getMsg(mob,target,this,auto?CMMsg.MASK_ALWAYS:CMMsg.MSG_DELICATE_SMALL_HANDS_ACT,CMMsg.MSG_OK_VISUAL,CMMsg.MSG_OK_VISUAL,auto?"":"<T-NAME> dampen(s) <T-HIS-HER> auras.");
-		if(!success)
-			return beneficialVisualFizzle(mob,null,auto?"":"<S-NAME> attempt(s) to dampen <S-HIS-HER> auras, but fail(s).");
-		else
-		if(mob.location().okMessage(mob,msg))
-		{
-			mob.location().send(mob,msg);
-			beneficialAffect(mob,target,asLevel,0);
-			Ability A=target.fetchEffect(ID());
-			if(A!=null)
-			{
-				A.tick(target,Tickable.TICKID_MOB);
-				Item I=null;
-				Physical affecting=A.affecting();
-				StringBuffer items=new StringBuffer("");
-				for(int i=0;i<target.numItems();i++)
-				{
-					I=target.getItem(i);
-					if((I!=null)&&(I.container()==null))
-					{
+		CMMsg msg = CMClass.getMsg(mob, target, this, auto ? CMMsg.MASK_ALWAYS
+				: CMMsg.MSG_DELICATE_SMALL_HANDS_ACT, CMMsg.MSG_OK_VISUAL,
+				CMMsg.MSG_OK_VISUAL, auto ? ""
+						: "<T-NAME> dampen(s) <T-HIS-HER> auras.");
+		if (!success)
+			return beneficialVisualFizzle(
+					mob,
+					null,
+					auto ? ""
+							: "<S-NAME> attempt(s) to dampen <S-HIS-HER> auras, but fail(s).");
+		else if (mob.location().okMessage(mob, msg)) {
+			mob.location().send(mob, msg);
+			beneficialAffect(mob, target, asLevel, 0);
+			Ability A = target.fetchEffect(ID());
+			if (A != null) {
+				A.tick(target, Tickable.TICKID_MOB);
+				Item I = null;
+				Physical affecting = A.affecting();
+				StringBuffer items = new StringBuffer("");
+				for (int i = 0; i < target.numItems(); i++) {
+					I = target.getItem(i);
+					if ((I != null) && (I.container() == null)) {
 						I.addEffect(A);
 						A.setAffectedOne(affecting);
-						items.append(", "+I.name());
+						items.append(", " + I.name());
 					}
 				}
-				if(items.length()>2)
-					target.tell("You've dampened the auras on the following items: "+items.substring(2));
+				if (items.length() > 2)
+					target.tell("You've dampened the auras on the following items: "
+							+ items.substring(2));
 				target.location().recoverRoomStats();
 			}
 		}

@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Thief;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -13,170 +14,215 @@ import com.planet_ink.coffee_mud.core.CMParms;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Thief_SlipItem extends ThiefSkill
-{
-	public String ID() { return "Thief_SlipItem"; }
-	public String name(){ return "Slip Item";}
-	protected int canAffectCode(){return 0;}
-	protected int canTargetCode(){return CAN_MOBS;}
-	public int abstractQuality(){return Ability.QUALITY_MALICIOUS;}
-	public int classificationCode(){return Ability.ACODE_THIEF_SKILL|Ability.DOMAIN_STEALING;}
-	private static final String[] triggerStrings = {"SLIPITEM"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int usageType(){return USAGE_MOVEMENT|USAGE_MANA;}
-	public int code=0;
+public class Thief_SlipItem extends ThiefSkill {
+	public String ID() {
+		return "Thief_SlipItem";
+	}
 
-	public int abilityCode(){return code;}
-	public void setAbilityCode(int newCode){code=newCode;}
+	public String name() {
+		return "Slip Item";
+	}
 
-	public int castingQuality(MOB mob, Physical target)
-	{
-		if(mob!=null)
-		{
-			if(mob.isInCombat())
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	protected int canTargetCode() {
+		return CAN_MOBS;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_THIEF_SKILL | Ability.DOMAIN_STEALING;
+	}
+
+	private static final String[] triggerStrings = { "SLIPITEM" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int usageType() {
+		return USAGE_MOVEMENT | USAGE_MANA;
+	}
+
+	public int code = 0;
+
+	public int abilityCode() {
+		return code;
+	}
+
+	public void setAbilityCode(int newCode) {
+		code = newCode;
+	}
+
+	public int castingQuality(MOB mob, Physical target) {
+		if (mob != null) {
+			if (mob.isInCombat())
 				return Ability.QUALITY_INDIFFERENT;
-			if(target instanceof MOB)
-			{
-				if((((MOB)target).amDead())||(!CMLib.flags().canBeSeenBy(target,mob)))
+			if (target instanceof MOB) {
+				if ((((MOB) target).amDead())
+						|| (!CMLib.flags().canBeSeenBy(target, mob)))
 					return Ability.QUALITY_INDIFFERENT;
-				Item w=mob.fetchWieldedItem();
-				if((w==null)||(w.minRange()>0)||(w.maxRange()>0))
+				Item w = mob.fetchWieldedItem();
+				if ((w == null) || (w.minRange() > 0) || (w.maxRange() > 0))
 					return Ability.QUALITY_INDIFFERENT;
 			}
 		}
-		return super.castingQuality(mob,target);
+		return super.castingQuality(mob, target);
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		String itemToSteal="all";
-		if(!auto)
-		{
-			if(commands.size()<2)
-			{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		String itemToSteal = "all";
+		if (!auto) {
+			if (commands.size() < 2) {
 				mob.tell("Slip what off of whom?");
 				return false;
 			}
-			itemToSteal=(String)commands.elementAt(0);
+			itemToSteal = (String) commands.elementAt(0);
 		}
 
-		MOB target=null;
-		if((givenTarget!=null)&&(givenTarget instanceof MOB)) 
-			target=(MOB)givenTarget;
+		MOB target = null;
+		if ((givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
 		else
-			target=mob.location().fetchInhabitant(CMParms.combine(commands,1));
-		if((target==null)||(target.amDead())||(!CMLib.flags().canBeSeenBy(target,mob)))
-		{
-			mob.tell("You don't see '"+CMParms.combine(commands,1)+"' here.");
+			target = mob.location().fetchInhabitant(
+					CMParms.combine(commands, 1));
+		if ((target == null) || (target.amDead())
+				|| (!CMLib.flags().canBeSeenBy(target, mob))) {
+			mob.tell("You don't see '" + CMParms.combine(commands, 1)
+					+ "' here.");
 			return false;
 		}
-		if(mob.isInCombat())
-		{
+		if (mob.isInCombat()) {
 			mob.tell("Not while you are fighting!");
 			return false;
 		}
-		int levelDiff=target.phyStats().level()-(mob.phyStats().level()+abilityCode()+(getXLEVELLevel(mob)*2));
+		int levelDiff = target.phyStats().level()
+				- (mob.phyStats().level() + abilityCode() + (getXLEVELLevel(mob) * 2));
 
-		if((!target.mayIFight(mob))||(levelDiff>15))
-		{
-			mob.tell("You cannot slip anything off of "+target.charStats().himher()+".");
+		if ((!target.mayIFight(mob)) || (levelDiff > 15)) {
+			mob.tell("You cannot slip anything off of "
+					+ target.charStats().himher() + ".");
 			return false;
 		}
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		Item stolen=target.fetchItem(null,Wearable.FILTER_WORNONLY,itemToSteal);
-		if((stolen==null)||(!CMLib.flags().canBeSeenBy(stolen,mob)))
-		{
-			mob.tell(target.name(mob)+" doesn't seem to be wearing '"+itemToSteal+"'.");
-			return false;
-		}
-		if(stolen.amWearingAt(Wearable.WORN_WIELD))
-		{
-			mob.tell(target.name(mob)+" is wielding "+stolen.name()+"! Try disarm!");
+		Item stolen = target.fetchItem(null, Wearable.FILTER_WORNONLY,
+				itemToSteal);
+		if ((stolen == null) || (!CMLib.flags().canBeSeenBy(stolen, mob))) {
+			mob.tell(target.name(mob) + " doesn't seem to be wearing '"
+					+ itemToSteal + "'.");
 			return false;
 		}
+		if (stolen.amWearingAt(Wearable.WORN_WIELD)) {
+			mob.tell(target.name(mob) + " is wielding " + stolen.name()
+					+ "! Try disarm!");
+			return false;
+		}
 
-		int discoverChance=(target.charStats().getStat(CharStats.STAT_WISDOM)*5)
-							-(levelDiff*5)
-							+(getX1Level(mob)*5);
-		if(!CMLib.flags().canBeSeenBy(mob,target))
-			discoverChance+=50;
-		if(discoverChance>95) discoverChance=95;
-		if(discoverChance<5) discoverChance=5;
+		int discoverChance = (target.charStats().getStat(CharStats.STAT_WISDOM) * 5)
+				- (levelDiff * 5) + (getX1Level(mob) * 5);
+		if (!CMLib.flags().canBeSeenBy(mob, target))
+			discoverChance += 50;
+		if (discoverChance > 95)
+			discoverChance = 95;
+		if (discoverChance < 5)
+			discoverChance = 5;
 
-		if(levelDiff>0)
-			levelDiff=-(levelDiff*((!CMLib.flags().canBeSeenBy(mob,target))?5:15));
+		if (levelDiff > 0)
+			levelDiff = -(levelDiff * ((!CMLib.flags().canBeSeenBy(mob, target)) ? 5
+					: 15));
 		else
-			levelDiff=-(levelDiff*((!CMLib.flags().canBeSeenBy(mob,target))?1:2));
-		boolean success=proficiencyCheck(mob,levelDiff,auto);
+			levelDiff = -(levelDiff * ((!CMLib.flags().canBeSeenBy(mob, target)) ? 1
+					: 2));
+		boolean success = proficiencyCheck(mob, levelDiff, auto);
 
-		if(!success)
-		{
-			if(CMLib.dice().rollPercentage()>discoverChance)
-			{
-				CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSG_NOISYMOVEMENT,auto?"":"You fumble the attempt to slip "+stolen.name()+" off <T-NAME>; <T-NAME> spots you!",CMMsg.MSG_NOISYMOVEMENT,auto?"":"<S-NAME> tries to slip "+stolen.name()+" off you and fails!",CMMsg.MSG_NOISYMOVEMENT,auto?"":"<S-NAME> tries to slip "+stolen.name()+" off <T-NAME> and fails!");
-				if(mob.location().okMessage(mob,msg))
-					mob.location().send(mob,msg);
-			}
-			else
-				mob.tell(auto?"":"You fumble the attempt to slip "+stolen.name()+" off "+target.name(mob)+".");
-		}
-		else
-		{
-			String str=null;
-			if(!auto)
-				if(!stolen.amWearingAt(Wearable.IN_INVENTORY))
-					str="<S-NAME> slip(s) "+stolen.name()+" off <T-NAMESELF>.";
+		if (!success) {
+			if (CMLib.dice().rollPercentage() > discoverChance) {
+				CMMsg msg = CMClass.getMsg(
+						mob,
+						target,
+						this,
+						CMMsg.MSG_NOISYMOVEMENT,
+						auto ? "" : "You fumble the attempt to slip "
+								+ stolen.name()
+								+ " off <T-NAME>; <T-NAME> spots you!",
+						CMMsg.MSG_NOISYMOVEMENT, auto ? ""
+								: "<S-NAME> tries to slip " + stolen.name()
+										+ " off you and fails!",
+						CMMsg.MSG_NOISYMOVEMENT, auto ? ""
+								: "<S-NAME> tries to slip " + stolen.name()
+										+ " off <T-NAME> and fails!");
+				if (mob.location().okMessage(mob, msg))
+					mob.location().send(mob, msg);
+			} else
+				mob.tell(auto ? "" : "You fumble the attempt to slip "
+						+ stolen.name() + " off " + target.name(mob) + ".");
+		} else {
+			String str = null;
+			if (!auto)
+				if (!stolen.amWearingAt(Wearable.IN_INVENTORY))
+					str = "<S-NAME> slip(s) " + stolen.name()
+							+ " off <T-NAMESELF>.";
 				else
-					str="<S-NAME> attempt(s) to slip "+stolen.name()+" off <T-HIM-HER>, but it doesn't appear "+target.charStats().heshe()+" has that in <T-HIS-HER> inventory!";
+					str = "<S-NAME> attempt(s) to slip " + stolen.name()
+							+ " off <T-HIM-HER>, but it doesn't appear "
+							+ target.charStats().heshe()
+							+ " has that in <T-HIS-HER> inventory!";
 
-			boolean alreadyFighting=(mob.getVictim()==target)||(target.getVictim()==mob);
-			String hisStr=str;
-			int hisCode=CMMsg.MSG_THIEF_ACT;
-			if(CMLib.dice().rollPercentage()<discoverChance)
-				hisStr=null;
+			boolean alreadyFighting = (mob.getVictim() == target)
+					|| (target.getVictim() == mob);
+			String hisStr = str;
+			int hisCode = CMMsg.MSG_THIEF_ACT;
+			if (CMLib.dice().rollPercentage() < discoverChance)
+				hisStr = null;
 			else
-				hisCode=hisCode|((target.mayIFight(mob))?CMMsg.MASK_MALICIOUS:0);
+				hisCode = hisCode
+						| ((target.mayIFight(mob)) ? CMMsg.MASK_MALICIOUS : 0);
 
-			CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSG_THIEF_ACT,str,hisCode,hisStr,CMMsg.NO_EFFECT,null);
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				
-				if((!target.isMonster())&&(mob.isMonster())&&(!alreadyFighting))
-				{
-					if(target.getVictim()==mob)
+			CMMsg msg = CMClass.getMsg(mob, target, this, CMMsg.MSG_THIEF_ACT,
+					str, hisCode, hisStr, CMMsg.NO_EFFECT, null);
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+
+				if ((!target.isMonster()) && (mob.isMonster())
+						&& (!alreadyFighting)) {
+					if (target.getVictim() == mob)
 						target.makePeace();
-					if(mob.getVictim()==target)
+					if (mob.getVictim() == target)
 						mob.makePeace();
-				}
-				else
-				if(((hisStr==null)||mob.isMonster())
-				&&(!alreadyFighting)
-				&&(CMLib.dice().rollPercentage()>stolen.phyStats().level()))
-				{
-					if(target.getVictim()==mob)
+				} else if (((hisStr == null) || mob.isMonster())
+						&& (!alreadyFighting)
+						&& (CMLib.dice().rollPercentage() > stolen.phyStats()
+								.level())) {
+					if (target.getVictim() == mob)
 						target.makePeace();
 				}
-				msg=CMClass.getMsg(target,stolen,null,CMMsg.MSG_REMOVE,CMMsg.MSG_REMOVE,CMMsg.MSG_NOISE,null);
-				if(target.location().okMessage(target,msg))
-					target.location().send(mob,msg);
+				msg = CMClass.getMsg(target, stolen, null, CMMsg.MSG_REMOVE,
+						CMMsg.MSG_REMOVE, CMMsg.MSG_NOISE, null);
+				if (target.location().okMessage(target, msg))
+					target.location().send(mob, msg);
 			}
 		}
 		return success;

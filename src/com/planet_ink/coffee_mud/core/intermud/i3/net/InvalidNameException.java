@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.core.intermud.i3.net;
+
 /**
  * com.planet_ink.coffee_mud.core.intermud.i3.net.InvalidNameException
  * Copyright (c) 1996 George Reese
@@ -17,22 +18,22 @@ package com.planet_ink.coffee_mud.core.intermud.i3.net;
  * An exception thrown for invalid user names.
  */
 
-
 /**
- * This class is thrown whenever an attempt to create
- * a bad user name is made.<BR>
+ * This class is thrown whenever an attempt to create a bad user name is made.<BR>
  * Created: 28 September 1996<BR>
  * Last modified: 28 September 1996
+ * 
  * @author George Reese (borg@imaginary.com)
  * @version 1.0
  */
-public class InvalidNameException extends Exception 
-{
-	public static final long serialVersionUID=0;
+public class InvalidNameException extends Exception {
+	public static final long serialVersionUID = 0;
+
 	/**
-	 * Constructs a new invalid name exception with
-	 * the specified reason.
-	 * @param reason the reason for the exception
+	 * Constructs a new invalid name exception with the specified reason.
+	 * 
+	 * @param reason
+	 *            the reason for the exception
 	 */
 	public InvalidNameException(String reason) {
 		super(reason);

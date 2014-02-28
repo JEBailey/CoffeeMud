@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Spells;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -17,120 +18,143 @@ import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Spell_FakeWeapon extends Spell
-{
-	public String ID() { return "Spell_FakeWeapon"; }
-	public String name(){return "Fake Weapon";}
-	protected int canAffectCode(){return CAN_ITEMS;}
-	protected int canTargetCode(){return 0;}
-	public int classificationCode(){ return Ability.ACODE_SPELL|Ability.DOMAIN_ILLUSION;}
-	public int abstractQuality(){ return Ability.QUALITY_INDIFFERENT;}
+public class Spell_FakeWeapon extends Spell {
+	public String ID() {
+		return "Spell_FakeWeapon";
+	}
 
-	public void unInvoke()
-	{
-		Item item=null;
-		if(affected instanceof Item)
-			item=(Item)affected;
+	public String name() {
+		return "Fake Weapon";
+	}
+
+	protected int canAffectCode() {
+		return CAN_ITEMS;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SPELL | Ability.DOMAIN_ILLUSION;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	public void unInvoke() {
+		Item item = null;
+		if (affected instanceof Item)
+			item = (Item) affected;
 		super.unInvoke();
-		if(item != null)
+		if (item != null)
 			item.destroy();
 	}
 
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
-		if((affected!=null)&&(affected instanceof Item))
-		{
-			if((msg.tool()==affected)
-			&&(msg.targetMinor()==CMMsg.TYP_DAMAGE))
-			{
-				int damageType=Weapon.TYPE_BURSTING;
-				if(affected instanceof Weapon) 
-					damageType=((Weapon)affected).weaponType();
-				if(msg.sourceMessage()!=null)
-					msg.setSourceMessage(CMLib.combat().replaceDamageTag(msg.sourceMessage(), msg.value(), damageType, 'S'));
-				if(msg.targetMessage()!=null)
-					msg.setTargetMessage(CMLib.combat().replaceDamageTag(msg.targetMessage(), msg.value(), damageType, 'T'));
-				if(msg.othersMessage()!=null)
-					msg.setOthersMessage(CMLib.combat().replaceDamageTag(msg.othersMessage(), msg.value(), damageType, 'O'));
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
+		if ((affected != null) && (affected instanceof Item)) {
+			if ((msg.tool() == affected)
+					&& (msg.targetMinor() == CMMsg.TYP_DAMAGE)) {
+				int damageType = Weapon.TYPE_BURSTING;
+				if (affected instanceof Weapon)
+					damageType = ((Weapon) affected).weaponType();
+				if (msg.sourceMessage() != null)
+					msg.setSourceMessage(CMLib.combat().replaceDamageTag(
+							msg.sourceMessage(), msg.value(), damageType, 'S'));
+				if (msg.targetMessage() != null)
+					msg.setTargetMessage(CMLib.combat().replaceDamageTag(
+							msg.targetMessage(), msg.value(), damageType, 'T'));
+				if (msg.othersMessage() != null)
+					msg.setOthersMessage(CMLib.combat().replaceDamageTag(
+							msg.othersMessage(), msg.value(), damageType, 'O'));
 				msg.setValue(0);
-			}
-			else
-			if((msg.target()!=null)
-			&&((msg.target()==affected)
-				||(msg.target()==((Item)affected).container())
-				||(msg.target()==((Item)affected).ultimateContainer(null))))
-			{
-				if(((CMath.bset(msg.sourceMajor(),CMMsg.MASK_MAGIC))
-				||(CMath.bset(msg.targetMajor(),CMMsg.MASK_MAGIC))
-				||(CMath.bset(msg.othersMajor(),CMMsg.MASK_MAGIC))))
-				{
-					Room room=null;
-					if((msg.source()!=null)
-					&&(msg.source().location()!=null))
-						room=msg.source().location();
-					if(room==null) room=CMLib.map().roomLocation(affected);
-					if(room!=null)
-						room.showHappens(CMMsg.MSG_OK_VISUAL,"Magic energy fizzles around "+affected.Name()+" and is absorbed into the air.");
+			} else if ((msg.target() != null)
+					&& ((msg.target() == affected)
+							|| (msg.target() == ((Item) affected).container()) || (msg
+							.target() == ((Item) affected)
+							.ultimateContainer(null)))) {
+				if (((CMath.bset(msg.sourceMajor(), CMMsg.MASK_MAGIC))
+						|| (CMath.bset(msg.targetMajor(), CMMsg.MASK_MAGIC)) || (CMath
+							.bset(msg.othersMajor(), CMMsg.MASK_MAGIC)))) {
+					Room room = null;
+					if ((msg.source() != null)
+							&& (msg.source().location() != null))
+						room = msg.source().location();
+					if (room == null)
+						room = CMLib.map().roomLocation(affected);
+					if (room != null)
+						room.showHappens(
+								CMMsg.MSG_OK_VISUAL,
+								"Magic energy fizzles around "
+										+ affected.Name()
+										+ " and is absorbed into the air.");
 					return false;
-				}
-				else
-				if(msg.tool() instanceof Ability)
-				{
-					msg.source().tell("That doesn't appear to work on "+affected.name());
+				} else if (msg.tool() instanceof Ability) {
+					msg.source()
+							.tell("That doesn't appear to work on "
+									+ affected.name());
 					return false;
 				}
 			}
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		String weaponName=CMParms.combine(commands,0);
-		String[] choices={"sword","dagger","mace","staff","axe","hammer", "flail"};
-		int choice=-1;
-		for(int i=0;i<choices.length;i++)
-		{
-			if(choices[i].equalsIgnoreCase(weaponName))
-				choice=i;
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		String weaponName = CMParms.combine(commands, 0);
+		String[] choices = { "sword", "dagger", "mace", "staff", "axe",
+				"hammer", "flail" };
+		int choice = -1;
+		for (int i = 0; i < choices.length; i++) {
+			if (choices[i].equalsIgnoreCase(weaponName))
+				choice = i;
 		}
-		if(choice<0)
-		{
+		if (choice < 0) {
 			mob.tell("You must specify what kind of weapon to create: sword, dagger, mace, flail, staff, axe, or hammer.");
 			return false;
 		}
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,null,this,somanticCastCode(mob,null,auto),auto?"":"^S<S-NAME> wave(s) <S-HIS-HER> arms around dramatically.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				Weapon weapon=(Weapon)CMClass.getItem("GenWeapon");
-				weapon.basePhyStats().setAttackAdjustment(100 +(10 * super.getXLEVELLevel(mob)));
-				weapon.basePhyStats().setDamage(75+(3 * super.getXLEVELLevel(mob)));
-				weapon.basePhyStats().setDisposition(weapon.basePhyStats().disposition()|PhyStats.IS_BONUS);
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							null,
+							this,
+							somanticCastCode(mob, null, auto),
+							auto ? ""
+									: "^S<S-NAME> wave(s) <S-HIS-HER> arms around dramatically.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				Weapon weapon = (Weapon) CMClass.getItem("GenWeapon");
+				weapon.basePhyStats().setAttackAdjustment(
+						100 + (10 * super.getXLEVELLevel(mob)));
+				weapon.basePhyStats().setDamage(
+						75 + (3 * super.getXLEVELLevel(mob)));
+				weapon.basePhyStats()
+						.setDisposition(
+								weapon.basePhyStats().disposition()
+										| PhyStats.IS_BONUS);
 				weapon.setMaterial(RawMaterial.RESOURCE_COTTON);
-				switch(choice)
-				{
+				switch (choice) {
 				case 0:
 					weapon.setName("a fancy sword");
 					weapon.setDisplayText("a fancy sword sits here");
@@ -185,13 +209,15 @@ public class Spell_FakeWeapon extends Spell
 				weapon.setBaseValue(0);
 				weapon.recoverPhyStats();
 				mob.addItem(weapon);
-				mob.location().show(mob,null,weapon,CMMsg.MSG_OK_ACTION,"Suddenly, <S-NAME> own(s) <O-NAME>!");
-				beneficialAffect(mob,weapon,asLevel,0);
+				mob.location().show(mob, null, weapon, CMMsg.MSG_OK_ACTION,
+						"Suddenly, <S-NAME> own(s) <O-NAME>!");
+				beneficialAffect(mob, weapon, asLevel, 0);
 			}
-		}
-		else
-			beneficialVisualFizzle(mob,null,"<S-NAME> dramatically wave(s) <S-HIS-HER> arms around, but fizzle(s) the spell.");
-
+		} else
+			beneficialVisualFizzle(
+					mob,
+					null,
+					"<S-NAME> dramatically wave(s) <S-HIS-HER> arms around, but fizzle(s) the spell.");
 
 		// return whether it worked
 		return success;

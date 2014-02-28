@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Commands;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Common.interfaces.Session;
@@ -9,32 +10,34 @@ import com.planet_ink.coffee_mud.core.CMSecurity;
 import com.planet_ink.coffee_mud.core.Resources;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class DumpFile extends StdCommand
-{
-	public DumpFile(){}
+public class DumpFile extends StdCommand {
+	public DumpFile() {
+	}
 
-	private final String[] access={"DUMPFILE"};
-	public String[] getAccessWords(){return access;}
+	private final String[] access = { "DUMPFILE" };
+
+	public String[] getAccessWords() {
+		return access;
+	}
+
 	public boolean execute(MOB mob, Vector commands, int metaFlags)
-		throws java.io.IOException
-	{
-		if(commands.size()<3)
-		{
+			throws java.io.IOException {
+		if (commands.size() < 3) {
 			mob.tell("dumpfile {raw} username|all {filename1 ...}");
 			return false;
 		}
@@ -42,38 +45,35 @@ public class DumpFile extends StdCommand
 
 		int numFiles = 0;
 		int numSessions = 0;
-		boolean rawMode=false;
+		boolean rawMode = false;
 
-		if(((String)commands.elementAt(0)).equalsIgnoreCase("raw"))
-		{
+		if (((String) commands.elementAt(0)).equalsIgnoreCase("raw")) {
 			rawMode = true;
 			commands.removeElementAt(0);
 		}
 
-		String targetName = (String)commands.elementAt(0);
-		boolean allFlag=(targetName.equalsIgnoreCase("all"));
+		String targetName = (String) commands.elementAt(0);
+		boolean allFlag = (targetName.equalsIgnoreCase("all"));
 
 		commands.removeElementAt(0);
 
 		// so they can do dumpfile (username) RAW filename too
-		if(!rawMode && ( ((String)commands.elementAt(0)).equalsIgnoreCase("raw")) )
-		{
+		if (!rawMode
+				&& (((String) commands.elementAt(0)).equalsIgnoreCase("raw"))) {
 			rawMode = true;
 			commands.removeElementAt(0);
 		}
 
 		StringBuffer fileText = new StringBuffer("");
-		while (commands.size() > 0)
-		{
+		while (commands.size() > 0) {
 			boolean wipeAfter = true;
-			String fn = (String)commands.elementAt(0);
+			String fn = (String) commands.elementAt(0);
 
 			if (Resources.getResource(fn) != null)
 				wipeAfter = false;
 
-			StringBuffer ft = new CMFile(fn,mob,CMFile.FLAG_LOGERRORS).text();
-			if (ft != null && ft.length() > 0)
-			{
+			StringBuffer ft = new CMFile(fn, mob, CMFile.FLAG_LOGERRORS).text();
+			if (ft != null && ft.length() > 0) {
 				fileText.append("\n\r");
 				fileText.append(ft);
 				++numFiles;
@@ -84,14 +84,12 @@ public class DumpFile extends StdCommand
 			commands.removeElementAt(0);
 
 		}
-		if (fileText.length() > 0)
-		{
-			for(Session S : CMLib.sessions().localOnlineIterable())
-			{
-				if(!CMSecurity.isAllowed(mob,S.mob().location(),CMSecurity.SecFlag.DUMPFILE))
+		if (fileText.length() > 0) {
+			for (Session S : CMLib.sessions().localOnlineIterable()) {
+				if (!CMSecurity.isAllowed(mob, S.mob().location(),
+						CMSecurity.SecFlag.DUMPFILE))
 					continue;
-				if (allFlag || S.mob().name().equalsIgnoreCase(targetName))
-				{
+				if (allFlag || S.mob().name().equalsIgnoreCase(targetName)) {
 					if (rawMode)
 						S.rawPrintln(fileText.toString());
 					else
@@ -104,8 +102,13 @@ public class DumpFile extends StdCommand
 		return false;
 	}
 
-	public boolean canBeOrdered(){return true;}
-	public boolean securityCheck(MOB mob){return CMSecurity.isAllowed(mob,mob.location(),CMSecurity.SecFlag.DUMPFILE);}
+	public boolean canBeOrdered() {
+		return true;
+	}
 
+	public boolean securityCheck(MOB mob) {
+		return CMSecurity.isAllowed(mob, mob.location(),
+				CMSecurity.SecFlag.DUMPFILE);
+	}
 
 }

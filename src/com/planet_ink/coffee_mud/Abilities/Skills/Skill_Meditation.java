@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Skills;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -13,87 +14,113 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /*
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Skill_Meditation extends StdSkill
-{
-	public String ID() { return "Skill_Meditation"; }
-	public String name(){ return "Meditation";}
-	public String displayText(){ return "(Meditating)";}
-	protected int canAffectCode(){return CAN_MOBS;}
-	protected int canTargetCode(){return 0;}
-	public int abstractQuality(){return Ability.QUALITY_INDIFFERENT;}
-	private static final String[] triggerStrings = {"MEDITATE"};
-	public String[] triggerStrings(){return triggerStrings;}
-	public int classificationCode() {   return Ability.ACODE_SKILL|Ability.DOMAIN_FITNESS; }
+public class Skill_Meditation extends StdSkill {
+	public String ID() {
+		return "Skill_Meditation";
+	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public String name() {
+		return "Meditation";
+	}
+
+	public String displayText() {
+		return "(Meditating)";
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	private static final String[] triggerStrings = { "MEDITATE" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_SKILL | Ability.DOMAIN_FITNESS;
+	}
+
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 		super.unInvoke();
-		if(canBeUninvoked())
-		{
-			if(!mob.amDead())
-			{
-				if(mob.location()!=null)
-					mob.location().show(mob,null,CMMsg.MSG_OK_ACTION,"<S-NAME> end(s) <S-HIS-HER> meditation.");
+		if (canBeUninvoked()) {
+			if (!mob.amDead()) {
+				if (mob.location() != null)
+					mob.location().show(mob, null, CMMsg.MSG_OK_ACTION,
+							"<S-NAME> end(s) <S-HIS-HER> meditation.");
 				else
 					mob.tell("Your meditation ends.");
 			}
 		}
 	}
 
-	public void executeMsg(final Environmental myHost, final CMMsg msg)
-	{
-		super.executeMsg(myHost,msg);
-		if(!(affected instanceof MOB))
+	public void executeMsg(final Environmental myHost, final CMMsg msg) {
+		super.executeMsg(myHost, msg);
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
-		if((msg.amISource(mob))
-		&&(!CMath.bset(msg.sourceMajor(),CMMsg.MASK_CHANNEL))
-		&&((CMath.bset(msg.sourceMajor(),CMMsg.MASK_MOVE))||(CMath.bset(msg.sourceMajor(),CMMsg.MASK_HANDS))||(CMath.bset(msg.sourceMajor(),CMMsg.MASK_MOUTH))))
+		if ((msg.amISource(mob))
+				&& (!CMath.bset(msg.sourceMajor(), CMMsg.MASK_CHANNEL))
+				&& ((CMath.bset(msg.sourceMajor(), CMMsg.MASK_MOVE))
+						|| (CMath.bset(msg.sourceMajor(), CMMsg.MASK_HANDS)) || (CMath
+							.bset(msg.sourceMajor(), CMMsg.MASK_MOUTH))))
 			unInvoke();
-		if(CMath.bset(msg.othersMajor(),CMMsg.MASK_SOUND)
-		   &&(CMLib.flags().canBeHeardMovingBy(msg.source(),mob)))
-		{
-			if(!msg.amISource(mob))
-				msg.addTrailerMsg(CMClass.getMsg(mob,null,null,CMMsg.TYP_GENERAL|CMMsg.MASK_HANDS,CMMsg.NO_EFFECT,CMMsg.NO_EFFECT,"Your meditation is interrupted by the noise."));
+		if (CMath.bset(msg.othersMajor(), CMMsg.MASK_SOUND)
+				&& (CMLib.flags().canBeHeardMovingBy(msg.source(), mob))) {
+			if (!msg.amISource(mob))
+				msg.addTrailerMsg(CMClass.getMsg(mob, null, null,
+						CMMsg.TYP_GENERAL | CMMsg.MASK_HANDS, CMMsg.NO_EFFECT,
+						CMMsg.NO_EFFECT,
+						"Your meditation is interrupted by the noise."));
 			else
-				msg.addTrailerMsg(CMClass.getMsg(mob,null,null,CMMsg.TYP_GENERAL|CMMsg.MASK_HANDS,CMMsg.NO_EFFECT,CMMsg.NO_EFFECT,"Your meditation is interrupted."));
+				msg.addTrailerMsg(CMClass.getMsg(mob, null, null,
+						CMMsg.TYP_GENERAL | CMMsg.MASK_HANDS, CMMsg.NO_EFFECT,
+						CMMsg.NO_EFFECT, "Your meditation is interrupted."));
 		}
 		return;
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!(affected instanceof MOB))
-			return super.tick(ticking,tickID);
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!(affected instanceof MOB))
+			return super.tick(ticking, tickID);
 
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
-		if(tickID!=Tickable.TICKID_MOB) return true;
-		if(!proficiencyCheck(null,0,false)) return true;
+		if (tickID != Tickable.TICKID_MOB)
+			return true;
+		if (!proficiencyCheck(null, 0, false))
+			return true;
 
-		if((mob.curState().getHunger()<=0)
-		||(mob.curState().getThirst()<=0))
-		{
-			if(mob.curState().getThirst()<=0)
+		if ((mob.curState().getHunger() <= 0)
+				|| (mob.curState().getThirst() <= 0)) {
+			if (mob.curState().getThirst() <= 0)
 				mob.tell("Your mouth is dry!");
 			else
 				mob.tell("Your stomach growls!");
@@ -101,60 +128,57 @@ public class Skill_Meditation extends StdSkill
 			return false;
 		}
 
-		if((!mob.isInCombat())
-		&&(CMLib.flags().isSitting(mob)))
-		{
-			double man=((mob.charStats().getStat(CharStats.STAT_INTELLIGENCE)
-							+(2*getXLEVELLevel(mob))
-							+mob.charStats().getStat(CharStats.STAT_WISDOM)));
-			mob.curState().adjMana( (int)Math.round( ( man * .1 ) + ( ( mob.phyStats().level() + ( 2.0 * getXLEVELLevel( mob ) ) ) / 2.0 ) ),
-									mob.maxState() );
-		}
-		else
-		{
+		if ((!mob.isInCombat()) && (CMLib.flags().isSitting(mob))) {
+			double man = ((mob.charStats().getStat(CharStats.STAT_INTELLIGENCE)
+					+ (2 * getXLEVELLevel(mob)) + mob.charStats().getStat(
+					CharStats.STAT_WISDOM)));
+			mob.curState()
+					.adjMana(
+							(int) Math
+									.round((man * .1)
+											+ ((mob.phyStats().level() + (2.0 * getXLEVELLevel(mob))) / 2.0)),
+							mob.maxState());
+		} else {
 			unInvoke();
 			return false;
 		}
-		return super.tick(ticking,tickID);
+		return super.tick(ticking, tickID);
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if(mob.isInCombat())
-		{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if (mob.isInCombat()) {
 			mob.tell("You can't meditate while in combat!");
 			return false;
 		}
-		if(!CMLib.flags().isSitting(mob))
-		{
+		if (!CMLib.flags().isSitting(mob)) {
 			mob.tell("You must be in a sitting, restful position to meditate.");
 			return false;
 		}
-		if(target.fetchEffect(ID())!=null)
-		{
+		if (target.fetchEffect(ID()) != null) {
 			mob.tell("You are already meditating!");
 			return false;
 		}
 		// now see if it worked
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
-			invoker=mob;
-			CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSG_OK_VISUAL|(auto?CMMsg.MASK_ALWAYS:0),auto?"":"<S-NAME> begin(s) to meditate...");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				beneficialAffect(mob,mob,asLevel,Ability.TICKS_FOREVER);
+			invoker = mob;
+			CMMsg msg = CMClass.getMsg(mob, target, this, CMMsg.MSG_OK_VISUAL
+					| (auto ? CMMsg.MASK_ALWAYS : 0), auto ? ""
+					: "<S-NAME> begin(s) to meditate...");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				beneficialAffect(mob, mob, asLevel, Ability.TICKS_FOREVER);
 				helpProficiency(mob, 0);
 			}
-		}
-		else
-			return beneficialVisualFizzle(mob,target,"<S-NAME> attempt(s) to meditate, but lose(s) concentration.");
+		} else
+			return beneficialVisualFizzle(mob, target,
+					"<S-NAME> attempt(s) to meditate, but lose(s) concentration.");
 
 		// return whether it worked
 		return success;

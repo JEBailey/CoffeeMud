@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Druid;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -13,118 +14,131 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
-@SuppressWarnings({"unchecked","rawtypes"})
-public class Chant_RustCurse extends Chant
-{
-	public String ID() { return "Chant_RustCurse"; }
-	public String name(){return "Rust Curse";}
-	public String displayText(){return "(Rust Curse)";}
-	public int classificationCode(){return Ability.ACODE_CHANT|Ability.DOMAIN_DEEPMAGIC;}
-	public int abstractQuality(){ return Ability.QUALITY_MALICIOUS;}
-	protected int canAffectCode(){return CAN_MOBS;}
-	protected int canTargetCode(){return CAN_MOBS;}
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class Chant_RustCurse extends Chant {
+	public String ID() {
+		return "Chant_RustCurse";
+	}
 
-	public void unInvoke()
-	{
-		MOB M=null;
-		if(affected instanceof MOB)
-			M=(MOB)affected;
+	public String name() {
+		return "Rust Curse";
+	}
+
+	public String displayText() {
+		return "(Rust Curse)";
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_CHANT | Ability.DOMAIN_DEEPMAGIC;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	protected int canAffectCode() {
+		return CAN_MOBS;
+	}
+
+	protected int canTargetCode() {
+		return CAN_MOBS;
+	}
+
+	public void unInvoke() {
+		MOB M = null;
+		if (affected instanceof MOB)
+			M = (MOB) affected;
 		super.unInvoke();
-		if((canBeUninvoked())&&(M!=null)&&(!M.amDead()))
+		if ((canBeUninvoked()) && (M != null) && (!M.amDead()))
 			M.tell("You don't feel so damp any more.");
 	}
 
-
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking,tickID))
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
-		if(affected instanceof MOB)
-		{
-			boolean goodChoices=false;
-			Vector choices=new Vector();
-			MOB mob=(MOB)affected;
-			for(int i=0;i<mob.numItems();i++)
-			{
-				Item I=mob.getItem(i);
-				if((I!=null)&&(I.subjectToWearAndTear())
-				   &&(((I.material()&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_METAL)
-					  ||((I.material()&RawMaterial.MATERIAL_MASK)==RawMaterial.MATERIAL_MITHRIL)))
-				{
-					if(!I.amWearingAt(Wearable.IN_INVENTORY))
-					{
-						goodChoices=true;
+		if (affected instanceof MOB) {
+			boolean goodChoices = false;
+			Vector choices = new Vector();
+			MOB mob = (MOB) affected;
+			for (int i = 0; i < mob.numItems(); i++) {
+				Item I = mob.getItem(i);
+				if ((I != null)
+						&& (I.subjectToWearAndTear())
+						&& (((I.material() & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_METAL) || ((I
+								.material() & RawMaterial.MATERIAL_MASK) == RawMaterial.MATERIAL_MITHRIL))) {
+					if (!I.amWearingAt(Wearable.IN_INVENTORY)) {
+						goodChoices = true;
 						choices.addElement(I);
-					}
-					else
-					if(!goodChoices)
+					} else if (!goodChoices)
 						choices.addElement(I);
 				}
 			}
-			if(goodChoices)
-			for(int i=choices.size()-1;i>=0;i--)
-				if(((Item)choices.elementAt(i)).amWearingAt(Wearable.IN_INVENTORY))
-					choices.removeElementAt(i);
-			if(choices.size()>0)
-			{
-				Item I=(Item)choices.elementAt(CMLib.dice().roll(1,choices.size(),-1));
-				if(((I.material()&RawMaterial.MATERIAL_MASK)!=RawMaterial.MATERIAL_MITHRIL)
-				||(CMLib.dice().rollPercentage()<10))
-					CMLib.combat().postItemDamage(mob, I, null, 1, CMMsg.TYP_ACID, "<T-NAME> rusts!");
+			if (goodChoices)
+				for (int i = choices.size() - 1; i >= 0; i--)
+					if (((Item) choices.elementAt(i))
+							.amWearingAt(Wearable.IN_INVENTORY))
+						choices.removeElementAt(i);
+			if (choices.size() > 0) {
+				Item I = (Item) choices.elementAt(CMLib.dice().roll(1,
+						choices.size(), -1));
+				if (((I.material() & RawMaterial.MATERIAL_MASK) != RawMaterial.MATERIAL_MITHRIL)
+						|| (CMLib.dice().rollPercentage() < 10))
+					CMLib.combat().postItemDamage(mob, I, null, 1,
+							CMMsg.TYP_ACID, "<T-NAME> rusts!");
 			}
 		}
 
 		return true;
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=getTarget(mob,commands,givenTarget);
-		if(target==null) return false;
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = getTarget(mob, commands, givenTarget);
+		if (target == null)
+			return false;
 
 		// the invoke method for spells receives as
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
 			// it worked, so build a copy of this ability,
 			// and add it to the affects list of the
-			// affected MOB.  Then tell everyone else
+			// affected MOB. Then tell everyone else
 			// what happened.
 
-			CMMsg msg = CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> chant(s) at <T-NAME> rustily!^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				if(msg.value()<=0)
-				{
-					maliciousAffect(mob,target,asLevel,0,-1);
+			CMMsg msg = CMClass.getMsg(mob, target, this,
+					verbalCastCode(mob, target, auto), auto ? ""
+							: "^S<S-NAME> chant(s) at <T-NAME> rustily!^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				if (msg.value() <= 0) {
+					maliciousAffect(mob, target, asLevel, 0, -1);
 					target.tell("You feel damp!");
 				}
 			}
-		}
-		else
-			return maliciousFizzle(mob,target,"<S-NAME> chant(s) at <T-NAME>, but the magic fizzles.");
+		} else
+			return maliciousFizzle(mob, target,
+					"<S-NAME> chant(s) at <T-NAME>, but the magic fizzles.");
 
 		// return whether it worked
 		return success;

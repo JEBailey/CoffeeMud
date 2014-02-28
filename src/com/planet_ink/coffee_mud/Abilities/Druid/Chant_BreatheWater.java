@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Druid;
+
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -11,91 +12,103 @@ import com.planet_ink.coffee_mud.Races.interfaces.Race;
 import com.planet_ink.coffee_mud.core.CMClass;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
-
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 @SuppressWarnings("rawtypes")
-public class Chant_BreatheWater extends Chant
-{
-	public String ID() { return "Chant_BreatheWater"; }
-	public String name(){ return "Fish Gills";}
-	public String displayText(){return "(Fish Gills)";}
-	public int classificationCode(){return Ability.ACODE_CHANT|Ability.DOMAIN_SHAPE_SHIFTING;}
-	public int abstractQuality(){return Ability.QUALITY_OK_SELF;}
-	protected int[] lastSet=null;
-	protected int[] newSet=null;
+public class Chant_BreatheWater extends Chant {
+	public String ID() {
+		return "Chant_BreatheWater";
+	}
 
-	public void unInvoke()
-	{
-		if(!(affected instanceof MOB))
+	public String name() {
+		return "Fish Gills";
+	}
+
+	public String displayText() {
+		return "(Fish Gills)";
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_CHANT | Ability.DOMAIN_SHAPE_SHIFTING;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_OK_SELF;
+	}
+
+	protected int[] lastSet = null;
+	protected int[] newSet = null;
+
+	public void unInvoke() {
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
-		if(canBeUninvoked())
+		if (canBeUninvoked())
 			mob.tell("Your fish gills disappear.");
 	}
 
-	public void affectCharStats(MOB affected, CharStats affectableStats)
-	{
-		if(affectableStats.getBodyPart(Race.BODY_GILL)==0)
-			affectableStats.alterBodypart(Race.BODY_GILL,2);
-		super.affectCharStats(affected,affectableStats);
-		final int[] breatheables=affectableStats.getBreathables();
-		if(breatheables.length==0)
+	public void affectCharStats(MOB affected, CharStats affectableStats) {
+		if (affectableStats.getBodyPart(Race.BODY_GILL) == 0)
+			affectableStats.alterBodypart(Race.BODY_GILL, 2);
+		super.affectCharStats(affected, affectableStats);
+		final int[] breatheables = affectableStats.getBreathables();
+		if (breatheables.length == 0)
 			return;
-		if((lastSet!=breatheables)||(newSet==null))
-		{
-			newSet=Arrays.copyOf(affectableStats.getBreathables(),affectableStats.getBreathables().length+2);
-			newSet[newSet.length-1]=RawMaterial.RESOURCE_SALTWATER;
-			newSet[newSet.length-2]=RawMaterial.RESOURCE_FRESHWATER;
+		if ((lastSet != breatheables) || (newSet == null)) {
+			newSet = Arrays.copyOf(affectableStats.getBreathables(),
+					affectableStats.getBreathables().length + 2);
+			newSet[newSet.length - 1] = RawMaterial.RESOURCE_SALTWATER;
+			newSet[newSet.length - 2] = RawMaterial.RESOURCE_FRESHWATER;
 			Arrays.sort(newSet);
-			lastSet=breatheables;
+			lastSet = breatheables;
 		}
 		affectableStats.setBreathables(newSet);
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		MOB target=mob;
-		if((auto)&&(givenTarget!=null)&&(givenTarget instanceof MOB))
-			target=(MOB)givenTarget;
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		MOB target = mob;
+		if ((auto) && (givenTarget != null) && (givenTarget instanceof MOB))
+			target = (MOB) givenTarget;
 
-		if(target.fetchEffect(this.ID())!=null)
-		{
-			mob.tell(target,null,null,"<S-NAME> <S-IS-ARE> already a water breather.");
+		if (target.fetchEffect(this.ID()) != null) {
+			mob.tell(target, null, null,
+					"<S-NAME> <S-IS-ARE> already a water breather.");
 			return false;
 		}
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),auto?"":"^S<S-NAME> chant(s) to <T-NAMESELF>.^?");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				mob.location().show(target,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> grow(s) a pair of gills!");
-				beneficialAffect(mob,target,asLevel,0);
+		boolean success = proficiencyCheck(mob, 0, auto);
+		if (success) {
+			CMMsg msg = CMClass.getMsg(mob, target, this,
+					verbalCastCode(mob, target, auto), auto ? ""
+							: "^S<S-NAME> chant(s) to <T-NAMESELF>.^?");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				mob.location().show(target, null, CMMsg.MSG_OK_VISUAL,
+						"<S-NAME> grow(s) a pair of gills!");
+				beneficialAffect(mob, target, asLevel, 0);
 			}
-		}
-		else
-			beneficialWordsFizzle(mob,target,"<S-NAME> chant(s) to <T-NAMESELF>, but nothing happens.");
+		} else
+			beneficialWordsFizzle(mob, target,
+					"<S-NAME> chant(s) to <T-NAMESELF>, but nothing happens.");
 
 		return success;
 	}

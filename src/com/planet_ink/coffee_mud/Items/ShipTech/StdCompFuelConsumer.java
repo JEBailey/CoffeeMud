@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.ShipTech;
+
 import java.util.List;
 
 import com.planet_ink.coffee_mud.Common.interfaces.CMMsg;
@@ -14,136 +15,151 @@ import com.planet_ink.coffee_mud.core.CMParms;
 import com.planet_ink.coffee_mud.core.interfaces.Environmental;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class StdCompFuelConsumer extends StdElecCompContainer implements Electronics.FuelConsumer
-{
-	public String ID(){	return "StdCompFuelConsumer";}
-	
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class StdCompFuelConsumer extends StdElecCompContainer implements
+		Electronics.FuelConsumer {
+	public String ID() {
+		return "StdCompFuelConsumer";
+	}
+
 	protected int[] generatedFuelTypes;
-	protected int   ticksPerFuelConsume = 10;
-	protected volatile int fuelTickDown	= 0;
-	
-	public StdCompFuelConsumer()
-	{
+	protected int ticksPerFuelConsume = 10;
+	protected volatile int fuelTickDown = 0;
+
+	public StdCompFuelConsumer() {
 		super();
 		setName("a fuel consuming engine");
 		basePhyStats.setWeight(50000);
 		setDisplayText("a fuel consuming engine sits here.");
 		setDescription("");
-		baseGoldValue=500000;
+		baseGoldValue = 500000;
 		basePhyStats().setLevel(1);
 		recoverPhyStats();
 		setMaterial(RawMaterial.RESOURCE_STEEL);
-		setConsumedFuelType(new int[]{RawMaterial.RESOURCE_DEUTERIUM});
+		setConsumedFuelType(new int[] { RawMaterial.RESOURCE_DEUTERIUM });
 	}
-	public boolean sameAs(Environmental E)
-	{
-		if(!(E instanceof StdCompFuelConsumer)) return false;
+
+	public boolean sameAs(Environmental E) {
+		if (!(E instanceof StdCompFuelConsumer))
+			return false;
 		return super.sameAs(E);
 	}
-	
-	protected boolean willConsumeFuelIdle() { return true; }
-	
+
+	protected boolean willConsumeFuelIdle() {
+		return true;
+	}
+
 	@Override
-	public long containTypes(){return Container.CONTAIN_RAWMATERIALS;}
+	public long containTypes() {
+		return Container.CONTAIN_RAWMATERIALS;
+	}
+
 	@Override
-	public void setContainTypes(long containTypes){containType=CONTAIN_RAWMATERIALS;}
+	public void setContainTypes(long containTypes) {
+		containType = CONTAIN_RAWMATERIALS;
+	}
+
 	@Override
-	public int getTicksPerFuelConsume() { return ticksPerFuelConsume; }
+	public int getTicksPerFuelConsume() {
+		return ticksPerFuelConsume;
+	}
+
 	@Override
-	public void getTicksPerFuelConsume(int tick) { ticksPerFuelConsume=tick; }
+	public void getTicksPerFuelConsume(int tick) {
+		ticksPerFuelConsume = tick;
+	}
+
 	@Override
-	public int[] getConsumedFuelTypes() { return generatedFuelTypes; }
+	public int[] getConsumedFuelTypes() {
+		return generatedFuelTypes;
+	}
+
 	@Override
-	public void setConsumedFuelType(int[] resources) { 
+	public void setConsumedFuelType(int[] resources) {
 		generatedFuelTypes = resources;
 	}
+
 	@Override
-	public int getFuelRemaining() 
-	{
-		int amt=0;
-		for(Item I : getFuel())
-			if(I instanceof RawMaterial)
-				amt+=I.phyStats().weight();
+	public int getFuelRemaining() {
+		int amt = 0;
+		for (Item I : getFuel())
+			if (I instanceof RawMaterial)
+				amt += I.phyStats().weight();
 		return amt;
 	}
+
 	@Override
-	public int getTotalFuelCapacity()
-	{
+	public int getTotalFuelCapacity() {
 		return capacity();
 	}
-	
+
 	@Override
-	public boolean canContain(Environmental E)
-	{
-		if(!super.canContain(E)) return false;
-		if(E instanceof RawMaterial)
-			return CMParms.contains(this.getConsumedFuelTypes(), ((RawMaterial)E).material());
+	public boolean canContain(Environmental E) {
+		if (!super.canContain(E))
+			return false;
+		if (E instanceof RawMaterial)
+			return CMParms.contains(this.getConsumedFuelTypes(),
+					((RawMaterial) E).material());
 		return false;
 	}
-	
-	protected void engineShutdown()
-	{
-		MOB deity=CMLib.map().deity();
-		CMMsg msg=CMClass.getMsg(CMLib.map().deity(), CMMsg.MSG_DEACTIVATE, "<T-NAME> sputters and shuts itself down.");
-		Room R=CMLib.map().roomLocation(this);
-		if((R!=null)&&(R.okMessage(deity, msg)))
+
+	protected void engineShutdown() {
+		MOB deity = CMLib.map().deity();
+		CMMsg msg = CMClass.getMsg(CMLib.map().deity(), CMMsg.MSG_DEACTIVATE,
+				"<T-NAME> sputters and shuts itself down.");
+		Room R = CMLib.map().roomLocation(this);
+		if ((R != null) && (R.okMessage(deity, msg)))
 			R.send(deity, msg);
 	}
 
-	protected volatile List<Item> fuelCache=null;
-	protected synchronized List<Item> getFuel()
-	{
-		if(fuelCache==null)
-		{
-			fuelCache=getContents();
+	protected volatile List<Item> fuelCache = null;
+
+	protected synchronized List<Item> getFuel() {
+		if (fuelCache == null) {
+			fuelCache = getContents();
 		}
 		return fuelCache;
 	}
-	protected synchronized void clearFuelCache()
-	{
-		fuelCache=null;
+
+	protected synchronized void clearFuelCache() {
+		fuelCache = null;
 	}
 
-	public boolean consumeFuel(int amount)
-	{
-		List<Item> fuel=getFuel();
-		for(Item I : fuel)
-		{
-			if((I instanceof RawMaterial)
-			&&(!I.amDestroyed())
-			&&CMParms.contains(this.getConsumedFuelTypes(), ((RawMaterial)I).material()))
-			{
-				amount-=CMLib.materials().destroyResourcesAmt(fuel, amount, ((RawMaterial)I).material());
-				if(amount<=0)
+	public boolean consumeFuel(int amount) {
+		List<Item> fuel = getFuel();
+		for (Item I : fuel) {
+			if ((I instanceof RawMaterial)
+					&& (!I.amDestroyed())
+					&& CMParms.contains(this.getConsumedFuelTypes(),
+							((RawMaterial) I).material())) {
+				amount -= CMLib.materials().destroyResourcesAmt(fuel, amount,
+						((RawMaterial) I).material());
+				if (amount <= 0)
 					break;
 			}
 		}
-		if(amount>0)
+		if (amount > 0)
 			engineShutdown();
-		return amount>0;
+		return amount > 0;
 	}
-	
-	public void executeMsg(Environmental myHost, CMMsg msg)
-	{
+
+	public void executeMsg(Environmental myHost, CMMsg msg) {
 		super.executeMsg(myHost, msg);
-		if(msg.amITarget(this))
-		{
-			switch(msg.targetMinor())
-			{
+		if (msg.amITarget(this)) {
+			switch (msg.targetMinor()) {
 			case CMMsg.TYP_GET:
 				clearFuelCache();
 				break;
@@ -159,15 +175,12 @@ public class StdCompFuelConsumer extends StdElecCompContainer implements Electro
 			case CMMsg.TYP_LOOK:
 				return;
 			case CMMsg.TYP_POWERCURRENT:
-				if(msg.value()==0)
-				{
+				if (msg.value() == 0) {
 					fuelTickDown--;
 				}
-				if(activated() && (willConsumeFuelIdle()))
-				{
-					if(fuelTickDown <= 0)
-					{
-						fuelTickDown=getTicksPerFuelConsume();
+				if (activated() && (willConsumeFuelIdle())) {
+					if (fuelTickDown <= 0) {
+						fuelTickDown = getTicksPerFuelConsume();
 						consumeFuel(1);
 					}
 				}

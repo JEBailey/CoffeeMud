@@ -11,57 +11,60 @@ import com.planet_ink.coffee_mud.core.interfaces.BoundedObject;
 import com.planet_ink.coffee_mud.core.interfaces.BoundedObject.BoundedCube;
 
 /**
- * 2D R-Tree implementation for Android.
- * Uses algorithms from: http://www.sai.msu.su/~megera/postgres/gist/papers/Rstar3.pdf
+ * 2D R-Tree implementation for Android. Uses algorithms from:
+ * http://www.sai.msu.su/~megera/postgres/gist/papers/Rstar3.pdf
+ * 
  * @author Colonel32
  * @author cnvandev
  * 
- * Adapted to 3d by:
+ *         Adapted to 3d by:
  * @author Bo Zimmerman
  * 
- * Found at:
- * https://github.com/pruby/xppylons/blob/master/src/com/untamedears/xppylons/rtree/AABB.java
- * (No license found)
+ *         Found at:
+ *         https://github.com/pruby/xppylons/blob/master/src/com/untamedears
+ *         /xppylons/rtree/AABB.java (No license found)
  */
 public class RTree<T extends BoundedObject> {
 	private RTreeNode root;
 	private int maxSize;
 	private int minSize;
-	private SLinkedHashtable<T,List<WeakReference<TrackingVector<T>>>> trackMap;
+	private SLinkedHashtable<T, List<WeakReference<TrackingVector<T>>>> trackMap;
 	private QuadraticNodeSplitter splitter;
-	
-	
+
 	public class RTreeNode implements BoundedObject {
 		RTreeNode parent;
 		BoundedCube box;
 		Vector<RTreeNode> children;
 		TrackingVector<T> data;
-		final RTreeNode me=this;
-		
-		public RTreeNode() {}
+		final RTreeNode me = this;
 
-		public RTreeNode(boolean isLeaf)	{
+		public RTreeNode() {
+		}
+
+		public RTreeNode(boolean isLeaf) {
 			if (isLeaf) {
-				data = new TrackingVector<T>(trackMap,maxSize+1,new TrackingVector.TrackBack<T>() {
-					@Override public void removed(T o) {
-						me.computeMBR(true);
-					}
-				});
+				data = new TrackingVector<T>(trackMap, maxSize + 1,
+						new TrackingVector.TrackBack<T>() {
+							@Override
+							public void removed(T o) {
+								me.computeMBR(true);
+							}
+						});
 			} else {
-				children = new Vector<RTreeNode>(maxSize+1);
+				children = new Vector<RTreeNode>(maxSize + 1);
 			}
 		}
 
 		public boolean isLeaf() {
 			return data != null;
 		}
-		
+
 		public boolean isRoot() {
 			return parent == null;
 		}
 
 		public void addTo(RTreeNode parent) {
-			assert(parent.children != null);
+			assert (parent.children != null);
 			parent.children.add(this);
 			this.parent = parent;
 			computeMBR();
@@ -75,11 +78,11 @@ public class RTree<T extends BoundedObject> {
 		public void computeMBR(boolean doParents) {
 			if (box == null)
 				box = new BoundedCube();
-			
+
 			if (!isLeaf()) {
 				if (children.isEmpty())
 					return;
-				
+
 				box.set(children.get(0).box);
 				for (int i = 1; i < children.size(); i++) {
 					box.union(children.get(i).box);
@@ -87,7 +90,7 @@ public class RTree<T extends BoundedObject> {
 			} else {
 				if (data.isEmpty())
 					return;
-				
+
 				box.set(data.get(0).getBounds());
 				for (int i = 1; i < data.size(); i++) {
 					box.union(data.get(i).getBounds());
@@ -100,13 +103,13 @@ public class RTree<T extends BoundedObject> {
 
 		public void remove() {
 			if (parent == null) {
-				assert(root == this);
+				assert (root == this);
 				root = null;
 				return;
 			}
-			
+
 			parent.children.remove(this);
-			
+
 			if (parent.children.isEmpty()) {
 				parent.remove();
 			} else {
@@ -121,7 +124,7 @@ public class RTree<T extends BoundedObject> {
 		public BoundedCube getBounds() {
 			return box;
 		}
-		
+
 		public boolean contains(long px, long py, int pz) {
 			return box.contains(px, py, pz);
 		}
@@ -129,11 +132,11 @@ public class RTree<T extends BoundedObject> {
 		public int size() {
 			return isLeaf() ? data.size() : children.size();
 		}
-		
+
 		public int depth() {
 			RTreeNode n = this;
 			int d = 0;
-			while(n != null) {
+			while (n != null) {
 				n = n.parent;
 				d++;
 			}
@@ -141,16 +144,18 @@ public class RTree<T extends BoundedObject> {
 		}
 
 		public String toString() {
-			return "Depth: "+depth()+", size: "+size();
+			return "Depth: " + depth() + ", size: " + size();
 		}
 	}
-	
+
 	private class QuadraticNodeSplitter {
 		public void split(RTreeNode n) {
-			if (n.size() <= maxSize) return;
+			if (n.size() <= maxSize)
+				return;
 			boolean isleaf = n.isLeaf();
 
-			// Choose seeds. Would write a function for this, but it requires returning 2 objects
+			// Choose seeds. Would write a function for this, but it requires
+			// returning 2 objects
 			BoundedObject seed1 = null, seed2 = null;
 			Vector<? extends BoundedObject> list;
 			if (isleaf)
@@ -161,12 +166,14 @@ public class RTree<T extends BoundedObject> {
 			long maxD = Long.MIN_VALUE;
 			BoundedCube box = new BoundedCube();
 			for (int i = 0; i < list.size(); i++) {
-				for (int j=0; j<list.size(); j++) {
-					if (i == j) continue;
+				for (int j = 0; j < list.size(); j++) {
+					if (i == j)
+						continue;
 					BoundedObject n1 = list.get(i), n2 = list.get(j);
 					box.set(n1.getBounds());
 					box.union(n2.getBounds());
-					long d = area(box) - area(n1.getBounds()) - area(n2.getBounds());
+					long d = area(box) - area(n1.getBounds())
+							- area(n2.getBounds());
 					if (d > maxD) {
 						maxD = d;
 						seed1 = n1;
@@ -174,9 +181,8 @@ public class RTree<T extends BoundedObject> {
 					}
 				}
 			}
-			if((seed1==null)||(seed2==null))
-			{
-				assert(seed1 != null && seed2 != null);
+			if ((seed1 == null) || (seed2 == null)) {
+				assert (seed1 != null && seed2 != null);
 				return;
 			}
 
@@ -208,11 +214,13 @@ public class RTree<T extends BoundedObject> {
 			group2.computeMBR();
 			split(parent);
 		}
-		
-		private void distributeBranches(RTreeNode n, RTreeNode g1, RTreeNode g2) {
-			assert(!(n.isLeaf() || g1.isLeaf() || g2.isLeaf()));
 
-			while(!n.children.isEmpty() && g1.children.size() < maxSize - minSize + 1 && g2.children.size() < maxSize - minSize + 1) {
+		private void distributeBranches(RTreeNode n, RTreeNode g1, RTreeNode g2) {
+			assert (!(n.isLeaf() || g1.isLeaf() || g2.isLeaf()));
+
+			while (!n.children.isEmpty()
+					&& g1.children.size() < maxSize - minSize + 1
+					&& g2.children.size() < maxSize - minSize + 1) {
 				// Pick next
 				int difmax = Integer.MIN_VALUE;
 				int nmax_index = -1;
@@ -226,7 +234,7 @@ public class RTree<T extends BoundedObject> {
 						nmax_index = i;
 					}
 				}
-				assert(nmax_index != -1);
+				assert (nmax_index != -1);
 
 				// Distribute Entry
 				RTreeNode nmax = n.children.remove(nmax_index);
@@ -243,15 +251,19 @@ public class RTree<T extends BoundedObject> {
 					// Or the one with the lowest area
 					long area1 = area(g1.box);
 					long area2 = area(g2.box);
-					if (area1 > area2) parent = g2;
-					else if (area2 > area1) parent = g1;
+					if (area1 > area2)
+						parent = g2;
+					else if (area2 > area1)
+						parent = g1;
 					else {
 						// Or the one with the least items
-						if (g1.children.size() < g2.children.size()) parent = g1;
-						else parent = g2;
+						if (g1.children.size() < g2.children.size())
+							parent = g1;
+						else
+							parent = g2;
 					}
 				}
-				assert(parent != null);
+				assert (parent != null);
 				parent.children.add(nmax);
 				nmax.parent = parent;
 			}
@@ -263,19 +275,20 @@ public class RTree<T extends BoundedObject> {
 				else
 					parent = g1;
 
-				for (int i = 0; i < n.children.size(); i++)	{
+				for (int i = 0; i < n.children.size(); i++) {
 					parent.children.add(n.children.get(i));
 					n.children.get(i).parent = parent;
 				}
 				n.children.clear();
 			}
 		}
-		
+
 		private void distributeLeaves(RTreeNode n, RTreeNode g1, RTreeNode g2) {
 			// Same process as above; just different types.
-			assert(n.isLeaf() && g1.isLeaf() && g2.isLeaf());
+			assert (n.isLeaf() && g1.isLeaf() && g2.isLeaf());
 
-			while(!n.data.isEmpty() && g1.data.size() < maxSize - minSize + 1 && g2.data.size() < maxSize - minSize + 1) {
+			while (!n.data.isEmpty() && g1.data.size() < maxSize - minSize + 1
+					&& g2.data.size() < maxSize - minSize + 1) {
 				// Pick next
 				int difmax = Integer.MIN_VALUE;
 				int nmax_index = -1;
@@ -289,7 +302,7 @@ public class RTree<T extends BoundedObject> {
 						nmax_index = i;
 					}
 				}
-				assert(nmax_index != -1);
+				assert (nmax_index != -1);
 
 				// Distribute Entry
 				T nmax = n.data.remove(nmax_index);
@@ -335,43 +348,54 @@ public class RTree<T extends BoundedObject> {
 	public RTree() {
 		this(2, 12);
 	}
-	
+
 	/**
 	 * Creates an R-Tree. Sets the splitting algorithm to quadratic splitting.
-	 * @param minChildren Minimum children in a node.  {@code 2 <= minChildren <= maxChildren/2}
-	 * @param maxChildren Maximum children in a node. Node splits at this number + 1
+	 * 
+	 * @param minChildren
+	 *            Minimum children in a node.
+	 *            {@code 2 <= minChildren <= maxChildren/2}
+	 * @param maxChildren
+	 *            Maximum children in a node. Node splits at this number + 1
 	 */
 	public RTree(int minChildren, int maxChildren) {
-		trackMap = new SLinkedHashtable<T,List<WeakReference<TrackingVector<T>>>>();
-		if (minChildren < 2 || minChildren > maxChildren/2)
-			throw new IllegalArgumentException("2 <= minChildren <= maxChildren/2");
+		trackMap = new SLinkedHashtable<T, List<WeakReference<TrackingVector<T>>>>();
+		if (minChildren < 2 || minChildren > maxChildren / 2)
+			throw new IllegalArgumentException(
+					"2 <= minChildren <= maxChildren/2");
 		splitter = new QuadraticNodeSplitter();
-				
+
 		this.minSize = minChildren;
 		this.maxSize = maxChildren;
 		root = null;
 	}
 
-	public void clear()
-	{
+	public void clear() {
 		splitter = new QuadraticNodeSplitter();
 		root = null;
 	}
-	
+
 	/**
 	 * Adds items whose AABB intersects the query AABB to results
-	 * @param results A collection to store the query results
-	 * @param box The query
+	 * 
+	 * @param results
+	 *            A collection to store the query results
+	 * @param box
+	 *            The query
 	 */
 	public void query(Collection<T> results) {
-		BoundedCube box = new BoundedCube(Long.MIN_VALUE, Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE);
+		BoundedCube box = new BoundedCube(Long.MIN_VALUE, Long.MAX_VALUE,
+				Long.MIN_VALUE, Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE);
 		query(results, box, root);
 	}
+
 	public void query(Collection<T> results, BoundedCube box) {
 		query(results, box, root);
 	}
+
 	private void query(Collection<T> results, BoundedCube box, RTreeNode node) {
-		if (node == null) return;
+		if (node == null)
+			return;
 		if (node.isLeaf()) {
 			for (int i = 0; i < node.data.size(); i++)
 				if (node.data.get(i).getBounds().intersects(box))
@@ -384,16 +408,18 @@ public class RTree<T extends BoundedObject> {
 			}
 		}
 	}
-	
+
 	/**
-	 * Returns one item that intersects the query box, or null if nothing intersects
-	 * the query box.
+	 * Returns one item that intersects the query box, or null if nothing
+	 * intersects the query box.
 	 */
 	public T queryOne(BoundedCube box) {
-		return queryOne(box,root);
+		return queryOne(box, root);
 	}
+
 	private T queryOne(BoundedCube box, RTreeNode node) {
-		if (node == null) return null;
+		if (node == null)
+			return null;
 		if (node.isLeaf()) {
 			for (int i = 0; i < node.data.size(); i++) {
 				if (node.data.get(i).getBounds().intersects(box)) {
@@ -404,8 +430,9 @@ public class RTree<T extends BoundedObject> {
 		} else {
 			for (int i = 0; i < node.children.size(); i++) {
 				if (node.children.get(i).box.intersects(box)) {
-					T result = queryOne(box,node.children.get(i));
-					if (result != null) return result;
+					T result = queryOne(box, node.children.get(i));
+					if (result != null)
+						return result;
 				}
 			}
 			return null;
@@ -414,15 +441,22 @@ public class RTree<T extends BoundedObject> {
 
 	/**
 	 * Returns items whose Rect contains the specified point.
-	 * @param results A collection to store the query results.
-	 * @param px Point X coordinate
-	 * @param py Point Y coordinate
+	 * 
+	 * @param results
+	 *            A collection to store the query results.
+	 * @param px
+	 *            Point X coordinate
+	 * @param py
+	 *            Point Y coordinate
 	 */
 	public void query(Collection<T> results, long px, long py, long pz) {
 		query(results, px, py, pz, root);
 	}
-	private void query(Collection<T> results, long px, long py, long pz, RTreeNode node) {
-		if (node == null) return;
+
+	private void query(Collection<T> results, long px, long py, long pz,
+			RTreeNode node) {
+		if (node == null)
+			return;
 		if (node.isLeaf()) {
 			for (int i = 0; i < node.data.size(); i++) {
 				if (node.data.get(i).getBounds().contains(px, py, pz)) {
@@ -439,13 +473,16 @@ public class RTree<T extends BoundedObject> {
 	}
 
 	/**
-	 * Returns one item that intersects the query point, or null if no items intersect that point.
+	 * Returns one item that intersects the query point, or null if no items
+	 * intersect that point.
 	 */
 	public T queryOne(long px, long py, long pz) {
 		return queryOne(px, py, pz, root);
 	}
+
 	private T queryOne(long px, long py, long pz, RTreeNode node) {
-		if (node == null) return null;
+		if (node == null)
+			return null;
 		if (node.isLeaf()) {
 			for (int i = 0; i < node.data.size(); i++) {
 				if (node.data.get(i).getBounds().contains(px, py, pz)) {
@@ -457,7 +494,8 @@ public class RTree<T extends BoundedObject> {
 			for (int i = 0; i < node.children.size(); i++) {
 				if (node.children.get(i).box.contains(px, py, pz)) {
 					T result = queryOne(px, py, pz, node.children.get(i));
-					if (result != null) return result;
+					if (result != null)
+						return result;
 				}
 			}
 			return null;
@@ -466,59 +504,56 @@ public class RTree<T extends BoundedObject> {
 
 	/**
 	 * Removes the specified object if it is in the tree.
+	 * 
 	 * @param o
 	 */
-	public boolean remove(T o) 
-	{
-		if(root==null) return false;
-		boolean removed=false;
-		TrackingVector<T> v=null;
-		synchronized(trackMap)
-		{
+	public boolean remove(T o) {
+		if (root == null)
+			return false;
+		boolean removed = false;
+		TrackingVector<T> v = null;
+		synchronized (trackMap) {
 			List<WeakReference<TrackingVector<T>>> nodes = trackMap.get(o);
-			if(nodes!=null)
-			{
-				int i=0;
-				while((v==null)&&(i<nodes.size()))
-				{
-					WeakReference<TrackingVector<T>> r  = nodes.get(i++);
-					if(r!=null)
-						v=r.get();
+			if (nodes != null) {
+				int i = 0;
+				while ((v == null) && (i < nodes.size())) {
+					WeakReference<TrackingVector<T>> r = nodes.get(i++);
+					if (r != null)
+						v = r.get();
 				}
 			}
 		}
-		if(v!=null)
-		{
+		if (v != null) {
 			v.removeAllTrackedEntries(o);
-			removed=true;
+			removed = true;
 		}
 		return removed;
 	}
 
 	/**
-	 * Inserts object o into the tree. Note that if the value of o.getBounds() changes
-	 * while in the R-tree, the result is undefined.
-	 * @throws NullPointerException If o == null
+	 * Inserts object o into the tree. Note that if the value of o.getBounds()
+	 * changes while in the R-tree, the result is undefined.
+	 * 
+	 * @throws NullPointerException
+	 *             If o == null
 	 */
 	public void insert(T o) {
-		if (o == null) throw new NullPointerException("Cannot store null object");
+		if (o == null)
+			throw new NullPointerException("Cannot store null object");
 		if (root == null)
 			root = new RTreeNode(true);
 
 		RTreeNode n = chooseLeaf(o, root);
-		assert(n.isLeaf());
-		if(!n.data.contains(o))
-		{
+		assert (n.isLeaf());
+		if (!n.data.contains(o)) {
 			n.data.add(o);
 			n.computeMBR();
 			splitter.split(n);
 		}
 	}
-	
-	
 
 	public boolean contains(T o) {
-		if (o == null) 
+		if (o == null)
 			return false;
 		if (root == null)
 			return false;
@@ -526,33 +561,33 @@ public class RTree<T extends BoundedObject> {
 		return trackMap.containsKey(o);
 	}
 
-	public Enumeration<T> objects()
-	{
+	public Enumeration<T> objects() {
 		return trackMap.keys();
 	}
-	
-	public Enumeration<Entry<T, List<WeakReference<TrackingVector<T>>>>> objectEntries()
-	{
+
+	public Enumeration<Entry<T, List<WeakReference<TrackingVector<T>>>>> objectEntries() {
 		return trackMap.entries();
 	}
-	
+
 	public boolean leafSearch(T o) {
-		if (o == null) 
+		if (o == null)
 			return false;
 		if (root == null)
 			return false;
-		return firstLeafSearch(o, root)!=null;
+		return firstLeafSearch(o, root) != null;
 	}
-	
+
 	/**
 	 * Counts the number of items in the tree.
 	 */
 	public int count() {
-		if (root == null) return 0;
+		if (root == null)
+			return 0;
 		return count(root);
 	}
+
 	private int count(RTreeNode n) {
-		assert(n != null);
+		assert (n != null);
 		if (n.isLeaf()) {
 			return n.data.size();
 		} else {
@@ -564,7 +599,7 @@ public class RTree<T extends BoundedObject> {
 	}
 
 	private RTreeNode chooseLeaf(T o, RTreeNode n) {
-		assert(n != null);
+		assert (n != null);
 		if (n.isLeaf()) {
 			return n;
 		} else {
@@ -574,55 +609,62 @@ public class RTree<T extends BoundedObject> {
 			RTreeNode maxnode = null;
 			for (int i = 0; i < n.children.size(); i++) {
 				int overlap = expansionNeeded(n.children.get(i).box, box);
-				if ((overlap < maxOverlap) || (overlap == maxOverlap)
-						&& ((maxnode!=null)&&(area(n.children.get(i).box) < area(maxnode.box)))) {
+				if ((overlap < maxOverlap)
+						|| (overlap == maxOverlap)
+						&& ((maxnode != null) && (area(n.children.get(i).box) < area(maxnode.box)))) {
 					maxOverlap = overlap;
 					maxnode = n.children.get(i);
 				}
 			}
-			
+
 			if (maxnode == null) // Not sure how this could occur
 				return null;
-			
+
 			return chooseLeaf(o, maxnode);
 		}
 	}
-	
+
 	private RTreeNode firstLeafSearch(T o, RTreeNode n) {
-		assert(n != null);
+		assert (n != null);
 		if (n.isLeaf()) {
-			return n.data.contains(o)?n:null;
+			return n.data.contains(o) ? n : null;
 		} else {
 			for (int i = 0; i < n.children.size(); i++) {
-				RTreeNode n2=n.children.get(i);
-				if(n2.isLeaf() && n2.data.contains(o))
+				RTreeNode n2 = n.children.get(i);
+				if (n2.isLeaf() && n2.data.contains(o))
 					return n2;
-				RTreeNode n3=firstLeafSearch(o,n2);
-				if(n3!=null)
+				RTreeNode n3 = firstLeafSearch(o, n2);
+				if (n3 != null)
 					return n3;
 			}
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns the amount that other will need to be expanded to fit this.
 	 */
 	private static int expansionNeeded(BoundedCube one, BoundedCube two) {
 		int total = 0;
 
-		if(two.lx < one.lx) total += one.lx - two.lx;
-		if(two.rx > one.rx) total += two.rx - one.rx;
+		if (two.lx < one.lx)
+			total += one.lx - two.lx;
+		if (two.rx > one.rx)
+			total += two.rx - one.rx;
 
-		if(two.ty < one.ty) total += one.ty - two.ty;
-		if(two.by > one.by) total += two.by - one.by;
+		if (two.ty < one.ty)
+			total += one.ty - two.ty;
+		if (two.by > one.by)
+			total += two.by - one.by;
 
-		if(two.iz < one.iz) total += one.iz - two.iz;
-		if(two.oz > one.oz) total += two.oz - one.oz;
+		if (two.iz < one.iz)
+			total += one.iz - two.iz;
+		if (two.oz > one.oz)
+			total += two.oz - one.oz;
 
 		return total;
 	}
-	
+
 	private static long area(BoundedCube rect) {
 		return rect.width() * rect.height() * rect.depth();
 	}

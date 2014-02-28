@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.core.intermud.cm1.commands;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,100 +10,85 @@ import com.planet_ink.coffee_mud.core.Log;
 import com.planet_ink.coffee_mud.core.intermud.cm1.RequestHandler;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-public class Monitor extends Listen
-{
-	public String getCommandWord(){ return "MONITOR";}
-	
-	public Monitor(RequestHandler req, String parameters) 
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class Monitor extends Listen {
+	public String getCommandWord() {
+		return "MONITOR";
+	}
+
+	public Monitor(RequestHandler req, String parameters) {
 		super(req, parameters);
 	}
-	
-	protected void sendMsg(Listener listener, String msg) throws IOException
-	{
-		synchronized(listener)
-		{
-			listener.msgs.add(listener.channelName+": "+msg);
+
+	protected void sendMsg(Listener listener, String msg) throws IOException {
+		synchronized (listener) {
+			listener.msgs.add(listener.channelName + ": " + msg);
 		}
 	}
-	
-	public void run()
-	{
-		try
-		{
+
+	public void run() {
+		try {
 			String name;
-			String rest="";
-			int x=parameters.indexOf(' ');
-			if(x>0)
-			{
-				name=parameters.substring(0,x).trim();
-				if(name.trim().length()==0)
-					name=null;
+			String rest = "";
+			int x = parameters.indexOf(' ');
+			if (x > 0) {
+				name = parameters.substring(0, x).trim();
+				if (name.trim().length() == 0)
+					name = null;
 				else
-					rest=parameters.substring(x+1).trim();
-			}
-			else
-				name=null;
-			if(name==null)
-			{
-				req.sendMsg("[FAIL No "+getCommandWord()+"ER name given]");
+					rest = parameters.substring(x + 1).trim();
+			} else
+				name = null;
+			if (name == null) {
+				req.sendMsg("[FAIL No " + getCommandWord() + "ER name given]");
 				return;
 			}
-			List<ListenCriterium> crit=getCriterium(rest);
-			if(crit==null)
+			List<ListenCriterium> crit = getCriterium(rest);
+			if (crit == null)
 				return;
-			else
-			if(crit.size()==0)
-			{
-				List<String> msgs=new LinkedList<String>();
-				for(Listener l : listeners)
-					if(l.channelName.equalsIgnoreCase(name))
-					{
-						synchronized(l)
-						{
-							for(Iterator<String> i = l.msgs.iterator();i.hasNext();)
-							{
-								String s=i.next();
+			else if (crit.size() == 0) {
+				List<String> msgs = new LinkedList<String>();
+				for (Listener l : listeners)
+					if (l.channelName.equalsIgnoreCase(name)) {
+						synchronized (l) {
+							for (Iterator<String> i = l.msgs.iterator(); i
+									.hasNext();) {
+								String s = i.next();
 								msgs.add(s);
 								i.remove();
 							}
 						}
 					}
-				if(msgs.size()==0)
+				if (msgs.size() == 0)
 					req.sendMsg("[FAIL NONE]");
-				else
-				{
-					req.sendMsg("[OK /MESSAGES:"+msgs.size()+"]");
-					for(String s : msgs)
-						req.sendMsg("[MESSAGE "+s+"]");
+				else {
+					req.sendMsg("[OK /MESSAGES:" + msgs.size() + "]");
+					for (String s : msgs)
+						req.sendMsg("[MESSAGE " + s + "]");
 				}
-			}
-			else
-			{
-				Listener newListener = new Listener(name,crit.toArray(new ListenCriterium[0]));
+			} else {
+				Listener newListener = new Listener(name,
+						crit.toArray(new ListenCriterium[0]));
 				CMLib.commands().addGlobalMonitor(newListener);
 				req.addDependent(newListener.channelName, newListener);
 				listeners.add(newListener);
 				req.sendMsg("[OK]");
 			}
-		}
-		catch(Exception ioe)
-		{
-			Log.errOut(className,ioe);
+		} catch (Exception ioe) {
+			Log.errOut(className, ioe);
 			req.close();
 		}
 	}

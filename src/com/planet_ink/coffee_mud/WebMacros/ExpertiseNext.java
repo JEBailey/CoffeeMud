@@ -12,116 +12,121 @@ import com.planet_ink.coffee_mud.core.collections.DVector;
 import com.planet_ink.miniweb.interfaces.HTTPRequest;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class ExpertiseNext extends StdWebMacro
-{
-	public String name() { return "ExpertiseNext"; }
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class ExpertiseNext extends StdWebMacro {
+	public String name() {
+		return "ExpertiseNext";
+	}
 
-	public String runMacro(HTTPRequest httpReq, String parm)
-	{
-		java.util.Map<String,String> parms=parseParms(parm);
-		String last=httpReq.getUrlParameter("EXPERTISE");
-		if(parms.containsKey("RESET"))
-		{	
-			if(last!=null) httpReq.removeUrlParameter("EXPERTISE");
+	public String runMacro(HTTPRequest httpReq, String parm) {
+		java.util.Map<String, String> parms = parseParms(parm);
+		String last = httpReq.getUrlParameter("EXPERTISE");
+		if (parms.containsKey("RESET")) {
+			if (last != null)
+				httpReq.removeUrlParameter("EXPERTISE");
 			return "";
 		}
-		String lastID="";
-		DVector experts=(DVector)httpReq.getRequestObjects().get("SORTED_EXPERTISE");
-		ExpertiseLibrary.ExpertiseDefinition E=null;
-		if(experts==null)
-		{
-			experts=new DVector(2);
-			String Ename=null;
-			String Vname=null;
-			int x=0;
-			for(Enumeration e=CMLib.expertises().definitions();e.hasMoreElements();)
-			{
-				E=(ExpertiseLibrary.ExpertiseDefinition)e.nextElement();
-				Ename=E.name;
-				x=Ename.lastIndexOf(' ');
-				if((x>0)&&(CMath.isRomanNumeral(Ename.substring(x).trim())))
-					Ename=Ename.substring(0,x)+" "+((char)('a'+CMath.convertFromRoman(Ename.substring(x).trim())));
-				boolean added=false;
-				for(int v=0;v<experts.size();v++)
-				{
-					Vname=(String)experts.elementAt(v,1);
-					if(Vname.compareTo(Ename)>0)
-					{
-						experts.insertElementAt(v,Ename,E);
-						added=true;
+		String lastID = "";
+		DVector experts = (DVector) httpReq.getRequestObjects().get(
+				"SORTED_EXPERTISE");
+		ExpertiseLibrary.ExpertiseDefinition E = null;
+		if (experts == null) {
+			experts = new DVector(2);
+			String Ename = null;
+			String Vname = null;
+			int x = 0;
+			for (Enumeration e = CMLib.expertises().definitions(); e
+					.hasMoreElements();) {
+				E = (ExpertiseLibrary.ExpertiseDefinition) e.nextElement();
+				Ename = E.name;
+				x = Ename.lastIndexOf(' ');
+				if ((x > 0)
+						&& (CMath.isRomanNumeral(Ename.substring(x).trim())))
+					Ename = Ename.substring(0, x)
+							+ " "
+							+ ((char) ('a' + CMath.convertFromRoman(Ename
+									.substring(x).trim())));
+				boolean added = false;
+				for (int v = 0; v < experts.size(); v++) {
+					Vname = (String) experts.elementAt(v, 1);
+					if (Vname.compareTo(Ename) > 0) {
+						experts.insertElementAt(v, Ename, E);
+						added = true;
 						break;
 					}
 				}
-				if(!added) experts.addElement(Ename,E);
+				if (!added)
+					experts.addElement(Ename, E);
 			}
-			httpReq.getRequestObjects().put("SORTED_EXPERTISE",experts);
+			httpReq.getRequestObjects().put("SORTED_EXPERTISE", experts);
 		}
-		Integer qualLevel=null;
-		String levelName=httpReq.getUrlParameter("LEVEL");
-		int levelCheck=((levelName!=null)&&(levelName.length()>0))?CMath.s_int(levelName):-1;
-		String className=httpReq.getUrlParameter("CLASS");
-		Hashtable expertsAllows=null;
-		if((className!=null)&&(className.length()>0))
-		{
-			expertsAllows=(Hashtable)httpReq.getRequestObjects().get("ALLOWS-"+className.toUpperCase().trim());
-			if(expertsAllows==null)
-			{
-				expertsAllows=new Hashtable();
-				httpReq.getRequestObjects().put("ALLOWS-"+className.toUpperCase().trim(),expertsAllows);
-				List<QualifyingID> DV=CMLib.ableMapper().getClassAllowsList(className);
-				if(DV!=null)
-					for(QualifyingID qID : DV)
-					{
-						String xpertise=qID.ID;
-						E=CMLib.expertises().getDefinition(xpertise);
-						if(E!=null)
-						{
-							qualLevel=Integer.valueOf(qID.qualifyingLevel);
-							int minLevel=E.getMinimumLevel();
-							if((qualLevel!=null)&&(minLevel<qualLevel.intValue()))
-								minLevel=qualLevel.intValue();
-							expertsAllows.put(xpertise,Integer.valueOf(minLevel));
+		Integer qualLevel = null;
+		String levelName = httpReq.getUrlParameter("LEVEL");
+		int levelCheck = ((levelName != null) && (levelName.length() > 0)) ? CMath
+				.s_int(levelName) : -1;
+		String className = httpReq.getUrlParameter("CLASS");
+		Hashtable expertsAllows = null;
+		if ((className != null) && (className.length() > 0)) {
+			expertsAllows = (Hashtable) httpReq.getRequestObjects().get(
+					"ALLOWS-" + className.toUpperCase().trim());
+			if (expertsAllows == null) {
+				expertsAllows = new Hashtable();
+				httpReq.getRequestObjects().put(
+						"ALLOWS-" + className.toUpperCase().trim(),
+						expertsAllows);
+				List<QualifyingID> DV = CMLib.ableMapper().getClassAllowsList(
+						className);
+				if (DV != null)
+					for (QualifyingID qID : DV) {
+						String xpertise = qID.ID;
+						E = CMLib.expertises().getDefinition(xpertise);
+						if (E != null) {
+							qualLevel = Integer.valueOf(qID.qualifyingLevel);
+							int minLevel = E.getMinimumLevel();
+							if ((qualLevel != null)
+									&& (minLevel < qualLevel.intValue()))
+								minLevel = qualLevel.intValue();
+							expertsAllows.put(xpertise,
+									Integer.valueOf(minLevel));
 						}
 					}
 			}
 		}
-		for(Enumeration e=experts.getDimensionVector(2).elements();e.hasMoreElements();)
-		{
-			E=(ExpertiseLibrary.ExpertiseDefinition)e.nextElement();
-			if(expertsAllows!=null)
-			{
-				qualLevel=(Integer)expertsAllows.get(E.ID);
-				if(qualLevel==null) continue;
-				if((levelCheck>=0)&&(levelCheck!=qualLevel.intValue()))
+		for (Enumeration e = experts.getDimensionVector(2).elements(); e
+				.hasMoreElements();) {
+			E = (ExpertiseLibrary.ExpertiseDefinition) e.nextElement();
+			if (expertsAllows != null) {
+				qualLevel = (Integer) expertsAllows.get(E.ID);
+				if (qualLevel == null)
 					continue;
-			}
-			else
-			if((levelCheck>=0)&&(levelCheck!=E.getMinimumLevel()))
+				if ((levelCheck >= 0) && (levelCheck != qualLevel.intValue()))
+					continue;
+			} else if ((levelCheck >= 0) && (levelCheck != E.getMinimumLevel()))
 				continue;
-			if((last==null)||((last.length()>0)&&(last.equals(lastID))&&(!E.ID.equals(lastID))))
-			{
-				httpReq.addFakeUrlParameter("EXPERTISE",E.ID);
+			if ((last == null)
+					|| ((last.length() > 0) && (last.equals(lastID)) && (!E.ID
+							.equals(lastID)))) {
+				httpReq.addFakeUrlParameter("EXPERTISE", E.ID);
 				return "";
 			}
-			lastID=E.ID;
+			lastID = E.ID;
 		}
-		httpReq.addFakeUrlParameter("EXPERTISE","");
-		if(parms.containsKey("EMPTYOK"))
+		httpReq.addFakeUrlParameter("EXPERTISE", "");
+		if (parms.containsKey("EMPTYOK"))
 			return "<!--EMPTY-->";
 		return " @break@";
 	}

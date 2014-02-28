@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Items.ClanItems;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -12,77 +13,75 @@ import com.planet_ink.coffee_mud.core.CMLib;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-@SuppressWarnings({"unchecked","rawtypes"})
-public class StdClanCommonContainer extends StdClanContainer
-{
-	public String ID(){	return "StdClanCommonContainer";}
-	protected int workDown=0;
-	public StdClanCommonContainer()
-	{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class StdClanCommonContainer extends StdClanContainer {
+	public String ID() {
+		return "StdClanCommonContainer";
+	}
+
+	protected int workDown = 0;
+
+	public StdClanCommonContainer() {
 		super();
 
 		setName("a clan workers container");
 		basePhyStats.setWeight(1);
 		setDisplayText("an workers container belonging to a clan is here.");
 		setDescription("");
-		secretIdentity="";
-		baseGoldValue=1;
-		capacity=100;
+		secretIdentity = "";
+		baseGoldValue = 1;
+		capacity = 100;
 		setCIType(ClanItem.CI_GATHERITEM);
-		material=RawMaterial.RESOURCE_OAK;
+		material = RawMaterial.RESOURCE_OAK;
 		recoverPhyStats();
 	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{
-		if(!super.tick(ticking,tickID))
+	public boolean tick(Tickable ticking, int tickID) {
+		if (!super.tick(ticking, tickID))
 			return false;
-		if((tickID==Tickable.TICKID_CLANITEM)
-		&&(owner() instanceof MOB)
-		&&(((MOB)owner()).isMonster())
-		&&(readableText().length()>0)
-		&&(((MOB)owner()).getClanRole(clanID())!=null)
-		&&((--workDown)<=0)
-		&&(!CMLib.flags().isAnimalIntelligence((MOB)owner())))
-		{
-			workDown=CMLib.dice().roll(1,5,0);
-			MOB M=(MOB)owner();
-			if(M.fetchEffect(readableText())==null)
-			{
-				Ability A=CMClass.getAbility(readableText());
-				if((A!=null)&&((A.classificationCode()&Ability.ALL_ACODES)==Ability.ACODE_COMMON_SKILL))
-				{
+		if ((tickID == Tickable.TICKID_CLANITEM) && (owner() instanceof MOB)
+				&& (((MOB) owner()).isMonster())
+				&& (readableText().length() > 0)
+				&& (((MOB) owner()).getClanRole(clanID()) != null)
+				&& ((--workDown) <= 0)
+				&& (!CMLib.flags().isAnimalIntelligence((MOB) owner()))) {
+			workDown = CMLib.dice().roll(1, 5, 0);
+			MOB M = (MOB) owner();
+			if (M.fetchEffect(readableText()) == null) {
+				Ability A = CMClass.getAbility(readableText());
+				if ((A != null)
+						&& ((A.classificationCode() & Ability.ALL_ACODES) == Ability.ACODE_COMMON_SKILL)) {
 					A.setProficiency(100);
-					if(M.numItems()>1)
-					{
-						Item I=null;
-						int tries=0;
-						while((I==null)&&((++tries)<20))
-						{
-							I=M.getRandomItem();
-							if((I==null)||(I==this)||(!I.amWearingAt(Wearable.IN_INVENTORY)))
-								I=null;
+					if (M.numItems() > 1) {
+						Item I = null;
+						int tries = 0;
+						while ((I == null) && ((++tries) < 20)) {
+							I = M.getRandomItem();
+							if ((I == null) || (I == this)
+									|| (!I.amWearingAt(Wearable.IN_INVENTORY)))
+								I = null;
 						}
-						Vector V=new Vector();
-						if(I!=null)	V.addElement(I.name());
-						A.invoke(M,V,null,false,phyStats().level());
-					}
-					else
-						A.invoke(M,new Vector(),null,false,phyStats().level());
+						Vector V = new Vector();
+						if (I != null)
+							V.addElement(I.name());
+						A.invoke(M, V, null, false, phyStats().level());
+					} else
+						A.invoke(M, new Vector(), null, false, phyStats()
+								.level());
 				}
 
 			}

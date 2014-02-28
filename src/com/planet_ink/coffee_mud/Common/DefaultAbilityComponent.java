@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Common;
+
 import com.planet_ink.coffee_mud.Common.interfaces.AbilityComponent;
 import com.planet_ink.coffee_mud.Libraries.interfaces.MaskingLibrary;
 import com.planet_ink.coffee_mud.core.CMClass;
@@ -7,22 +8,21 @@ import com.planet_ink.coffee_mud.core.CMath;
 import com.planet_ink.coffee_mud.core.interfaces.CMObject;
 
 /*
-Copyright 2007-2014 Bo Zimmerman
+ Copyright 2007-2014 Bo Zimmerman
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-public class DefaultAbilityComponent implements AbilityComponent
-{
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+public class DefaultAbilityComponent implements AbilityComponent {
 	private CompConnector connector = CompConnector.AND;
 	private CompLocation location = CompLocation.INVENTORY;
 	private boolean isConsumed = true;
@@ -32,99 +32,107 @@ public class DefaultAbilityComponent implements AbilityComponent
 	private String compTypeStr = "";
 	private String maskStr = "";
 	private MaskingLibrary.CompiledZapperMask compiledMask = null;
-	
-	public String ID(){return "DefaultAbilityComponent";}
-	public String name() { return ID();}
-	public int compareTo(CMObject o){ return CMClass.classID(this).compareToIgnoreCase(CMClass.classID(o));}
-	public CMObject newInstance(){try{return getClass().newInstance();}catch(Exception e){return new DefaultAbilityComponent();}}
-	public void initializeClass(){}
-	public CMObject copyOf()
-	{
-		try
-		{
-			Object O=this.clone();
-			return (CMObject)O;
-		}
-		catch(CloneNotSupportedException e)
-		{
+
+	public String ID() {
+		return "DefaultAbilityComponent";
+	}
+
+	public String name() {
+		return ID();
+	}
+
+	public int compareTo(CMObject o) {
+		return CMClass.classID(this).compareToIgnoreCase(CMClass.classID(o));
+	}
+
+	public CMObject newInstance() {
+		try {
+			return getClass().newInstance();
+		} catch (Exception e) {
 			return new DefaultAbilityComponent();
 		}
 	}
-	
-	public CompConnector getConnector() 
-	{
+
+	public void initializeClass() {
+	}
+
+	public CMObject copyOf() {
+		try {
+			Object O = this.clone();
+			return (CMObject) O;
+		} catch (CloneNotSupportedException e) {
+			return new DefaultAbilityComponent();
+		}
+	}
+
+	public CompConnector getConnector() {
 		return connector;
 	}
-	public void setConnector(CompConnector connector) 
-	{
+
+	public void setConnector(CompConnector connector) {
 		this.connector = connector;
 	}
-	public CompLocation getLocation() 
-	{
+
+	public CompLocation getLocation() {
 		return location;
 	}
-	public void setLocation(CompLocation location) 
-	{
+
+	public void setLocation(CompLocation location) {
 		this.location = location;
 	}
-	public boolean isConsumed() 
-	{
+
+	public boolean isConsumed() {
 		return isConsumed;
 	}
-	public void setConsumed(boolean isConsumed) 
-	{
+
+	public void setConsumed(boolean isConsumed) {
 		this.isConsumed = isConsumed;
 	}
-	public int getAmount() 
-	{
+
+	public int getAmount() {
 		return amount;
 	}
-	public void setAmount(int amount) 
-	{
+
+	public void setAmount(int amount) {
 		this.amount = amount;
 	}
-	public MaskingLibrary.CompiledZapperMask getCompiledMask() 
-	{
+
+	public MaskingLibrary.CompiledZapperMask getCompiledMask() {
 		return compiledMask;
 	}
-	public String getMaskStr()
-	{
+
+	public String getMaskStr() {
 		return maskStr;
 	}
-	public void setMask(String maskStr) 
-	{
-		
+
+	public void setMask(String maskStr) {
+
 		this.maskStr = maskStr.trim();
 		this.compiledMask = null;
-		if(this.maskStr.length()>0)
+		if (this.maskStr.length() > 0)
 			CMLib.masking().maskCompile(this.maskStr);
 	}
-	public CompType getType() 
-	{
+
+	public CompType getType() {
 		return type;
 	}
-	public void setType(CompType type, Object typeObj) 
-	{
+
+	public void setType(CompType type, Object typeObj) {
 		this.type = type;
-		if(typeObj == null)
-		{
-			compTypeStr="";
-			compTypeMatRsc=0;
-		}
-		else
-		if(type == CompType.STRING)
+		if (typeObj == null) {
+			compTypeStr = "";
+			compTypeMatRsc = 0;
+		} else if (type == CompType.STRING)
 			compTypeStr = typeObj.toString();
 		else
-			compTypeMatRsc=CMath.s_long(typeObj.toString());
+			compTypeMatRsc = CMath.s_long(typeObj.toString());
 	}
-	
-	public long getLongType() 
-	{ 
+
+	public long getLongType() {
 		return compTypeMatRsc;
 	}
-	
-	public String getStringType() 
-	{ 
+
+	public String getStringType() {
 		return compTypeStr;
 	}
 }

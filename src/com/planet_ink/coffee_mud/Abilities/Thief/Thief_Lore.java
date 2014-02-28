@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Thief;
+
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.Abilities.interfaces.Ability;
@@ -10,59 +11,91 @@ import com.planet_ink.coffee_mud.core.CMClass;
 import com.planet_ink.coffee_mud.core.interfaces.Physical;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Thief_Lore extends ThiefSkill
-{
-	public String ID() { return "Thief_Lore"; }
-	public String name(){ return "Lore";}
-	protected int canAffectCode(){return 0;}
-	protected int canTargetCode(){return Ability.CAN_ITEMS;}
-	public int abstractQuality(){return Ability.QUALITY_INDIFFERENT;}
-	private static final String[] triggerStrings = {"LORE"};
-	public String[] triggerStrings(){return triggerStrings;}
-	protected boolean disregardsArmorCheck(MOB mob){return true;}
-	public int classificationCode(){return Ability.ACODE_THIEF_SKILL|Ability.DOMAIN_ARCANELORE;}
+public class Thief_Lore extends ThiefSkill {
+	public String ID() {
+		return "Thief_Lore";
+	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Item target=getTarget(mob,mob.location(),givenTarget,commands,Wearable.FILTER_ANY);
-		if(target==null) return false;
+	public String name() {
+		return "Lore";
+	}
 
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	protected int canTargetCode() {
+		return Ability.CAN_ITEMS;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_INDIFFERENT;
+	}
+
+	private static final String[] triggerStrings = { "LORE" };
+
+	public String[] triggerStrings() {
+		return triggerStrings;
+	}
+
+	protected boolean disregardsArmorCheck(MOB mob) {
+		return true;
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_THIEF_SKILL | Ability.DOMAIN_ARCANELORE;
+	}
+
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Item target = getTarget(mob, mob.location(), givenTarget, commands,
+				Wearable.FILTER_ANY);
+		if (target == null)
 			return false;
 
-		int levelDiff=target.phyStats().level()-(mob.phyStats().level()+abilityCode()+(2*super.getXLEVELLevel(mob)));
-		if(levelDiff<0) levelDiff=0;
-		levelDiff*=5;
-		boolean success=proficiencyCheck(mob,-levelDiff,auto);
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+			return false;
 
-		if(success)
-		{
-			CMMsg msg=CMClass.getMsg(mob,target,this,CMMsg.MSG_DELICATE_HANDS_ACT,auto?"":"<S-NAME> stud(ys) <T-NAMESELF> and consider(s) for a moment.");
-			if(mob.location().okMessage(mob,msg))
-			{
-				mob.location().send(mob,msg);
-				String identity=target.secretIdentity();
+		int levelDiff = target.phyStats().level()
+				- (mob.phyStats().level() + abilityCode() + (2 * super
+						.getXLEVELLevel(mob)));
+		if (levelDiff < 0)
+			levelDiff = 0;
+		levelDiff *= 5;
+		boolean success = proficiencyCheck(mob, -levelDiff, auto);
+
+		if (success) {
+			CMMsg msg = CMClass
+					.getMsg(mob,
+							target,
+							this,
+							CMMsg.MSG_DELICATE_HANDS_ACT,
+							auto ? ""
+									: "<S-NAME> stud(ys) <T-NAMESELF> and consider(s) for a moment.");
+			if (mob.location().okMessage(mob, msg)) {
+				mob.location().send(mob, msg);
+				String identity = target.secretIdentity();
 				mob.tell(identity);
 
 			}
-		}
-		else
-			beneficialVisualFizzle(mob,target,"<S-NAME> stud(ys) <T-NAMESELF>, but can't remember a thing.");
+		} else
+			beneficialVisualFizzle(mob, target,
+					"<S-NAME> stud(ys) <T-NAMESELF>, but can't remember a thing.");
 		return success;
 	}
 }

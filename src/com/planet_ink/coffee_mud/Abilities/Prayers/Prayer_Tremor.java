@@ -1,4 +1,5 @@
 package com.planet_ink.coffee_mud.Abilities.Prayers;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -15,97 +16,119 @@ import com.planet_ink.coffee_mud.core.interfaces.Physical;
 import com.planet_ink.coffee_mud.core.interfaces.Tickable;
 
 /* 
-   Copyright 2000-2014 Bo Zimmerman
+ Copyright 2000-2014 Bo Zimmerman
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @SuppressWarnings("rawtypes")
-public class Prayer_Tremor extends Prayer
-{
-	public String ID() { return "Prayer_Tremor"; }
-	public String name(){ return "Tremor";}
-	public String displayText(){return "(Tremor)";}
-	public int classificationCode(){return Ability.ACODE_PRAYER|Ability.DOMAIN_CREATION;}
-	public int abstractQuality(){return Ability.QUALITY_MALICIOUS;}
-	public int maxRange(){return adjustedMaxInvokerRange(3);}
-	protected int canAffectCode(){return 0;}
-	protected int canTargetCode(){return 0;}
-	public long flags(){return Ability.FLAG_HOLY|Ability.FLAG_UNHOLY;}
-	protected boolean oncePerRd=false;
+public class Prayer_Tremor extends Prayer {
+	public String ID() {
+		return "Prayer_Tremor";
+	}
 
-	public boolean tick(Tickable ticking, int tickID)
-	{ oncePerRd=false; return super.tick(ticking,tickID);}
+	public String name() {
+		return "Tremor";
+	}
 
-	public void affectPhyStats(Physical affected, PhyStats affectableStats)
-	{
-		super.affectPhyStats(affected,affectableStats);
+	public String displayText() {
+		return "(Tremor)";
+	}
+
+	public int classificationCode() {
+		return Ability.ACODE_PRAYER | Ability.DOMAIN_CREATION;
+	}
+
+	public int abstractQuality() {
+		return Ability.QUALITY_MALICIOUS;
+	}
+
+	public int maxRange() {
+		return adjustedMaxInvokerRange(3);
+	}
+
+	protected int canAffectCode() {
+		return 0;
+	}
+
+	protected int canTargetCode() {
+		return 0;
+	}
+
+	public long flags() {
+		return Ability.FLAG_HOLY | Ability.FLAG_UNHOLY;
+	}
+
+	protected boolean oncePerRd = false;
+
+	public boolean tick(Tickable ticking, int tickID) {
+		oncePerRd = false;
+		return super.tick(ticking, tickID);
+	}
+
+	public void affectPhyStats(Physical affected, PhyStats affectableStats) {
+		super.affectPhyStats(affected, affectableStats);
 		// when this spell is on a MOBs Affected list,
 		// it should consistantly put the mob into
 		// a sleeping state, so that nothing they do
 		// can get them out of it.
-		affectableStats.setDisposition(affectableStats.disposition()|PhyStats.IS_SITTING);
+		affectableStats.setDisposition(affectableStats.disposition()
+				| PhyStats.IS_SITTING);
 	}
 
-
-	public boolean okMessage(final Environmental myHost, final CMMsg msg)
-	{
+	public boolean okMessage(final Environmental myHost, final CMMsg msg) {
 		// undo the affects of this spell
-		if(!(affected instanceof MOB))
-			return super.okMessage(myHost,msg);
-		MOB mob=(MOB)affected;
-		if((msg.amISource(mob))
-		&&(msg.sourceMinor()==CMMsg.TYP_STAND)
-		&&(mob.location()!=null))
-		{
-			if(!oncePerRd)
-			{
-				oncePerRd=true;
-				mob.location().show(mob,null,CMMsg.MASK_ALWAYS|CMMsg.MSG_NOISYMOVEMENT,"<S-NAME> attempt(s) to stand up, and falls back down!");
+		if (!(affected instanceof MOB))
+			return super.okMessage(myHost, msg);
+		MOB mob = (MOB) affected;
+		if ((msg.amISource(mob)) && (msg.sourceMinor() == CMMsg.TYP_STAND)
+				&& (mob.location() != null)) {
+			if (!oncePerRd) {
+				oncePerRd = true;
+				mob.location()
+						.show(mob, null,
+								CMMsg.MASK_ALWAYS | CMMsg.MSG_NOISYMOVEMENT,
+								"<S-NAME> attempt(s) to stand up, and falls back down!");
 			}
 			return false;
 		}
-		return super.okMessage(myHost,msg);
+		return super.okMessage(myHost, msg);
 	}
 
-	public void unInvoke()
-	{
+	public void unInvoke() {
 		// undo the affects of this spell
-		if(!(affected instanceof MOB))
+		if (!(affected instanceof MOB))
 			return;
-		MOB mob=(MOB)affected;
+		MOB mob = (MOB) affected;
 
 		super.unInvoke();
-		if(canBeUninvoked())
-		{
-			if((mob.location()!=null)&&(!mob.amDead()))
-			{
-				CMMsg msg=CMClass.getMsg(mob,null,CMMsg.MSG_NOISYMOVEMENT,"<S-NAME> regain(s) <S-HIS-HER> feet as the ground stops shaking.");
-				if(mob.location().okMessage(mob,msg))
-				{
-					mob.location().send(mob,msg);
-					CMLib.commands().postStand(mob,true);
+		if (canBeUninvoked()) {
+			if ((mob.location() != null) && (!mob.amDead())) {
+				CMMsg msg = CMClass
+						.getMsg(mob, null, CMMsg.MSG_NOISYMOVEMENT,
+								"<S-NAME> regain(s) <S-HIS-HER> feet as the ground stops shaking.");
+				if (mob.location().okMessage(mob, msg)) {
+					mob.location().send(mob, msg);
+					CMLib.commands().postStand(mob, true);
 				}
-			}
-			else
+			} else
 				mob.tell("The movement under your feet stops.");
 		}
 	}
 
-	public boolean invoke(MOB mob, Vector commands, Physical givenTarget, boolean auto, int asLevel)
-	{
-		Set<MOB> h=properTargets(mob,givenTarget,auto);
-		if(h==null)
-		{
+	public boolean invoke(MOB mob, Vector commands, Physical givenTarget,
+			boolean auto, int asLevel) {
+		Set<MOB> h = properTargets(mob, givenTarget, auto);
+		if (h == null) {
 			mob.tell("There doesn't appear to be anyone here worth shaking up.");
 			return false;
 		}
@@ -114,50 +137,64 @@ public class Prayer_Tremor extends Prayer
 		// parameters the invoker, and the REMAINING
 		// command line parameters, divided into words,
 		// and added as String objects to a vector.
-		if(!super.invoke(mob,commands,givenTarget,auto,asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
 			return false;
 
-		boolean success=proficiencyCheck(mob,0,auto);
+		boolean success = proficiencyCheck(mob, 0, auto);
 
-		if(success)
-		{
+		if (success) {
 
-			if(mob.location().show(mob,null,this,verbalCastCode(mob,null,auto),(auto?"":"^S<S-NAME> "+prayWord(mob)+" thunderously.^?")+CMLib.protocol().msp("earthquake.wav",40)))
-			for(Iterator f=h.iterator();f.hasNext();)
-			{
-				MOB target=(MOB)f.next();
+			if (mob.location().show(
+					mob,
+					null,
+					this,
+					verbalCastCode(mob, null, auto),
+					(auto ? "" : "^S<S-NAME> " + prayWord(mob)
+							+ " thunderously.^?")
+							+ CMLib.protocol().msp("earthquake.wav", 40)))
+				for (Iterator f = h.iterator(); f.hasNext();) {
+					MOB target = (MOB) f.next();
 
-				// it worked, so build a copy of this ability,
-				// and add it to the affects list of the
-				// affected MOB.  Then tell everyone else
-				// what happened.
-				CMMsg msg=CMClass.getMsg(mob,target,this,verbalCastCode(mob,target,auto),null);
-				if(CMLib.flags().isInFlight(target))
-					mob.location().show(target,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> seem(s) unaffected.");
-				else
-				if((mob.location().okMessage(mob,msg))&&(target.fetchEffect(this.ID())==null))
-				{
-					mob.location().send(mob,msg);
-					if(msg.value()<=0)
-					{
-						if(target.charStats().getBodyPart(Race.BODY_LEG)>0)
-						{
-							success=maliciousAffect(mob,target,asLevel,2,-1);
-							if(success)
-							{
-								if(target.location()==mob.location())
-									CMLib.combat().postDamage(mob,target,this,10,CMMsg.MASK_ALWAYS|CMMsg.TYP_CAST_SPELL,-1,"The ground underneath <T-NAME> shakes as <T-NAME> fall(s) to the ground!!");
-							}
+					// it worked, so build a copy of this ability,
+					// and add it to the affects list of the
+					// affected MOB. Then tell everyone else
+					// what happened.
+					CMMsg msg = CMClass.getMsg(mob, target, this,
+							verbalCastCode(mob, target, auto), null);
+					if (CMLib.flags().isInFlight(target))
+						mob.location().show(target, null, CMMsg.MSG_OK_VISUAL,
+								"<S-NAME> seem(s) unaffected.");
+					else if ((mob.location().okMessage(mob, msg))
+							&& (target.fetchEffect(this.ID()) == null)) {
+						mob.location().send(mob, msg);
+						if (msg.value() <= 0) {
+							if (target.charStats().getBodyPart(Race.BODY_LEG) > 0) {
+								success = maliciousAffect(mob, target, asLevel,
+										2, -1);
+								if (success) {
+									if (target.location() == mob.location())
+										CMLib.combat()
+												.postDamage(
+														mob,
+														target,
+														this,
+														10,
+														CMMsg.MASK_ALWAYS
+																| CMMsg.TYP_CAST_SPELL,
+														-1,
+														"The ground underneath <T-NAME> shakes as <T-NAME> fall(s) to the ground!!");
+								}
+							} else
+								mob.location()
+										.show(target, null,
+												CMMsg.MSG_OK_VISUAL,
+												"<S-NAME> seem(s) unaffected by the quake.");
 						}
-						else
-							mob.location().show(target,null,CMMsg.MSG_OK_VISUAL,"<S-NAME> seem(s) unaffected by the quake.");
 					}
 				}
-			}
-		}
-		else
-			return maliciousFizzle(mob,null,"<S-NAME> "+prayWord(mob)+" thunderously, but nothing happens.");
-
+		} else
+			return maliciousFizzle(mob, null, "<S-NAME> " + prayWord(mob)
+					+ " thunderously, but nothing happens.");
 
 		// return whether it worked
 		return success;
