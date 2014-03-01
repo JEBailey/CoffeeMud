@@ -80,13 +80,7 @@ public class StdAbility implements Ability {
 
 	public StdAbility() {
 		super();
-		// CMClass.bumpCounter(this,CMClass.CMObjectType.ABILITY);//removed for
-		// mem & perf
 	}
-
-	// protected void finalize(){
-	// CMClass.unbumpCounter(this,CMClass.CMObjectType.ABILITY); }//removed for
-	// mem & perf
 
 	public CMObject newInstance() {
 		try {

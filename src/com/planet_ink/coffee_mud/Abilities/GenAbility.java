@@ -93,17 +93,17 @@ public class GenAbility extends StdAbility {
 		O[V_NAME] = "an ability";
 		O[V_DISP] = "(An Affect)";
 		O[V_TRIG] = new String[] { "CAST", "CA", "C" };
-		O[V_MAXR] = Integer.valueOf(0);
-		O[V_MINR] = Integer.valueOf(0);
+		O[V_MAXR] = 0;
+		O[V_MINR] = 0;
 		O[V_AUTO] = Boolean.FALSE;
-		O[V_FLAG] = Integer.valueOf(0);
-		O[V_CLAS] = Integer.valueOf(Ability.ACODE_SPELL
-				| Ability.DOMAIN_ABJURATION);
-		O[V_OMAN] = Integer.valueOf(-1);
-		O[V_USAG] = Integer.valueOf(Ability.USAGE_MANA);
-		O[V_CAFF] = Integer.valueOf(Ability.CAN_MOBS);
-		O[V_CTAR] = Integer.valueOf(Ability.CAN_MOBS);
-		O[V_QUAL] = Integer.valueOf(Ability.QUALITY_BENEFICIAL_OTHERS);
+		O[V_FLAG] = 0;
+		O[V_CLAS] = Ability.ACODE_SPELL
+				| Ability.DOMAIN_ABJURATION;
+		O[V_OMAN] = -1;
+		O[V_USAG] = Ability.USAGE_MANA;
+		O[V_CAFF] = Ability.CAN_MOBS;
+		O[V_CTAR] = Ability.CAN_MOBS;
+		O[V_QUAL] = Ability.QUALITY_BENEFICIAL_OTHERS;
 		O[V_HERE] = CMClass.getAbility("Prop_HereAdjuster");
 		O[V_SCRP] = "";
 		O[V_CMSK] = "";
@@ -112,12 +112,12 @@ public class GenAbility extends StdAbility {
 		O[V_ACST] = "An amazing thing happens to <T-NAME>!";
 		O[V_CAST] = "<S-NAME> uses an ability against <T-NAME>";
 		O[V_PCST] = "<T-NAME> is <DAMAGE> by an ability from <S-NAME>!";
-		O[V_ATT2] = Integer.valueOf(0);
+		O[V_ATT2] = 0;
 		O[V_PAFF] = "";
 		O[V_PABL] = "";
 		O[V_PDMG] = "1";
 		O[V_HELP] = "<ABILITY>This ability is not yet documented.";
-		O[V_TKBC] = Integer.valueOf(0);
+		O[V_TKBC] = 0;
 		return O;
 	}
 
@@ -398,8 +398,9 @@ public class GenAbility extends StdAbility {
 							+ " due to <S-HIS-HER> armor!");
 			return false;
 		}
-		if (!super.invoke(mob, commands, givenTarget, auto, asLevel))
+		if (!super.invoke(mob, commands, givenTarget, auto, asLevel)){
 			return false;
+		}
 
 		boolean success = proficiencyCheck(mob, 0, auto);
 
@@ -837,41 +838,41 @@ public class GenAbility extends StdAbility {
 			break;
 		case 5:
 			SV(ID, V_MAXR,
-					Integer.valueOf(convert(Ability.RANGE_CHOICES, val, false)));
+					convert(Ability.RANGE_CHOICES, val, false));
 			break;
 		case 6:
 			SV(ID, V_MINR,
-					Integer.valueOf(convert(Ability.RANGE_CHOICES, val, false)));
+					convert(Ability.RANGE_CHOICES, val, false));
 			break;
 		case 7:
 			SV(ID, V_AUTO, Boolean.valueOf(CMath.s_bool(val)));
 			break;
 		case 8:
 			SV(ID, V_FLAG,
-					Integer.valueOf(convert(Ability.FLAG_DESCS, val, true)));
+					convert(Ability.FLAG_DESCS, val, true));
 			break;
 		case 9:
-			SV(ID, V_CLAS, Integer.valueOf(convertClassAndDomain(val)));
+			SV(ID, V_CLAS, convertClassAndDomain(val));
 			break;
 		case 10:
-			SV(ID, V_OMAN, Integer.valueOf(CMath.s_parseIntExpression(val)));
+			SV(ID, V_OMAN, CMath.s_parseIntExpression(val));
 			CMLib.ableMapper().getHardOverrideManaCache().remove(ID());
 			break;
 		case 11:
 			SV(ID, V_USAG,
-					Integer.valueOf(convert(Ability.USAGE_DESCS, val, true)));
+					convert(Ability.USAGE_DESCS, val, true));
 			break;
 		case 12:
 			SV(ID, V_CAFF,
-					Integer.valueOf(convert(Ability.CAN_DESCS, val, true)));
+					convert(Ability.CAN_DESCS, val, true));
 			break;
 		case 13:
 			SV(ID, V_CTAR,
-					Integer.valueOf(convert(Ability.CAN_DESCS, val, true)));
+					convert(Ability.CAN_DESCS, val, true));
 			break;
 		case 14:
 			SV(ID, V_QUAL,
-					Integer.valueOf(convert(Ability.QUALITY_DESCS, val, false)));
+					convert(Ability.QUALITY_DESCS, val, false));
 			break;
 		case 15:
 			((Ability) V(ID, V_HERE)).setMiscText(val);
@@ -899,7 +900,7 @@ public class GenAbility extends StdAbility {
 			break;
 		case 23:
 			SV(ID, V_ATT2,
-					Integer.valueOf(convert(CMMsg.TYPE_DESCS, val, false)));
+					convert(CMMsg.TYPE_DESCS, val, false));
 			break;
 		case 24:
 			SV(ID, V_PAFF, val);
@@ -914,7 +915,7 @@ public class GenAbility extends StdAbility {
 			SV(ID, V_HELP, val);
 			break;
 		case 28:
-			SV(ID, V_TKBC, Integer.valueOf(CMath.s_int(val)));
+			SV(ID, V_TKBC, CMath.s_int(val));
 			break;
 		default:
 			if (code.equalsIgnoreCase("allxml")
