@@ -1,5 +1,6 @@
 package com.planet_ink.coffee_mud.WebMacros;
 
+import java.util.List;
 import java.util.Vector;
 
 import com.planet_ink.coffee_mud.core.Log;
@@ -29,23 +30,21 @@ public class AddFile extends StdWebMacro {
 
 	public String runMacro(HTTPRequest httpReq, String parm) {
 		java.util.Map<String, String> parms = parseParms(parm);
-		if ((parms == null) || (parms.size() == 0))
-			return "";
 		StringBuffer buf = new StringBuffer("");
+		
 		boolean webify = false;
-		Vector V = new Vector();
-		V.addAll(parms.values());
-		for (int v = V.size() - 1; v >= 0; v--) {
-			String file = (String) V.elementAt(v);
+
+		for (String file:parms.values()) {
 			if (file.length() > 0) {
 				try {
-					if (file.equalsIgnoreCase("webify"))
+					if (file.equalsIgnoreCase("webify")){
 						webify = true;
-					else if (webify)
+					} else if (webify){
 						buf.append(webify(new StringBuffer(new String(
 								getHTTPFileData(httpReq, file)))));
-					else
+					}else {
 						buf.append(new String(getHTTPFileData(httpReq, file)));
+					}
 				} catch (HTTPException e) {
 					Log.warnOut("Failed " + name() + " " + file);
 				}

@@ -87,14 +87,17 @@ public class MUDGrinder extends StdWebMacro {
 
 		if (parms != null)
 			if (parms.containsKey("AREAMAP")) {
-				String AREA = httpReq.getUrlParameter("AREA");
-				if (AREA == null)
+				String area = httpReq.getUrlParameter("AREA");
+				if (area == null){
 					return "";
-				if (AREA.length() == 0)
+				}
+				if (area.length() == 0){
 					return "";
-				Area A = CMLib.map().getArea(AREA);
-				if (A == null)
+				}
+				Area A = CMLib.map().getArea(area);
+				if (A == null){
 					return "";
+				}
 				if ((A.properSize() == 0) && (A.getRandomProperRoom() == null))
 					GrinderRooms.createLonelyRoom(A, null, 0, false);
 				GrinderFlatMap map = null;
@@ -115,19 +118,19 @@ public class MUDGrinder extends StdWebMacro {
 						return "";
 					if (AREA.length() == 0)
 						return "";
-					Area A = CMLib.map().getArea(AREA);
-					if (A == null)
+					Area area = CMLib.map().getArea(AREA);
+					if (area == null)
 						return "";
-					if ((A.properSize() == 0)
-							&& (A.getRandomProperRoom() == null))
-						GrinderRooms.createLonelyRoom(A, null, 0, false);
+					if ((area.properSize() == 0)
+							&& (area.getRandomProperRoom() == null))
+						GrinderRooms.createLonelyRoom(area, null, 0, false);
 					GrinderFlatMap map = null;
 					if ((httpReq.getUrlParameter("MAPSTYLE") != null)
 							&& (httpReq.getUrlParameter("MAPSTYLE").length() > 0)
-							&& (!(A instanceof GridZones)))
-						map = new GrinderMap(A, null);
+							&& (!(area instanceof GridZones)))
+						map = new GrinderMap(area, null);
 					else
-						map = new GrinderFlatMap(A, null);
+						map = new GrinderFlatMap(area, null);
 					map.rePlaceRooms();
 					String rS = httpReq.getUrlParameter("ROOMSIZE");
 					int roomSize = (rS != null) ? CMath.s_int(rS) : 4;

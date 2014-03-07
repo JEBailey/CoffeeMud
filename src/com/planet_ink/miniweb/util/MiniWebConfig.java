@@ -1099,9 +1099,10 @@ public class MiniWebConfig implements Cloneable {
 	 */
 	public void load(Properties props) {
 		miscFlags.clear();
-		for (Object propName : props.keySet())
+		for (Object propName : props.keySet()){
 			miscFlags.put(propName.toString().toUpperCase(),
 					getString(props, propName.toString(), ""));
+		}
 		sslKeystorePath = getString(props, "SSLKEYSTOREPATH", sslKeystorePath);
 		sslKeystorePassword = getString(props, "SSLKEYSTOREPASSWORD",
 				sslKeystorePassword);

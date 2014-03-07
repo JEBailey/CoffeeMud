@@ -647,10 +647,11 @@ public class StdWebMacro implements WebMacro {
 	}
 
 	protected java.util.Map<String, String> parseParms(String parm) {
-		final Hashtable<String, String> requestParms = new Hashtable<String, String>();
+		final Map<String, String> requestParms = new Hashtable<String, String>();
 		final PairSVector<String, String> requestParsed = parseOrderedParms(parm);
-		for (final Pair<String, String> P : requestParsed)
+		for (final Pair<String, String> P : requestParsed){
 			requestParms.put(P.first, P.second);
+		}
 		return requestParms;
 	}
 }
