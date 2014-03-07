@@ -1,0 +1,76 @@
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">CoffeeMud</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown">Builders Guides<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a target=OtherBrowser href="/pub/guides/ArchonGuide.html">Archon's
+								Guide</a></li>
+						<li><A target=OtherBrowser
+							href="/pub/guides/GameBuildersGuide.html">Game Builders Guide</A></li>
+						<li><A target=OtherBrowser href="/pub/guides/Scriptable.html">Scripting
+								Guide</A></li>
+						<li><A target=OtherBrowser href="/pub/guides/MUDChat.html">MUDChat
+								Guide</A></li>
+						<li><A target=OtherBrowser href="/pub/guides/MUDGrinder.html">MUDGrinder
+								Guide</A></li>
+					</ul></li>
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown">Builders Lists<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a target=OtherBrowser href="/ahelps.cmvp">Archon Help
+								Topics</A></li>
+						<li><A target=OtherBrowser href="abilities.cmvp">Skills
+								List</a></li>
+						<li><A target=OtherBrowser href="behaviors.cmvp">Behaviors
+								List</a></li>
+						<li><A target=OtherBrowser href="affects.cmvp">Affects
+								List</a></li>
+					</ul></li>
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown">Other Guides<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><A target=OtherBrowser
+							href="/pub/guides/InstallationGuide.html">Installation Guide</A></li>
+						<li><A target=OtherBrowser href="/pub/guides/WebServer.html">Web
+								Server guide</A></li>
+						<li><A target=OtherBrowser href="/pub/guides/SMTPServer.html">SMTP
+								Server guide</A></li>
+						<li class="divider"></li>
+						<li><A target=OtherBrowser href="/pub/guides/Programming.html">Programmers
+								Guide</A></li>
+						<li class="divider"></li>
+						<li><A target=OtherBrowser href="/pub/guides/BuildersFAQ.html">Builders
+								FAQ</A></li>
+					</ul></li>
+			</ul>
+			@if?Authenticate@
+			<ul class="nav navbar-nav pull-right">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> Welcome @username@<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="/user/preferences"><i class="icon-cog"></i>
+								Preferences</a></li>
+						<li><a href="/help/support"><i class="icon-envelope"></i>
+								Contact Support</a></li>
+						<li class="divider"></li>
+						<li><a href="/"><span class="glyphicon glyphicon-off"></span>
+								Logout</a></li>
+					</ul></li>
+			</ul>
+			@endif@
+		</div>
+
+		<!--/.nav-collapse -->
+	</div>
+</div>

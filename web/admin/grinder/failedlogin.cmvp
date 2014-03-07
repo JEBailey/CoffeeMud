@@ -1,25 +1,36 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-<html>
-<head>
-	<!-- tell spiders to sod off -->
-	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
-	<link rel="STYLESHEET" TYPE="TEXT/CSS" HREF="/grinder/grinder.css">
- 	<link rel="grinder icon" href="/images/grinder.ico" >
-	<title>CoffeeMud MUDGrinder</title>
-</head>
-
+@AddRequestParameter?title=@@MUDSERVERVERSION@@, @@WEBSERVERVERSION@@ '@@WEBSERVERNAME@@' @
+@AddFile?/common/header.cmvp@
 <body>
+@AddFile?/common/menu.cmvp@
 
-<CENTER>
-<IMG SRC="/grinder/images/grinder.gif" WIDTH=78 HEIGHT=122 ALT="" BORDER="0"><br>
-<h3>MUDGrinder</H3>
-<P>
-<FORM  ACCEPT-CHARSET="UTF-8" NAME=NEWAREA METHOD=POST ACTION="/index.cmvp" TARGET=_top>
-<INPUT TYPE=HIDDEN NAME=AUTH VALUE="@Authenticate?AUTH@">
-<B><FONT COLOR=RED>Your login or password was not matched in the 
-CoffeeMud database.  Please go back and try again.</FONT><P>
-<INPUT TYPE=SUBMIT NAME=CONTINUE VALUE="Continue">
-</FORM>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<img src="/grinder/images/grinder.gif" WIDTH=78 HEIGHT=122 ALT="" hspace="8" style="float:left"
+							BORDER="0"><br>
+						<h3>MUDGrinder</H3>
+						<P>
+						<form ACCEPT-CHARSET="UTF-8" NAME=NEWAREA METHOD=POST ACTION="/"
+							target="_top">
+							<INPUT TYPE=HIDDEN NAME=AUTH VALUE="@Authenticate?AUTH@">
+							<div class="alert alert-danger">
+								Your login or password was not matched in the CoffeeMud
+								database. <br/><input class="btn btn-link alert-link" type="submit"
+									name="continue" VALUE="Please go back and try again">
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+@AddFile?/common/footer.cmvp@
 </body>
-</HTML>
+</html>
+
+
+
+
+

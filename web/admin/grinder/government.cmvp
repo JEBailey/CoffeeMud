@@ -1,72 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 @if?!Authenticate@ @AddFile?/grinder/failedlogin.cmvp@ @else@
 @if?!CheckAuthCode?AUTH_CMDCLANS=true@ @AddFile?/grinder/nopriv.cmvp@ @else@
-<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-<html>
+@AddFile?/common/header.cmvp@
 <head>
  	<link rel="grinder icon" href="/images/grinder.ico" >
 	<title>Clan Information</title>
 	<!--@ClanGovernmentData?NAME@-->
-	<script language=JavaScript>
-	<!--
-		function openUp2(named)
-		{
-			var strFeatures="top=200,left=50,resizeable=no,scrollbars=yes,height=400,width=650,alwaysRaised=yes,dependent=yes";
-			w=window.open("/property.cmvp?ABILITY="+named,
-			            "Ability",strFeatures, false);
-		}
-		function Delete()
-		{
-			if(confirm('Delete this government?! Confirm!'))
-			{
-				if(confirm('Press OK to Delete this government!'))
-				{
-					document.RESOURCES.action='governmentdo.cmvp';
-					document.RESOURCES.FUNCTION.value='DELCLANGOVERNMENT';
-					document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
-					document.RESOURCES.submit();
-				}
-			}
-		}
-		function EditDone()
-		{
-			if(confirm('Submit your changes to this government?'))
-			{
-				document.RESOURCES.action='governmentdo.cmvp';
-				document.RESOURCES.FUNCTION.value='EDITCLANGOVERNMENT';
-				document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
-				document.RESOURCES.submit();
-			}
-		}
-		function ReShow()
-		{
-			document.RESOURCES.FUNCTION.value='';
-			document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
-			document.RESOURCES.action='/grinder/government.cmvp';
-			document.RESOURCES.submit();
-		}
-        function EditAffect(ME)
-        {
-            if(ME.selectedIndex==0)
-                ReShow();
-        }
-        function AddAffect(ME)
-        {
-            if(ME.selectedIndex>0)
-                ReShow();
-        }
-        function Cancel()
-        {
-        	window.close();
-        }
-		function OpenUp(file,named)
-		{
-			var strFeatures="top=200,left=50,scrollbars=yes,resizeable=no,height=400,width=650,alwaysRaised=yes,dependent=yes";
-			w=window.open("/"+file+"?HELPTOPIC="+named,
-			            "Help",strFeatures, false);
-		}
-	//-->
-	</script>
+
 </head>
 <body BGCOLOR=BLACK>
 <FORM  ACCEPT-CHARSET="UTF-8" NAME=RESOURCES TARGET=_top METHOD=POST ACTION="government.cmvp">
@@ -231,6 +170,66 @@
 </TR>
 </TABLE>
 </FORM>
+	<script language=JavaScript>
+	<!--
+		function openUp2(named)
+		{
+			var strFeatures="top=200,left=50,resizeable=no,scrollbars=yes,height=400,width=650,alwaysRaised=yes,dependent=yes";
+			w=window.open("/property.cmvp?ABILITY="+named,
+			            "Ability",strFeatures, false);
+		}
+		function Delete()
+		{
+			if(confirm('Delete this government?! Confirm!'))
+			{
+				if(confirm('Press OK to Delete this government!'))
+				{
+					document.RESOURCES.action='governmentdo.cmvp';
+					document.RESOURCES.FUNCTION.value='DELCLANGOVERNMENT';
+					document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
+					document.RESOURCES.submit();
+				}
+			}
+		}
+		function EditDone()
+		{
+			if(confirm('Submit your changes to this government?'))
+			{
+				document.RESOURCES.action='governmentdo.cmvp';
+				document.RESOURCES.FUNCTION.value='EDITCLANGOVERNMENT';
+				document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
+				document.RESOURCES.submit();
+			}
+		}
+		function ReShow()
+		{
+			document.RESOURCES.FUNCTION.value='';
+			document.RESOURCES.GOVERNMENT.value='@ClanGovernmentID@';
+			document.RESOURCES.action='/grinder/government.cmvp';
+			document.RESOURCES.submit();
+		}
+        function EditAffect(ME)
+        {
+            if(ME.selectedIndex==0)
+                ReShow();
+        }
+        function AddAffect(ME)
+        {
+            if(ME.selectedIndex>0)
+                ReShow();
+        }
+        function Cancel()
+        {
+        	window.close();
+        }
+		function OpenUp(file,named)
+		{
+			var strFeatures="top=200,left=50,scrollbars=yes,resizeable=no,height=400,width=650,alwaysRaised=yes,dependent=yes";
+			w=window.open("/"+file+"?HELPTOPIC="+named,
+			            "Help",strFeatures, false);
+		}
+	//-->
+	</script>
 </BODY>
 </HTML>
 @endif@
